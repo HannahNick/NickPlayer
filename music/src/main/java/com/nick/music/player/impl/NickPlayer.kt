@@ -1,6 +1,7 @@
 package com.nick.music.player.impl
 
 import android.media.MediaPlayer
+import com.blankj.utilcode.util.LogUtils
 import com.nick.music.entity.MusicVo
 import com.nick.music.player.PlayerControl
 
@@ -8,10 +9,22 @@ class NickPlayer: PlayerControl{
     private val mediaPlayer = MediaPlayer()
     private val musicData = ArrayList<MusicVo>()
     private var index: Int = -1
+    private var initSourceFlag = false
+
+
 
     override fun play() {
-        mediaPlayer.prepare()
-        mediaPlayer.start()
+        if (initSourceFlag && !mediaPlayer.isPlaying){
+            mediaPlayer.start()
+        }else{
+            mediaPlayer.setDataSource(musicData[0].url)
+            mediaPlayer.prepareAsync()
+            mediaPlayer.setOnPreparedListener {
+                LogUtils.i("播放器准备完成，开始播放")
+                mediaPlayer.start()
+            }
+        }
+        initSourceFlag = true
     }
 
     override fun pause() {
@@ -47,6 +60,7 @@ class NickPlayer: PlayerControl{
         mediaPlayer.setDataSource(musicVo.url)
         mediaPlayer.prepare()
         mediaPlayer.start()
+        initSourceFlag = true
     }
 
     override fun replay() {

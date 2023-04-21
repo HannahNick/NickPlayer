@@ -5,11 +5,11 @@ plugins {
 
 android {
     namespace 'com.nick.music'
-    compileSdk 32
+    compileSdk sdk_version.compileSdkVersion
 
     defaultConfig {
-        minSdk 21
-        targetSdk 32
+        minSdk sdk_version.minSdkVersion
+        targetSdk sdk_version.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
