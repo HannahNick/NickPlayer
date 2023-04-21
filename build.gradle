@@ -1,0 +1,50 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply from: file('config.gradle')
+
+buildscript {
+    ext {
+        kotlin_version = "1.7.20"
+        objectboxVersion = "3.5.1"
+        /*
+        仓库配置
+        */
+        repo_url = 'http://4dcloud.f3322.net:8081/repository/4cloud-release/'
+        repo_username = 'admin'
+        repo_password = 'qwert26990000'
+        artifact_group = 'com.xyz.module'
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath "io.objectbox:objectbox-gradle-plugin:$objectboxVersion"
+    }
+    repositories {
+        mavenCentral()
+        maven {
+            url "http://4dcloud.f3322.net:8081/repository/4cloud/"
+            allowInsecureProtocol true
+        }
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "http://4dcloud.f3322.net:8081/repository/4cloud/"
+            allowInsecureProtocol true
+        }
+        maven {
+            url "https://jitpack.io"
+        }
+    }
+}
+
+
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
