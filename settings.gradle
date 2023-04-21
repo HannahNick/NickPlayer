@@ -1,3 +1,4 @@
 rootProject.name = "NickPlayer"
 include ':app'
 include ':music'
+include ':base'
