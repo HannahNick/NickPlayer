@@ -6,15 +6,21 @@ import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
+import com.nick.music.kt.play
 import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
+import java.util.Timer
+import java.util.TimerTask
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class NickPlayer: PlayerControl{
     private val mMediaPlayer = MediaPlayer()
     private val mMusicData = ArrayList<MusicVo>()
+    private val mTimer = Timer()
     private var mIndex: Int = -1
+    private var mDuration: Int = -1
+    private var mCurrentPosition: Int = -1
     private var mPlayMode = PlayMode.PLAY_CYCLE
     private var mPlayStatus = PlayStatus.PAUSE
     private var mInitSourceFlag = false
@@ -40,10 +46,17 @@ class NickPlayer: PlayerControl{
                 val timestamp = it.timestamp
                 LogUtils.i("准备播放回调 anchorMediaTime:${timestamp?.anchorMediaTimeUs},nanoTime:${timestamp?.anchorSystemNanoTime},mediaClockRate:${timestamp?.mediaClockRate}")
                 it.start()
+                mDuration = it.duration
                 mPlayStatus = PlayStatus.PLAY
             }
         }
-
+        val task = object : TimerTask(){
+            override fun run() {
+                mCurrentPosition = mMediaPlayer.currentPosition
+                LogUtils.i("position:$mCurrentPosition")
+            }
+        }
+        mTimer.schedule(task,500)
     }
 
 
@@ -78,10 +91,7 @@ class NickPlayer: PlayerControl{
         }
         mIndex++
         val musicVo = mMusicData[mIndex]
-        mMediaPlayer.stop()
-        mMediaPlayer.seekTo(0)
-        mMediaPlayer.setDataSource(musicVo.url)
-        mMediaPlayer.prepareAsync()
+        mMediaPlayer.play(musicVo.url)
     }
 
     override fun last() {
@@ -91,17 +101,12 @@ class NickPlayer: PlayerControl{
         }
         mIndex--
         val musicVo = mMusicData[mIndex]
-        mMediaPlayer.stop()
-        mMediaPlayer.seekTo(0)
-        mMediaPlayer.setDataSource(musicVo.url)
-        mMediaPlayer.prepareAsync()
+        mMediaPlayer.play(musicVo.url)
     }
 
     override fun playSource(musicVo: MusicVo) {
-        mMusicData.add(0,musicVo)
-        mMediaPlayer.setDataSource(musicVo.url)
-        mMediaPlayer.prepare()
-        mMediaPlayer.start()
+        mMusicData.add(mIndex,musicVo)
+        mMediaPlayer.play(musicVo.url)
         mInitSourceFlag = true
     }
 
