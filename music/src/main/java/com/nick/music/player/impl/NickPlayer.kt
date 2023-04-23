@@ -1,79 +1,130 @@
 package com.nick.music.player.impl
 
 import android.media.MediaPlayer
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.entity.MusicVo
+import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayerControl
+import com.nick.music.server.PlayMode
+import com.nick.music.server.PlayStatus
 
+@RequiresApi(Build.VERSION_CODES.Q)
 class NickPlayer: PlayerControl{
-    private val mediaPlayer = MediaPlayer()
-    private val musicData = ArrayList<MusicVo>()
-    private var index: Int = -1
-    private var initSourceFlag = false
+    private val mMediaPlayer = MediaPlayer()
+    private val mMusicData = ArrayList<MusicVo>()
+    private var mIndex: Int = -1
+    private var mPlayMode = PlayMode.PLAY_CYCLE
+    private var mPlayStatus = PlayStatus.PAUSE
+    private var mInitSourceFlag = false
+    private var mMediaPlayerHasPrepare = false
 
-
-
-    override fun play() {
-        if (initSourceFlag && !mediaPlayer.isPlaying){
-            mediaPlayer.start()
-        }else{
-            mediaPlayer.setDataSource(musicData[0].url)
-            mediaPlayer.prepareAsync()
-            mediaPlayer.setOnPreparedListener {
-                LogUtils.i("播放器准备完成，开始播放")
-                mediaPlayer.start()
+    init {
+        mMediaPlayer.apply {
+            setOnCompletionListener {
+                LogUtils.i("播放完毕")
+            }
+            setOnErrorListener { mp, what, extra ->
+                LogUtils.e("播放异常error, what:$what,extra:$extra")
+                return@setOnErrorListener true
+            }
+            setOnSeekCompleteListener {
+                LogUtils.i("seek完成")
+            }
+            setOnTimedMetaDataAvailableListener { mp, data ->
+                LogUtils.i("TimedMetaDataAvailableListener:${data.timestamp}")
+            }
+            setOnPreparedListener {
+                mMediaPlayerHasPrepare = true
+                val timestamp = it.timestamp
+                LogUtils.i("准备播放回调 anchorMediaTime:${timestamp?.anchorMediaTimeUs},nanoTime:${timestamp?.anchorSystemNanoTime},mediaClockRate:${timestamp?.mediaClockRate}")
+                it.start()
+                mPlayStatus = PlayStatus.PLAY
             }
         }
-        initSourceFlag = true
+
+    }
+
+
+    override fun play(index: Int) {
+        if (mMusicData.isEmpty()|| mMediaPlayer.isPlaying){
+            return
+        }
+        mIndex = index
+        if (mMediaPlayerHasPrepare){
+            mMediaPlayer.start()
+        }else{
+            mMediaPlayer.setDataSource(mMusicData[index].url)
+            mMediaPlayerHasPrepare = false
+            mMediaPlayer.prepareAsync()
+        }
+        mInitSourceFlag = true
     }
 
     override fun pause() {
-        mediaPlayer.pause()
+        mPlayStatus = PlayStatus.PAUSE
+        mMediaPlayer.pause()
     }
 
     override fun seek(num: Int) {
-        mediaPlayer.seekTo(num)
+        mMediaPlayer.seekTo(num)
     }
 
     override fun next() {
-        if (index+1>=musicData.size){
+        if (mIndex+1>=mMusicData.size){
+            LogUtils.i("已经最后一首了")
             return
         }
-        val musicVo = musicData[index]
-        mediaPlayer.setDataSource(musicVo.url)
-        mediaPlayer.prepare()
-        mediaPlayer.start()
+        mIndex++
+        val musicVo = mMusicData[mIndex]
+        mMediaPlayer.stop()
+        mMediaPlayer.seekTo(0)
+        mMediaPlayer.setDataSource(musicVo.url)
+        mMediaPlayer.prepareAsync()
     }
 
     override fun last() {
-        if (index-1<0){
+        if (mIndex-1<0){
+            LogUtils.i("已经是第一首了")
             return
         }
-        val musicVo = musicData[index]
-        mediaPlayer.setDataSource(musicVo.url)
-        mediaPlayer.prepare()
-        mediaPlayer.start()
+        mIndex--
+        val musicVo = mMusicData[mIndex]
+        mMediaPlayer.stop()
+        mMediaPlayer.seekTo(0)
+        mMediaPlayer.setDataSource(musicVo.url)
+        mMediaPlayer.prepareAsync()
     }
 
     override fun playSource(musicVo: MusicVo) {
-        musicData.add(0,musicVo)
-        mediaPlayer.setDataSource(musicVo.url)
-        mediaPlayer.prepare()
-        mediaPlayer.start()
-        initSourceFlag = true
+        mMusicData.add(0,musicVo)
+        mMediaPlayer.setDataSource(musicVo.url)
+        mMediaPlayer.prepare()
+        mMediaPlayer.start()
+        mInitSourceFlag = true
     }
 
     override fun replay() {
-        mediaPlayer.stop()
-        mediaPlayer.prepare()
-        mediaPlayer.start()
+        mMediaPlayer.stop()
+        mMediaPlayer.prepare()
+        mMediaPlayer.start()
     }
 
     override fun setPlayList(data: List<MusicVo>) {
-        musicData.clear()
-        musicData.addAll(data)
+        mMusicData.clear()
+        mMusicData.addAll(data)
+        mIndex = 0
     }
 
-    override fun getCurrentInfo() {
+    override fun getCurrentInfo():PlayInfo {
+        val musicVo = mMusicData[mIndex]
+        return PlayInfo().apply {
+            dataIndex = mIndex
+            playStatus = mPlayStatus
+            playMode = mPlayMode
+            albumName = musicVo.albumName
+            mainActor = musicVo.mainActors
+        }
     }
 }

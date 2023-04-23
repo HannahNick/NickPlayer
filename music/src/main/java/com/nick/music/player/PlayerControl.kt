@@ -1,12 +1,13 @@
 package com.nick.music.player
 
 import com.nick.music.entity.MusicVo
+import com.nick.music.entity.PlayInfo
 
 interface PlayerControl {
     /**
      * 继续播放
      */
-    fun play()
+    fun play(index:Int = 0)
 
     /**
      * 暂停播放
@@ -46,5 +47,5 @@ interface PlayerControl {
     /**
      * 获取当前播放信息和状态
      */
-    fun getCurrentInfo()
+    fun getCurrentInfo(): PlayInfo
 }

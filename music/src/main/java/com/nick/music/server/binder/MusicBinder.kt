@@ -1,12 +1,13 @@
 package com.nick.music.server.binder
 
 import com.nick.music.entity.MusicVo
+import com.nick.music.entity.PlayInfo
 
 interface MusicBinder {
     /**
      * 继续播放
      */
-    fun play()
+    fun play(index:Int = 0)
 
     /**
      * 暂停播放
@@ -21,12 +22,12 @@ interface MusicBinder {
     /**
      * 下一首
      */
-    fun next()
+    fun playNext()
 
     /**
      * 上一首
      */
-    fun last()
+    fun playLast()
 
     /**
      * 播放指定音乐
@@ -42,4 +43,9 @@ interface MusicBinder {
      * 设置播放列表
      */
     fun setPlayList(data: List<MusicVo>)
+
+    /**
+     * 获取当前播放器信息
+     */
+    fun getPlayInfo(): PlayInfo
 }

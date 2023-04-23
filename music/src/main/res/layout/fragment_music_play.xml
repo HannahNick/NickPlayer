@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/purple_200"
+    tools:context=".ui.MusicPlayActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_back"
+        android:layout_width="@dimen/dp_25"
+        android:layout_height="@dimen/dp_25"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginStart="@dimen/dp_20"
+        android:src="@drawable/back"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_album_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="歌名"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_main_actor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_album_name"
+        android:text="表演者"
+        />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_play"
+        android:layout_width="@dimen/dp_50"
+        android:layout_height="@dimen/dp_50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/dp_70"
+        android:src="@drawable/play"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_play_last"
+        android:layout_width="@dimen/dp_35"
+        android:layout_height="@dimen/dp_35"
+        app:layout_constraintEnd_toStartOf="@id/iv_play"
+        app:layout_constraintTop_toTopOf="@id/iv_play"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play"
+        android:layout_marginEnd="@dimen/dp_30"
+        android:src="@drawable/play_last"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_play_next"
+        android:layout_width="@dimen/dp_35"
+        android:layout_height="@dimen/dp_35"
+        app:layout_constraintStart_toEndOf="@id/iv_play"
+        app:layout_constraintTop_toTopOf="@id/iv_play"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play"
+        android:layout_marginStart="@dimen/dp_30"
+        android:src="@drawable/play_next"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_mode"
+        android:layout_width="@dimen/dp_30"
+        android:layout_height="@dimen/dp_30"
+        app:layout_constraintTop_toTopOf="@id/iv_play_last"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play_last"
+        app:layout_constraintEnd_toStartOf="@id/iv_play_last"
+        android:layout_marginEnd="@dimen/dp_30"
+        android:src="@drawable/play_cycle"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_music_list"
+        android:layout_width="@dimen/dp_30"
+        android:layout_height="@dimen/dp_30"
+        app:layout_constraintTop_toTopOf="@id/iv_play_next"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play_next"
+        app:layout_constraintStart_toEndOf="@id/iv_play_next"
+        android:src="@drawable/play_list"
+        android:layout_marginStart="@dimen/dp_30"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>
