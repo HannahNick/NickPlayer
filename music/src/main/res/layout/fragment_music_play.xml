@@ -95,7 +95,7 @@
         />
 
     <SeekBar
-        android:id="@+id/sk_seek"
+        android:id="@+id/sk_position_bar"
         android:layout_width="@dimen/dp_300"
         android:layout_height="@dimen/dp_25"
         app:layout_constraintStart_toStartOf="parent"
@@ -105,13 +105,24 @@
         />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_seek_time"
+        android:id="@+id/tv_play_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/sk_seek"
-        app:layout_constraintBottom_toBottomOf="@id/sk_seek"
-        app:layout_constraintStart_toEndOf="@id/sk_seek"
+        app:layout_constraintTop_toTopOf="@id/sk_position_bar"
+        app:layout_constraintBottom_toBottomOf="@id/sk_position_bar"
+        app:layout_constraintEnd_toStartOf="@id/sk_position_bar"
+        android:layout_marginEnd="@dimen/dp_5"
+        android:text="00:00"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_duration_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/sk_position_bar"
+        app:layout_constraintBottom_toBottomOf="@id/sk_position_bar"
+        app:layout_constraintStart_toEndOf="@id/sk_position_bar"
         android:layout_marginStart="@dimen/dp_5"
-        android:text="1:41"
+        android:text="00:00"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

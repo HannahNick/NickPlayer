@@ -11,4 +11,6 @@ class PlayInfo {
     var albumName = ""
     //演唱者
     var mainActor = ""
+    var currentPosition = 0
+    var duration = 0
 }

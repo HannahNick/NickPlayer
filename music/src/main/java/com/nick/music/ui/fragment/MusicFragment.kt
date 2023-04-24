@@ -8,21 +8,28 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ServiceUtils
 import com.blankj.utilcode.util.ServiceUtils.bindService
+import com.blankj.utilcode.util.TimeUtils
 import com.nick.base.BaseUrl
 import com.nick.music.R
 import com.nick.music.databinding.FragmentMusicPlayBinding
 import com.nick.music.entity.MusicVo
+import com.nick.music.player.CurrentPositionCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 
-class MusicFragment:Fragment(), ServiceConnection {
+class MusicFragment:Fragment(), ServiceConnection,CurrentPositionCallBack {
 
     private val mBinding by lazy { FragmentMusicPlayBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
@@ -44,17 +51,19 @@ class MusicFragment:Fragment(), ServiceConnection {
     }
 
     private fun initData(){
-        val task = Runnable {
+        val initDataTask = Runnable {
             val data = listOf(
-                MusicVo("1","光年之外","邓紫棋","${BaseUrl.url}/music/Born_To_Die-Lana_Del_Rey.mp3"),
-                MusicVo("2","光年之外","邓紫棋","${BaseUrl.url}/music/lemon.mp3"),
-                MusicVo("3","光年之外","邓紫棋","${BaseUrl.url}/music/Landscape-押尾コータロー.mp3"),
+                MusicVo("2","光年之外","邓紫棋","${BaseUrl.url}/music/High_By_The_Beach-Lana_Del_Rey.mp3"),
+                MusicVo("1","光年之外","邓紫棋","${BaseUrl.url}/music/Young_And_Beautiful-Lana_Del_Rey.mp3"),
+                MusicVo("3","光年之外","邓紫棋","${BaseUrl.url}/music/exid - 上和下.mp3"),
             )
             mMusicBinder.setPlayList(data)
-            LogUtils.i("设置播放数据成功")
         }
-        mTasks.add(task)
-
+        val registerCallBackTask = Runnable {
+            mMusicBinder.registerCallBack(this)
+        }
+        mTasks.add(initDataTask)
+        mTasks.add(registerCallBackTask)
     }
 
     private fun initServer(){
@@ -69,6 +78,7 @@ class MusicFragment:Fragment(), ServiceConnection {
             ivBack.setOnClickListener {  }
             ivPlay.setOnClickListener {
                 val info = mMusicBinder.getPlayInfo()
+                LogUtils.i(GsonUtils.toJson(info))
                 if (info.playStatus == PlayStatus.PLAY){
                     mMusicBinder.pause()
                     ivPlay.setImageResource(R.drawable.play)
@@ -84,7 +94,32 @@ class MusicFragment:Fragment(), ServiceConnection {
             ivPlayLast.setOnClickListener {
                 mMusicBinder.playLast()
             }
+            skPositionBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+                override fun onProgressChanged(
+                    seekBar: SeekBar,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    mBinding.tvPlayTime.text = TimeUtils.millis2String(progress.toLong(),"mm:ss")
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    val seekPosition = seekBar.progress
+                    mMusicBinder.seek(seekPosition)
+                }
+
+            })
         }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mMusicBinder.removeCallBack(this)
+        mMusicBinder.release()
     }
 
 
@@ -97,5 +132,20 @@ class MusicFragment:Fragment(), ServiceConnection {
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
+    }
+
+    override fun playPosition(position: Int,duration: Int) {
+        val playTime = TimeUtils.millis2String(position.toLong(),"mm:ss")
+        val durationTime = TimeUtils.millis2String(duration.toLong(),"mm:ss")
+        lifecycleScope.launchWhenResumed {
+            withContext(Dispatchers.Main){
+                mBinding.apply {
+                    skPositionBar.progress = position
+                    skPositionBar.max = duration
+                    tvPlayTime.text = playTime
+                    tvDurationTime.text = durationTime
+                }
+            }
+        }
     }
 }

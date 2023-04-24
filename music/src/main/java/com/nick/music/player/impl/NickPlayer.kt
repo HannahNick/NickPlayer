@@ -7,6 +7,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.kt.play
+import com.nick.music.player.CurrentPositionCallBack
 import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
@@ -25,11 +26,22 @@ class NickPlayer: PlayerControl{
     private var mPlayStatus = PlayStatus.PAUSE
     private var mInitSourceFlag = false
     private var mMediaPlayerHasPrepare = false
+    private var mPositionCallBackList = HashSet<CurrentPositionCallBack>()
+    private var mPlayNow = false
+    private val mTask = object : TimerTask(){
+        override fun run() {
+            mCurrentPosition = mMediaPlayer.currentPosition
+            mPositionCallBackList.forEach {
+                it.playPosition(mCurrentPosition,mDuration)
+            }
+        }
+    }
 
     init {
         mMediaPlayer.apply {
             setOnCompletionListener {
                 LogUtils.i("播放完毕")
+                next()
             }
             setOnErrorListener { mp, what, extra ->
                 LogUtils.e("播放异常error, what:$what,extra:$extra")
@@ -43,20 +55,14 @@ class NickPlayer: PlayerControl{
             }
             setOnPreparedListener {
                 mMediaPlayerHasPrepare = true
-                val timestamp = it.timestamp
-                LogUtils.i("准备播放回调 anchorMediaTime:${timestamp?.anchorMediaTimeUs},nanoTime:${timestamp?.anchorSystemNanoTime},mediaClockRate:${timestamp?.mediaClockRate}")
-                it.start()
                 mDuration = it.duration
-                mPlayStatus = PlayStatus.PLAY
+                if (mPlayNow){
+                    mPlayStatus = PlayStatus.PLAY
+                    it.start()
+                }
             }
         }
-        val task = object : TimerTask(){
-            override fun run() {
-                mCurrentPosition = mMediaPlayer.currentPosition
-                LogUtils.i("position:$mCurrentPosition")
-            }
-        }
-        mTimer.schedule(task,500)
+        mTimer.schedule(mTask,0,1000)
     }
 
 
@@ -65,6 +71,7 @@ class NickPlayer: PlayerControl{
             return
         }
         mIndex = index
+        mPlayNow = true
         if (mMediaPlayerHasPrepare){
             mMediaPlayer.start()
         }else{
@@ -76,8 +83,8 @@ class NickPlayer: PlayerControl{
     }
 
     override fun pause() {
-        mPlayStatus = PlayStatus.PAUSE
         mMediaPlayer.pause()
+        mPlayStatus = PlayStatus.PAUSE
     }
 
     override fun seek(num: Int) {
@@ -112,8 +119,7 @@ class NickPlayer: PlayerControl{
 
     override fun replay() {
         mMediaPlayer.stop()
-        mMediaPlayer.prepare()
-        mMediaPlayer.start()
+        mMediaPlayer.prepareAsync()
     }
 
     override fun setPlayList(data: List<MusicVo>) {
@@ -128,8 +134,31 @@ class NickPlayer: PlayerControl{
             dataIndex = mIndex
             playStatus = mPlayStatus
             playMode = mPlayMode
+            currentPosition = mCurrentPosition
+            duration = mDuration
             albumName = musicVo.albumName
             mainActor = musicVo.mainActors
         }
     }
+
+    override fun release() {
+        mTimer.cancel()
+        mMediaPlayer.stop()
+        mMediaPlayer.release()
+        mMediaPlayer.clearOnMediaTimeDiscontinuityListener()
+        mMediaPlayer.clearOnSubtitleDataListener()
+        mPositionCallBackList.clear()
+    }
+
+    override fun registerCallBack(callBack: CurrentPositionCallBack) {
+        mPositionCallBackList.add(callBack)
+    }
+
+    override fun removeCallBack(callBack: CurrentPositionCallBack) {
+        if (mPositionCallBackList.contains(callBack)){
+            mPositionCallBackList.remove(callBack)
+        }
+    }
+
+
 }

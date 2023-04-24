@@ -2,6 +2,7 @@ package com.nick.music.server.binder
 
 import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
+import com.nick.music.player.CurrentPositionCallBack
 
 interface MusicBinder {
     /**
@@ -48,4 +49,19 @@ interface MusicBinder {
      * 获取当前播放器信息
      */
     fun getPlayInfo(): PlayInfo
+
+    /**
+     * 释放资源
+     */
+    fun release()
+
+    /**
+     * 注册播放位置回调
+     */
+    fun registerCallBack(callBack: CurrentPositionCallBack)
+
+    /**
+     * 移除播放位置回调
+     */
+    fun removeCallBack(callBack: CurrentPositionCallBack)
 }

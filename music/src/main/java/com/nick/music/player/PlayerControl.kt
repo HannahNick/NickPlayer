@@ -48,4 +48,19 @@ interface PlayerControl {
      * 获取当前播放信息和状态
      */
     fun getCurrentInfo(): PlayInfo
+
+    /**
+     * 释放资源
+     */
+    fun release()
+
+    /**
+     * 注册播放位置回调
+     */
+    fun registerCallBack(callBack: CurrentPositionCallBack)
+
+    /**
+     * 移除播放位置回调
+     */
+    fun removeCallBack(callBack: CurrentPositionCallBack)
 }
