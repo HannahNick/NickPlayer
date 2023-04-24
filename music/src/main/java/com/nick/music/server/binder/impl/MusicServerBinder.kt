@@ -3,7 +3,7 @@ package com.nick.music.server.binder.impl
 import android.os.Binder
 import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
-import com.nick.music.player.CurrentPositionCallBack
+import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
 import com.nick.music.server.binder.MusicBinder
 
@@ -49,11 +49,11 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
         playerControl.release()
     }
 
-    override fun registerCallBack(callBack: CurrentPositionCallBack) {
+    override fun registerCallBack(callBack: PlayInfoCallBack) {
         playerControl.registerCallBack(callBack)
     }
 
-    override fun removeCallBack(callBack: CurrentPositionCallBack) {
+    override fun removeCallBack(callBack: PlayInfoCallBack) {
         playerControl.removeCallBack(callBack)
     }
 

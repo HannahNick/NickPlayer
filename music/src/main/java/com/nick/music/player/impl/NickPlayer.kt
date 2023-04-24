@@ -7,7 +7,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.kt.play
-import com.nick.music.player.CurrentPositionCallBack
+import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
@@ -26,13 +26,13 @@ class NickPlayer: PlayerControl{
     private var mPlayStatus = PlayStatus.PAUSE
     private var mInitSourceFlag = false
     private var mMediaPlayerHasPrepare = false
-    private var mPositionCallBackList = HashSet<CurrentPositionCallBack>()
+    private var mPositionCallBackList = HashSet<PlayInfoCallBack>()
     private var mPlayNow = false
     private val mTask = object : TimerTask(){
         override fun run() {
             mCurrentPosition = mMediaPlayer.currentPosition
             mPositionCallBackList.forEach {
-                it.playPosition(mCurrentPosition,mDuration)
+                it.playPosition(mCurrentPosition)
             }
         }
     }
@@ -59,6 +59,11 @@ class NickPlayer: PlayerControl{
                 if (mPlayNow){
                     mPlayStatus = PlayStatus.PLAY
                     it.start()
+                }
+
+                val playInfo = getCurrentInfo()
+                mPositionCallBackList.forEach { callback->
+                    callback.prepareStart(playInfo)
                 }
             }
         }
@@ -149,11 +154,11 @@ class NickPlayer: PlayerControl{
         mPositionCallBackList.clear()
     }
 
-    override fun registerCallBack(callBack: CurrentPositionCallBack) {
+    override fun registerCallBack(callBack: PlayInfoCallBack) {
         mPositionCallBackList.add(callBack)
     }
 
-    override fun removeCallBack(callBack: CurrentPositionCallBack) {
+    override fun removeCallBack(callBack: PlayInfoCallBack) {
         if (mPositionCallBackList.contains(callBack)){
             mPositionCallBackList.remove(callBack)
         }

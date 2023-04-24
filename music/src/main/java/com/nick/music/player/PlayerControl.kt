@@ -57,10 +57,10 @@ interface PlayerControl {
     /**
      * 注册播放位置回调
      */
-    fun registerCallBack(callBack: CurrentPositionCallBack)
+    fun registerCallBack(callBack: PlayInfoCallBack)
 
     /**
      * 移除播放位置回调
      */
-    fun removeCallBack(callBack: CurrentPositionCallBack)
+    fun removeCallBack(callBack: PlayInfoCallBack)
 }

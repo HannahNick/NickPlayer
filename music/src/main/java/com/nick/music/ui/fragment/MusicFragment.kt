@@ -21,7 +21,8 @@ import com.nick.base.BaseUrl
 import com.nick.music.R
 import com.nick.music.databinding.FragmentMusicPlayBinding
 import com.nick.music.entity.MusicVo
-import com.nick.music.player.CurrentPositionCallBack
+import com.nick.music.entity.PlayInfo
+import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
@@ -29,7 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class MusicFragment:Fragment(), ServiceConnection,CurrentPositionCallBack {
+class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 
     private val mBinding by lazy { FragmentMusicPlayBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
@@ -53,9 +54,9 @@ class MusicFragment:Fragment(), ServiceConnection,CurrentPositionCallBack {
     private fun initData(){
         val initDataTask = Runnable {
             val data = listOf(
-                MusicVo("2","光年之外","邓紫棋","${BaseUrl.url}/music/High_By_The_Beach-Lana_Del_Rey.mp3"),
-                MusicVo("1","光年之外","邓紫棋","${BaseUrl.url}/music/Young_And_Beautiful-Lana_Del_Rey.mp3"),
-                MusicVo("3","光年之外","邓紫棋","${BaseUrl.url}/music/exid - 上和下.mp3"),
+                MusicVo("2","夜空中最亮的星","逃跑计划","${BaseUrl.url}/music/逃跑计划 - 夜空中最亮的星.mp3"),
+                MusicVo("1","这班人","陈慧琳","${BaseUrl.url}/music/这班人-陈慧琳.mp3"),
+                MusicVo("3","原谅","张玉华","${BaseUrl.url}/music/原谅-张玉华.mp3"),
             )
             mMusicBinder.setPlayList(data)
         }
@@ -115,13 +116,6 @@ class MusicFragment:Fragment(), ServiceConnection,CurrentPositionCallBack {
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mMusicBinder.removeCallBack(this)
-        mMusicBinder.release()
-    }
-
-
     override fun onServiceConnected(name: ComponentName?, service: IBinder) {
         mMusicBinder = service as MusicBinder
         LogUtils.i("绑定服务回调成功")
@@ -133,18 +127,26 @@ class MusicFragment:Fragment(), ServiceConnection,CurrentPositionCallBack {
     override fun onServiceDisconnected(name: ComponentName?) {
     }
 
-    override fun playPosition(position: Int,duration: Int) {
+    override fun playPosition(position: Int) {
         val playTime = TimeUtils.millis2String(position.toLong(),"mm:ss")
-        val durationTime = TimeUtils.millis2String(duration.toLong(),"mm:ss")
+
         lifecycleScope.launchWhenResumed {
             withContext(Dispatchers.Main){
                 mBinding.apply {
                     skPositionBar.progress = position
-                    skPositionBar.max = duration
                     tvPlayTime.text = playTime
-                    tvDurationTime.text = durationTime
                 }
             }
+        }
+    }
+
+    override fun prepareStart(playInfo: PlayInfo) {
+        val durationTime = TimeUtils.millis2String(playInfo.duration.toLong(),"mm:ss")
+        mBinding.apply {
+            skPositionBar.max = playInfo.duration
+            tvDurationTime.text = durationTime
+            tvAlbumName.text = playInfo.albumName
+            tvMainActor.text = playInfo.mainActor
         }
     }
 }
