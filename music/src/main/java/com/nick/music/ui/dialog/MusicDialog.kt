@@ -8,13 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.fragment.app.DialogFragment
+import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.ui.fragment.MusicFragment
 
 class MusicDialog: DialogFragment() {
 
-
+    private val musicFragment = MusicFragment()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,13 +28,17 @@ class MusicDialog: DialogFragment() {
         window?.decorView?.setPadding(0,0,0,0)
         window?.setBackgroundDrawable(ColorDrawable())
         childFragmentManager.beginTransaction()
-            .replace(R.id.root,MusicFragment())
-            .commit()
+            .replace(R.id.root,musicFragment)
+            .commitAllowingStateLoss()
+        LogUtils.i("onCreateView")
         return inflater.inflate(R.layout.dialog_music, container, false)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.findViewById<AppCompatImageView>(R.id.iv_back).setOnClickListener {
+            dismissAllowingStateLoss()
+        }
         val window = dialog?.window
         val lp = window?.attributes
         lp?.width = WindowManager.LayoutParams.MATCH_PARENT
@@ -41,5 +47,6 @@ class MusicDialog: DialogFragment() {
         lp?.windowAnimations = R.style.AnimDownToTop
         window?.attributes = lp
     }
+
 
 }

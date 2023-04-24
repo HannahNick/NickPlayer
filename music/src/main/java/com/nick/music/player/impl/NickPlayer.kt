@@ -143,7 +143,6 @@ class NickPlayer: PlayerControl{
 
     override fun release() {
         mTimer.cancel()
-        mMediaPlayer.stop()
         mMediaPlayer.release()
         mMediaPlayer.clearOnMediaTimeDiscontinuityListener()
         mMediaPlayer.clearOnSubtitleDataListener()

@@ -75,7 +75,6 @@ class MusicFragment:Fragment(), ServiceConnection,CurrentPositionCallBack {
 
     private fun initListener(){
         mBinding.apply {
-            ivBack.setOnClickListener {  }
             ivPlay.setOnClickListener {
                 val info = mMusicBinder.getPlayInfo()
                 LogUtils.i(GsonUtils.toJson(info))

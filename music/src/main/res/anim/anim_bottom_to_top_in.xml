@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- y的起始值，从1000%跑到0 -->
+    <!-- y的起始值，从100%跑到0 -->
     <translate
         android:duration="300"
         android:fromYDelta="100%p"
         android:toYDelta="0" />
 
-    <alpha
-        android:duration="300"
-        android:fromAlpha="0.0"
-        android:toAlpha="1.0" />
 </set>
