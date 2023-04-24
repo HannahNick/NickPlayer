@@ -30,7 +30,6 @@ class MusicDialog: DialogFragment() {
         childFragmentManager.beginTransaction()
             .replace(R.id.root,musicFragment)
             .commitAllowingStateLoss()
-        LogUtils.i("onCreateView")
         return inflater.inflate(R.layout.dialog_music, container, false)
     }
 

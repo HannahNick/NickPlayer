@@ -24,8 +24,10 @@ import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
+import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
+import com.nick.music.util.Ring
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -35,6 +37,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
     private val mBinding by lazy { FragmentMusicPlayBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
     private lateinit var mMusicBinder: MusicBinder
+    private val mPlayModeList = Ring<PlayMode>().apply { addAll(PlayMode.values().toMutableList()) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,6 +60,9 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 MusicVo("2","夜空中最亮的星","逃跑计划","${BaseUrl.url}/music/逃跑计划 - 夜空中最亮的星.mp3"),
                 MusicVo("1","这班人","陈慧琳","${BaseUrl.url}/music/这班人-陈慧琳.mp3"),
                 MusicVo("3","原谅","张玉华","${BaseUrl.url}/music/原谅-张玉华.mp3"),
+                MusicVo("3","存在","邓紫棋","${BaseUrl.url}/music/邓紫棋 - 存在.mp3"),
+                MusicVo("3","长路漫漫伴你闯","林子祥","${BaseUrl.url}/music/长路漫漫伴你闯-林子祥.mp3"),
+                MusicVo("3","Dark Horse","Katy Perry、juicy J","${BaseUrl.url}/music/Katy Perry、juicy J - Dark Horse.mp3"),
             )
             mMusicBinder.setPlayList(data)
         }
@@ -83,7 +89,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                     mMusicBinder.pause()
                     ivPlay.setImageResource(R.drawable.play)
                 }else{
-                    mMusicBinder.play()
+                    mMusicBinder.play(info.dataIndex)
                     ivPlay.setImageResource(R.drawable.pause)
                 }
             }
@@ -112,6 +118,16 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 }
 
             })
+            ivMode.setOnClickListener {
+                val playMode = mPlayModeList.next()
+                when (playMode){
+                    PlayMode.CYCLE-> ivMode.setImageResource(R.drawable.play_cycle)
+                    PlayMode.SINGLE-> ivMode.setImageResource(R.drawable.play_single)
+                    PlayMode.RANDOM-> ivMode.setImageResource(R.drawable.play_random)
+                    else->{}
+                }
+                mMusicBinder.setPlayMode(playMode?:PlayMode.CYCLE)
+            }
         }
 
     }

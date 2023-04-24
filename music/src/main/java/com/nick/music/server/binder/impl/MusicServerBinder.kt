@@ -5,6 +5,7 @@ import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
+import com.nick.music.server.PlayMode
 import com.nick.music.server.binder.MusicBinder
 
 class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),MusicBinder{
@@ -55,6 +56,10 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
 
     override fun removeCallBack(callBack: PlayInfoCallBack) {
         playerControl.removeCallBack(callBack)
+    }
+
+    override fun setPlayMode(playMode: PlayMode) {
+        playerControl.setPlayMode(playMode)
     }
 
 }

@@ -3,6 +3,7 @@ package com.nick.music.server.binder
 import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
+import com.nick.music.server.PlayMode
 
 interface MusicBinder {
     /**
@@ -64,4 +65,9 @@ interface MusicBinder {
      * 移除播放位置回调
      */
     fun removeCallBack(callBack: PlayInfoCallBack)
+
+    /**
+     * 设置播放模式
+     */
+    fun setPlayMode(playMode: PlayMode)
 }

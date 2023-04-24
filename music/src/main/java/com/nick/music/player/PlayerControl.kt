@@ -2,12 +2,18 @@ package com.nick.music.player
 
 import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
+import com.nick.music.server.PlayMode
 
 interface PlayerControl {
     /**
      * 继续播放
      */
     fun play(index:Int = 0)
+
+    /**
+     * 随机播放
+     */
+    fun playRandom()
 
     /**
      * 暂停播放
@@ -63,4 +69,9 @@ interface PlayerControl {
      * 移除播放位置回调
      */
     fun removeCallBack(callBack: PlayInfoCallBack)
+
+    /**
+     * 设置播放模式
+     */
+    fun setPlayMode(playMode: PlayMode)
 }
