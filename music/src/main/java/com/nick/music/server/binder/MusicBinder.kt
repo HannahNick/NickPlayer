@@ -1,6 +1,6 @@
 package com.nick.music.server.binder
 
-import com.nick.music.entity.MusicVo
+import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.PlayMode

@@ -4,7 +4,8 @@ import android.media.MediaPlayer
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
-import com.nick.music.entity.MusicVo
+import com.nick.base.BaseUrl
+import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.kt.play
 import com.nick.music.player.PlayInfoCallBack
@@ -62,8 +63,8 @@ class NickPlayer: PlayerControl{
                 mMediaPlayerHasPrepare = true
                 mDuration = it.duration
                 if (mPlayNow){
-                    mPlayStatus = PlayStatus.PLAY
                     it.start()
+                    mPlayStatus = PlayStatus.PLAY
                 }
 
                 val playInfo = getCurrentInfo()
@@ -91,7 +92,7 @@ class NickPlayer: PlayerControl{
         mPlayNow = true
         mMediaPlayerHasPrepare = false
         val musicVo = mMusicData[index]
-        mMediaPlayer.play(musicVo.url)
+        mMediaPlayer.play("${BaseUrl.url}${musicVo.path}")
         mHasRandomPlayData.setCurrentNode(musicVo)
     }
 
@@ -169,7 +170,7 @@ class NickPlayer: PlayerControl{
         }
         mPlayNow = false
         mMediaPlayer.reset()
-        mMediaPlayer.setDataSource(mMusicData[mIndex].url)
+        mMediaPlayer.setDataSource("${BaseUrl.url}${mMusicData[mIndex].path}")
         mMediaPlayer.prepareAsync()
     }
 

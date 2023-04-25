@@ -18,9 +18,9 @@ import com.blankj.utilcode.util.ServiceUtils
 import com.blankj.utilcode.util.ServiceUtils.bindService
 import com.blankj.utilcode.util.TimeUtils
 import com.nick.base.BaseUrl
+import com.nick.base.http.HttpManager
 import com.nick.music.R
 import com.nick.music.databinding.FragmentMusicPlayBinding
-import com.nick.music.entity.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
@@ -31,6 +31,7 @@ import com.nick.music.util.Ring
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 
@@ -56,15 +57,13 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 
     private fun initData(){
         val initDataTask = Runnable {
-            val data = listOf(
-                MusicVo("2","夜空中最亮的星","逃跑计划","${BaseUrl.url}/music/逃跑计划 - 夜空中最亮的星.mp3"),
-                MusicVo("1","这班人","陈慧琳","${BaseUrl.url}/music/这班人-陈慧琳.mp3"),
-                MusicVo("3","原谅","张玉华","${BaseUrl.url}/music/原谅-张玉华.mp3"),
-                MusicVo("3","存在","邓紫棋","${BaseUrl.url}/music/邓紫棋 - 存在.mp3"),
-                MusicVo("3","长路漫漫伴你闯","林子祥","${BaseUrl.url}/music/长路漫漫伴你闯-林子祥.mp3"),
-                MusicVo("3","Dark Horse","Katy Perry、juicy J","${BaseUrl.url}/music/Katy Perry、juicy J - Dark Horse.mp3"),
-            )
-            mMusicBinder.setPlayList(data)
+            lifecycleScope.launchWhenResumed {
+                val data = withContext(Dispatchers.IO){
+                    return@withContext HttpManager.api.getAllMusic().data
+                }
+                LogUtils.i("完成数据请求")
+                mMusicBinder.setPlayList(data?:ArrayList())
+            }
         }
         val registerCallBackTask = Runnable {
             mMusicBinder.registerCallBack(this)
@@ -166,6 +165,11 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
             tvDurationTime.text = durationTime
             tvAlbumName.text = playInfo.albumName
             tvMainActor.text = playInfo.mainActor
+            if (playInfo.playStatus == PlayStatus.PLAY){
+                ivPlay.setImageResource(R.drawable.pause)
+            }else{
+                ivPlay.setImageResource(R.drawable.play)
+            }
         }
     }
 }
