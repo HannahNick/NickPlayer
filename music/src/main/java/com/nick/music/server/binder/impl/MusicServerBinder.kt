@@ -62,4 +62,8 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
         playerControl.setPlayMode(playMode)
     }
 
+    override fun getRandomMusicList(): List<MusicVo> {
+        return playerControl.getRandomMusicList()
+    }
+
 }

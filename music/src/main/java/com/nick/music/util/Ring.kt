@@ -1,5 +1,8 @@
 package com.nick.music.util
 
+/**
+ * 环
+ */
 class Ring<T> {
     private val items = mutableListOf<T>()
     private var currentIndex = 0

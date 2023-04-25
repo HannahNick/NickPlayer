@@ -8,12 +8,17 @@ interface PlayerControl {
     /**
      * 继续播放
      */
-    fun play(index:Int = 0)
+    fun play(index: Int = 0)
 
     /**
-     * 随机播放
+     * 随机播放下一首
      */
-    fun playRandom()
+    fun playNextRandom()
+
+    /**
+     * 随机播放上一首
+     */
+    fun playLastRandom()
 
     /**
      * 暂停播放
@@ -74,4 +79,9 @@ interface PlayerControl {
      * 设置播放模式
      */
     fun setPlayMode(playMode: PlayMode)
+
+    /**
+     * 获取随机播放列表数据
+     */
+    fun getRandomMusicList(): List<MusicVo>
 }

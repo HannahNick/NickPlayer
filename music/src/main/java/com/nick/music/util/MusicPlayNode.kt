@@ -3,74 +3,131 @@ package com.nick.music.util
 /**
  * 音乐数据环,用于记录随机播放数据
  */
-class MusicPlayNode<T>(data: T){
+class MusicPlayNode<T> {
     //第一个
-    var mFirstNode:Node<T> = Node(data)
+    private var mFirstNode: Node<T>? = null
+
     //最后一个
-    var mLastNode:Node<T> = Node(data)
+    private var mLastNode: Node<T>? = null
+
     //当前节点
-    var mCurrentNode: Node<T> = Node(data)
+    private var mCurrentNode: Node<T>? = null
+
     //总结点数
-    var size: Int = 1
+    var size: Int = 0
+
+    private fun initRoot(newData: T){
+        val rootNode = Node(newData)
+        mFirstNode = rootNode
+        mLastNode = rootNode
+        mCurrentNode = rootNode
+        rootNode.last = mFirstNode
+        rootNode.next = mLastNode
+        size++
+    }
 
     /**
      * 添加数据节点并以最新的节点为当前节点
      */
-    fun addAndSkipLast(newData: T){
+    fun addAndSkipLast(newData: T) {
+        add(newData)
+        mCurrentNode = mLastNode
+    }
+
+    fun add(newData: T) {
+        if (mCurrentNode==null){
+            initRoot(newData)
+            return
+        }
+
         val newNode = Node(newData)
-        newNode.last = mCurrentNode
-        mCurrentNode.next = newNode
+        newNode.last = mLastNode
+        newNode.next = mFirstNode
+        mLastNode!!.next = newNode
         mLastNode = newNode
-        mCurrentNode = newNode
         size++
     }
 
-    fun contains(data: T):Boolean{
-        var tempNode:Node<T>? = mFirstNode
-        while (tempNode?.next!=null){
-            if (tempNode.data == data){
+    fun contains(data: T): Boolean {
+        val firstNode: Node<T>? = mCurrentNode
+        var tempNode: Node<T>? = mCurrentNode
+
+        while (tempNode != null) {
+            if (tempNode.data == data) {
                 return true
             }
             tempNode = tempNode.next
+            if (tempNode == firstNode){
+                break
+            }
         }
         return false
     }
 
-    fun getCurrentNodeData(): T{
-        return mCurrentNode.data
+    fun setCurrentNode(data: T) {
+        if (mCurrentNode?.data == data) {
+            return
+        }
+
+        var tempNode: Node<T>? = mFirstNode
+        while (tempNode != null) {
+            if (tempNode.data == data){
+                mCurrentNode = tempNode
+                return
+            }
+            tempNode = tempNode.next
+        }
+
     }
 
-    fun nextData(): T{
-        val nextNode = mCurrentNode.next
+    fun getCurrentNodeData(): T {
+        return mCurrentNode!!.data
+    }
+
+    fun nextData(): T {
+        val nextNode = mCurrentNode!!.next
         //如果当前是最后一个节点就跳到第一个节点
-        if (nextNode==null){
-            mCurrentNode = mFirstNode
-        }
-        return mFirstNode.data
+        mCurrentNode = nextNode ?: mFirstNode
+        return mCurrentNode!!.data
     }
 
-    fun lastData(): T{
-        val lastNode = mCurrentNode.last
-        if (lastNode==null){
-            mCurrentNode = mLastNode
-        }
-        return mLastNode.data
+    fun lastData(): T {
+        val lastNode = mCurrentNode!!.last
+        //如果当前是第一个节点就跳到最后一个节点
+        mCurrentNode = lastNode ?: mLastNode
+        return mCurrentNode!!.data
     }
 
-    fun reset(data: T){
-        val root = Node(data)
-        mFirstNode = root
-        mLastNode = root
-        mCurrentNode = root
-        size = 1
+    fun reset() {
+        mFirstNode = null
+        mLastNode = null
+        mCurrentNode = null
+        size = 0
+    }
+
+    /**
+     * 以当前节点为起点生成有序数组
+     */
+    fun convertList(): List<T> {
+        val newList = ArrayList<T>()
+        val firstNode: Node<T>? = mCurrentNode
+        var tempNode: Node<T>? = mCurrentNode
+        while (tempNode != null) {
+            newList.add(tempNode.data)
+            tempNode = tempNode.next
+            if (tempNode == firstNode){//遍历已回到起点
+                break
+            }
+        }
+        return newList
     }
 
 
     class Node<T>(
         var data: T,
         //上一个
-        var last:Node<T>? = null,
+        var last: Node<T>? = null,
         //下一个
-        var next:Node<T>? = null,
+        var next: Node<T>? = null,
     )
 }

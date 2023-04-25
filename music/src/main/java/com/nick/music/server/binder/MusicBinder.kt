@@ -70,4 +70,9 @@ interface MusicBinder {
      * 设置播放模式
      */
     fun setPlayMode(playMode: PlayMode)
+
+    /**
+     * 获取随机播放列表数据
+     */
+    fun getRandomMusicList(): List<MusicVo>
 }

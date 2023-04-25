@@ -45,7 +45,7 @@ class NickPlayer: PlayerControl{
                 when(mPlayMode){
                     PlayMode.SINGLE-> replay()
                     PlayMode.CYCLE-> next()
-                    else-> playRandom()
+                    else-> playNextRandom()
                 }
             }
             setOnErrorListener { mp, what, extra ->
@@ -76,24 +76,6 @@ class NickPlayer: PlayerControl{
         LogUtils.i("初始化完成")
     }
 
-    /**
-     * 获取随机播放index
-     */
-    private fun addHasPlayRandomMusicAndGetPlayNextIndex(): Int{
-        var randomIndex: Int
-        if (mHasRandomPlayData.size == mMusicData.size){
-            return mMusicData.indexOf(mHasRandomPlayData.nextData())
-        }
-        val random = Random()
-        var musicVo: MusicVo
-        do {
-            randomIndex = random.nextInt(mMusicData.size)
-            musicVo = mMusicData[randomIndex]
-        }while (mHasRandomPlayData.contains(musicVo))
-        mHasRandomPlayData.addAndSkipLast(musicVo)
-        return randomIndex
-    }
-
     override fun play(index: Int) {
         if (mMusicData.isEmpty()){
             return
@@ -108,12 +90,19 @@ class NickPlayer: PlayerControl{
         mIndex = index
         mPlayNow = true
         mMediaPlayerHasPrepare = false
-        mMediaPlayer.play(mMusicData[index].url)
+        val musicVo = mMusicData[index]
+        mMediaPlayer.play(musicVo.url)
+        mHasRandomPlayData.setCurrentNode(musicVo)
     }
 
-    override fun playRandom() {
-        val randomIndex = addHasPlayRandomMusicAndGetPlayNextIndex()
-        play(randomIndex)
+    override fun playNextRandom() {
+        val musicVo = mHasRandomPlayData.nextData()
+        play(mMusicData.indexOf(musicVo))
+    }
+
+    override fun playLastRandom() {
+        val musicVo = mHasRandomPlayData.lastData()
+        play(mMusicData.indexOf(musicVo))
     }
 
     override fun pause() {
@@ -127,33 +116,30 @@ class NickPlayer: PlayerControl{
 
     override fun next() {
         if (mPlayMode == PlayMode.RANDOM){
-            playRandom()
+            playNextRandom()
             return
         }
         if (mIndex+1>=mMusicData.size){
             mIndex = -1
         }
-        mIndex++
-        val musicVo = mMusicData[mIndex]
-        mMediaPlayer.play(musicVo.url)
+        play(mIndex+1)
     }
 
     override fun last() {
         if (mPlayMode == PlayMode.RANDOM){
-
+            playLastRandom()
+            return
         }
 
         if (mIndex-1<0){
             mIndex = mMusicData.size
         }
-        mIndex--
-        val musicVo = mMusicData[mIndex]
-        mMediaPlayer.play(musicVo.url)
+        play(mIndex-1)
     }
 
     override fun playSource(musicVo: MusicVo) {
         mMusicData.add(mIndex,musicVo)
-        mMediaPlayer.play(musicVo.url)
+        play(mIndex)
     }
 
     override fun replay() {
@@ -171,8 +157,20 @@ class NickPlayer: PlayerControl{
         mMusicData.clear()
         mMusicData.addAll(data)
         mIndex = 0
-        // TODO: 设置随机播放的数据列表
-        mHasRandomPlayData.reset(mMusicData[mIndex])
+        //设置
+        val randomList = ArrayList(mMusicData).shuffled()
+        if (::mHasRandomPlayData.isInitialized){
+            mHasRandomPlayData.reset()
+        }else{
+            mHasRandomPlayData = MusicPlayNode()
+        }
+        randomList.forEach {
+            mHasRandomPlayData.add(it)
+        }
+        mPlayNow = false
+        mMediaPlayer.reset()
+        mMediaPlayer.setDataSource(mMusicData[mIndex].url)
+        mMediaPlayer.prepareAsync()
     }
 
     override fun getCurrentInfo():PlayInfo {
@@ -207,10 +205,11 @@ class NickPlayer: PlayerControl{
     }
 
     override fun setPlayMode(playMode: PlayMode) {
-        if (playMode==PlayMode.RANDOM){
-            mHasRandomPlayData.reset(mMusicData[mIndex])
-        }
         mPlayMode = playMode
+    }
+
+    override fun getRandomMusicList(): List<MusicVo> {
+        return mHasRandomPlayData.convertList()
     }
 
 }

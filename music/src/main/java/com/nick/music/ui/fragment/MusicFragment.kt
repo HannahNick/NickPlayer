@@ -128,6 +128,9 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 }
                 mMusicBinder.setPlayMode(playMode?:PlayMode.CYCLE)
             }
+            ivMusicList.setOnClickListener {
+                LogUtils.json(GsonUtils.toJson(mMusicBinder.getRandomMusicList()))
+            }
         }
 
     }
