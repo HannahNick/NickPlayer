@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.VodActivity">
+
+    <SurfaceView
+        android:id="@+id/sv_video"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_250"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_play"
+        android:layout_width="@dimen/dp_35"
+        android:layout_height="@dimen/dp_35"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sv_video"
+        android:layout_marginTop="@dimen/dp_15"
+        android:src="@drawable/ic_play"
+        />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_pause"
+        android:layout_width="@dimen/dp_35"
+        android:layout_height="@dimen/dp_35"
+        app:layout_constraintTop_toTopOf="@id/iv_play"
+        app:layout_constraintEnd_toStartOf="@id/iv_play"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play"
+        android:src="@drawable/ic_pause"
+        android:layout_marginEnd="@dimen/dp_35"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

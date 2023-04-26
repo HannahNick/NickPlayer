@@ -1,5 +1,6 @@
 package com.nick.music.player
 
+import android.view.SurfaceHolder
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.server.PlayMode
@@ -84,4 +85,9 @@ interface PlayerControl {
      * 获取随机播放列表数据
      */
     fun getRandomMusicList(): List<MusicVo>
+
+    /**
+     * 绑定SurfaceHolder
+     */
+    fun attachSurfaceHolder(holder: SurfaceHolder)
 }

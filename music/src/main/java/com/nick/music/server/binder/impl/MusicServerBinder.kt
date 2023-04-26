@@ -1,6 +1,7 @@
 package com.nick.music.server.binder.impl
 
 import android.os.Binder
+import android.view.SurfaceHolder
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
@@ -64,6 +65,10 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
 
     override fun getRandomMusicList(): List<MusicVo> {
         return playerControl.getRandomMusicList()
+    }
+
+    override fun attachSurfaceHolder(holder: SurfaceHolder) {
+        playerControl.attachSurfaceHolder(holder)
     }
 
 }

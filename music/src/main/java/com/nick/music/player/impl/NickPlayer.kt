@@ -2,6 +2,7 @@ package com.nick.music.player.impl
 
 import android.media.MediaPlayer
 import android.os.Build
+import android.view.SurfaceHolder
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.nick.base.BaseUrl
@@ -71,6 +72,9 @@ class NickPlayer: PlayerControl{
                 mPositionCallBackList.forEach { callback->
                     callback.prepareStart(playInfo)
                 }
+            }
+            setOnBufferingUpdateListener { mp,precent ->
+                LogUtils.i("已缓存:${precent}%")
             }
         }
         mTimer.schedule(mTask,0,1000)
@@ -211,6 +215,10 @@ class NickPlayer: PlayerControl{
 
     override fun getRandomMusicList(): List<MusicVo> {
         return mHasRandomPlayData.convertList()
+    }
+
+    override fun attachSurfaceHolder(holder: SurfaceHolder) {
+        mMediaPlayer.setDisplay(holder)
     }
 
 }

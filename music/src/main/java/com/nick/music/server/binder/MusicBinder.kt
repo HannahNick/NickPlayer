@@ -1,5 +1,6 @@
 package com.nick.music.server.binder
 
+import android.view.SurfaceHolder
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
@@ -75,4 +76,9 @@ interface MusicBinder {
      * 获取随机播放列表数据
      */
     fun getRandomMusicList(): List<MusicVo>
+
+    /**
+     * 播放器和surfaceHolder绑定
+     */
+    fun attachSurfaceHolder(holder: SurfaceHolder)
 }
