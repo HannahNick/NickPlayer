@@ -19,27 +19,8 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 @RequiresApi(Build.VERSION_CODES.Q)
-class NickPlayer: PlayerControl{
+class NickPlayer: AbsPlayer(){
     private val mMediaPlayer = MediaPlayer()
-    private val mMusicData = ArrayList<MusicVo>()
-    private val mTimer = Timer()
-    private var mIndex: Int = 0
-    private var mDuration: Int = -1
-    private var mCurrentPosition: Int = -1
-    private var mPlayMode = PlayMode.CYCLE
-    private var mPlayStatus = PlayStatus.PAUSE
-    private var mMediaPlayerHasPrepare = false
-    private var mPositionCallBackList = HashSet<PlayInfoCallBack>()
-    private var mPlayNow = false
-    private val mTask = object : TimerTask(){
-        override fun run() {
-            mCurrentPosition = mMediaPlayer.currentPosition
-            mPositionCallBackList.forEach {
-                it.playPosition(mCurrentPosition)
-            }
-        }
-    }
-    private lateinit var mHasRandomPlayData: MusicPlayNode<MusicVo>
 
     init {
         mMediaPlayer.apply {
@@ -77,7 +58,7 @@ class NickPlayer: PlayerControl{
                 LogUtils.i("已缓存:${precent}%")
             }
         }
-        mTimer.schedule(mTask,0,1000)
+        init()
         LogUtils.i("初始化完成")
     }
 
@@ -159,36 +140,10 @@ class NickPlayer: PlayerControl{
             LogUtils.w("setPlayList data is empty")
             return
         }
-        mMusicData.clear()
-        mMusicData.addAll(data)
-        mIndex = 0
-        //设置
-        val randomList = ArrayList(mMusicData).shuffled()
-        if (::mHasRandomPlayData.isInitialized){
-            mHasRandomPlayData.reset()
-        }else{
-            mHasRandomPlayData = MusicPlayNode()
-        }
-        randomList.forEach {
-            mHasRandomPlayData.add(it)
-        }
-        mPlayNow = false
+        setDataSource(data)
         mMediaPlayer.reset()
         mMediaPlayer.setDataSource("${BaseUrl.url}${mMusicData[mIndex].path}")
         mMediaPlayer.prepareAsync()
-    }
-
-    override fun getCurrentInfo():PlayInfo {
-        val musicVo = mMusicData[mIndex]
-        return PlayInfo().apply {
-            dataIndex = mIndex
-            playStatus = mPlayStatus
-            playMode = mPlayMode
-            currentPosition = mCurrentPosition
-            duration = mDuration
-            albumName = musicVo.albumName
-            mainActor = musicVo.mainActors
-        }
     }
 
     override fun release() {
@@ -199,22 +154,9 @@ class NickPlayer: PlayerControl{
         mPositionCallBackList.clear()
     }
 
-    override fun registerCallBack(callBack: PlayInfoCallBack) {
-        mPositionCallBackList.add(callBack)
-    }
+    override fun getPlayPosition(): Int {
 
-    override fun removeCallBack(callBack: PlayInfoCallBack) {
-        if (mPositionCallBackList.contains(callBack)){
-            mPositionCallBackList.remove(callBack)
-        }
-    }
-
-    override fun setPlayMode(playMode: PlayMode) {
-        mPlayMode = playMode
-    }
-
-    override fun getRandomMusicList(): List<MusicVo> {
-        return mHasRandomPlayData.convertList()
+        return mMediaPlayer.currentPosition
     }
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
