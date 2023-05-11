@@ -49,83 +49,20 @@ class NickPlayer: AbsPlayer(){
                     mPlayStatus = PlayStatus.PLAY
                 }
 
-                val playInfo = getCurrentInfo()
                 mPositionCallBackList.forEach { callback->
-                    callback.prepareStart(playInfo)
+                    callback.prepareStart(getCurrentInfo())
                 }
             }
             setOnBufferingUpdateListener { mp,precent ->
                 LogUtils.i("已缓存:${precent}%")
             }
         }
-        init()
+        super.init()
         LogUtils.i("初始化完成")
-    }
-
-    override fun play(index: Int) {
-        if (mMusicData.isEmpty()){
-            return
-        }
-        if (mIndex == index && mMediaPlayerHasPrepare){
-            if (mPlayStatus==PlayStatus.PAUSE){
-                mMediaPlayer.start()
-                mPlayStatus = PlayStatus.PLAY
-            }
-            return
-        }
-        mIndex = index
-        mPlayNow = true
-        mMediaPlayerHasPrepare = false
-        val musicVo = mMusicData[index]
-        mMediaPlayer.play("${BaseUrl.url}${musicVo.path}")
-        mHasRandomPlayData.setCurrentNode(musicVo)
-    }
-
-    override fun playNextRandom() {
-        val musicVo = mHasRandomPlayData.nextData()
-        play(mMusicData.indexOf(musicVo))
-    }
-
-    override fun playLastRandom() {
-        val musicVo = mHasRandomPlayData.lastData()
-        play(mMusicData.indexOf(musicVo))
-    }
-
-    override fun pause() {
-        mMediaPlayer.pause()
-        mPlayStatus = PlayStatus.PAUSE
     }
 
     override fun seek(num: Int) {
         mMediaPlayer.seekTo(num)
-    }
-
-    override fun next() {
-        if (mPlayMode == PlayMode.RANDOM){
-            playNextRandom()
-            return
-        }
-        if (mIndex+1>=mMusicData.size){
-            mIndex = -1
-        }
-        play(mIndex+1)
-    }
-
-    override fun last() {
-        if (mPlayMode == PlayMode.RANDOM){
-            playLastRandom()
-            return
-        }
-
-        if (mIndex-1<0){
-            mIndex = mMusicData.size
-        }
-        play(mIndex-1)
-    }
-
-    override fun playSource(musicVo: MusicVo) {
-        mMusicData.add(mIndex,musicVo)
-        play(mIndex)
     }
 
     override fun replay() {
@@ -135,27 +72,34 @@ class NickPlayer: AbsPlayer(){
         }
     }
 
-    override fun setPlayList(data: List<MusicVo>) {
-        if (data.isEmpty()){
-            LogUtils.w("setPlayList data is empty")
-            return
-        }
-        setDataSource(data)
-        mMediaPlayer.reset()
-        mMediaPlayer.setDataSource("${BaseUrl.url}${mMusicData[mIndex].path}")
-        mMediaPlayer.prepareAsync()
-    }
 
     override fun release() {
-        mTimer.cancel()
+        super.release()
         mMediaPlayer.release()
         mMediaPlayer.clearOnMediaTimeDiscontinuityListener()
         mMediaPlayer.clearOnSubtitleDataListener()
         mPositionCallBackList.clear()
     }
 
-    override fun getPlayPosition(): Int {
+    override fun startPlay() {
+        mMediaPlayer.start()
+    }
 
+    override fun playUrl(url: String) {
+        mMediaPlayer.play(url)
+    }
+
+    override fun prepareUrl(url: String) {
+        mMediaPlayer.reset()
+        mMediaPlayer.setDataSource(url)
+        mMediaPlayer.prepareAsync()
+    }
+
+    override fun playerPause() {
+        mMediaPlayer.pause()
+    }
+
+    override fun getPlayPosition(): Int {
         return mMediaPlayer.currentPosition
     }
 

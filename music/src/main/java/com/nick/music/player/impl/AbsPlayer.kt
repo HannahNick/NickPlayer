@@ -1,5 +1,7 @@
 package com.nick.music.player.impl
 
+import com.blankj.utilcode.util.LogUtils
+import com.nick.base.BaseUrl
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
@@ -7,12 +9,13 @@ import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.util.MusicPlayNode
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 /**
- * 播放器抽象父类，用于保存一些音乐数据和状态数据
+ * 播放器抽象父类，用于保存一些音乐、状态数据，还有部分播放的业务逻辑
  */
 abstract class AbsPlayer: PlayerControl {
     //首次初始化数据,播放数据
@@ -40,10 +43,14 @@ abstract class AbsPlayer: PlayerControl {
 
     private val mTask = object : TimerTask(){
         override fun run() {
-            mCurrentPosition = getPlayPosition()
-            mPositionCallBackList.forEach {
-                it.playPosition(mCurrentPosition)
-            }
+            io.reactivex.rxjava3.core.Observable.just("")
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { _ ->
+                    mCurrentPosition = getPlayPosition()
+                    mPositionCallBackList.forEach {
+                        it.playPosition(mCurrentPosition)
+                    }
+                }
         }
     }
 
@@ -57,9 +64,7 @@ abstract class AbsPlayer: PlayerControl {
         mTimer.cancel()
     }
 
-    abstract fun getPlayPosition(): Int
-
-    protected fun setDataSource(data: List<MusicVo>){
+    private fun setDataSource(data: List<MusicVo>){
         mMusicData.clear()
         mMusicData.addAll(data)
         mIndex = 0
@@ -106,4 +111,103 @@ abstract class AbsPlayer: PlayerControl {
     override fun getRandomMusicList(): List<MusicVo> {
         return mHasRandomPlayData.convertList()
     }
+
+    override fun play(index: Int) {
+        if (mMusicData.isEmpty()){
+            return
+        }
+        if (mIndex == index && mMediaPlayerHasPrepare){
+            if (mPlayStatus==PlayStatus.PAUSE){
+                startPlay()
+                mPlayStatus = PlayStatus.PLAY
+            }
+            return
+        }
+        mIndex = index
+        mPlayNow = true
+        mMediaPlayerHasPrepare = false
+        val musicVo = mMusicData[index]
+        playUrl("${BaseUrl.url}${musicVo.path}")
+        mHasRandomPlayData.setCurrentNode(musicVo)
+    }
+
+    override fun playNextRandom() {
+        val musicVo = mHasRandomPlayData.nextData()
+        play(mMusicData.indexOf(musicVo))
+    }
+
+    override fun playLastRandom() {
+        val musicVo = mHasRandomPlayData.lastData()
+        play(mMusicData.indexOf(musicVo))
+    }
+
+    override fun pause() {
+        playerPause()
+        mPlayStatus = PlayStatus.PAUSE
+    }
+
+    override fun next() {
+        if (mPlayMode == PlayMode.RANDOM){
+            playNextRandom()
+            return
+        }
+        if (mIndex+1>=mMusicData.size){
+            mIndex = -1
+        }
+        play(mIndex+1)
+    }
+
+    override fun last() {
+        if (mPlayMode == PlayMode.RANDOM){
+            playLastRandom()
+            return
+        }
+
+        if (mIndex-1<0){
+            mIndex = mMusicData.size
+        }
+        play(mIndex-1)
+    }
+
+    override fun playSource(musicVo: MusicVo) {
+        mMusicData.add(mIndex,musicVo)
+        play(mIndex)
+    }
+
+    override fun setPlayList(data: List<MusicVo>) {
+        if (data.isEmpty()){
+            LogUtils.w("setPlayList data is empty")
+            return
+        }
+        setDataSource(data)
+        prepareUrl("${BaseUrl.url}${mMusicData[mIndex].path}")
+
+    }
+
+    /**
+     * 直接播放无需准备
+     */
+    abstract fun startPlay()
+
+    /**
+     * 播放指定路径，需要准备
+     */
+    abstract fun playUrl(url: String)
+
+    /**
+     * 准备播放路径
+     */
+    abstract fun prepareUrl(url: String)
+
+    /**
+     * 播放暂停
+     */
+    abstract fun playerPause()
+
+    /**
+     * 获取当前播放位置
+     */
+    abstract fun getPlayPosition(): Int
+
+
 }

@@ -1,78 +1,90 @@
 package com.nick.music.player.impl
 
+import android.content.Context
 import android.view.SurfaceHolder
-import com.nick.base.vo.MusicVo
-import com.nick.music.entity.PlayInfo
-import com.nick.music.player.PlayInfoCallBack
-import com.nick.music.player.PlayerControl
-import com.nick.music.server.PlayMode
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import com.blankj.utilcode.util.LogUtils
+import com.nick.music.server.PlayStatus
 
-class NickExoPlayer: PlayerControl {
-    override fun play(index: Int) {
-        TODO("Not yet implemented")
+class NickExoPlayer(private val context: Context): AbsPlayer() {
+
+    private val player = ExoPlayer.Builder(context).build()
+
+    init {
+        player.addListener(object : Player.Listener{
+
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                super.onPlaybackStateChanged(playbackState)
+                if (playbackState == Player.STATE_READY){
+                    LogUtils.i("duration: ${player.duration}")
+                    mDuration = player.contentDuration.toInt()
+                    if (mPlayNow){
+                        player.play()
+                        mPlayStatus = PlayStatus.PLAY
+                    }
+                    mPositionCallBackList.forEach { callback->
+                        callback.prepareStart(getCurrentInfo())
+                    }
+                }
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                super.onPlayerError(error)
+                LogUtils.e("onPlayerError: $error")
+
+            }
+
+        })
+        super.init()
     }
 
-    override fun playNextRandom() {
-        TODO("Not yet implemented")
+    override fun startPlay() {
+        player.play()
     }
 
-    override fun playLastRandom() {
-        TODO("Not yet implemented")
+    override fun playUrl(url: String) {
+        val mediaItem = MediaItem.fromUri(url)
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        mMediaPlayerHasPrepare = true
+
     }
 
-    override fun pause() {
-        TODO("Not yet implemented")
+    override fun prepareUrl(url: String) {
+        val mediaItem = MediaItem.fromUri(url)
+        player.setMediaItem(mediaItem)
+        player.prepare()
+    }
+
+    override fun playerPause() {
+        player.pause()
+    }
+
+    override fun getPlayPosition(): Int {
+        return player.currentPosition.toInt()
     }
 
     override fun seek(num: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun next() {
-        TODO("Not yet implemented")
-    }
-
-    override fun last() {
-        TODO("Not yet implemented")
-    }
-
-    override fun playSource(musicVo: MusicVo) {
-        TODO("Not yet implemented")
+        player.seekTo(num.toLong())
     }
 
     override fun replay() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setPlayList(data: List<MusicVo>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCurrentInfo(): PlayInfo {
-        TODO("Not yet implemented")
-    }
-
-    override fun release() {
-        TODO("Not yet implemented")
-    }
-
-    override fun registerCallBack(callBack: PlayInfoCallBack) {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeCallBack(callBack: PlayInfoCallBack) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setPlayMode(playMode: PlayMode) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getRandomMusicList(): List<MusicVo> {
-        TODO("Not yet implemented")
+        player.seekTo(0)
+        if (!player.isPlaying){
+            player.play()
+        }
     }
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
-        TODO("Not yet implemented")
+
     }
+
+    override fun release() {
+        super.release()
+        player.release()
+    }
+
 }
