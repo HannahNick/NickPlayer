@@ -3,16 +3,22 @@ package com.nick.music.player.impl
 import android.content.Context
 import android.view.SurfaceHolder
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
 import com.blankj.utilcode.util.LogUtils
+import com.nick.base.vo.enum.UrlType
 import com.nick.music.server.PlayStatus
 
 class NickExoPlayer(private val context: Context): AbsPlayer() {
-
+    private val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
     private val player = ExoPlayer.Builder(context).build()
-
     init {
         player.addListener(object : Player.Listener{
 
@@ -45,17 +51,25 @@ class NickExoPlayer(private val context: Context): AbsPlayer() {
         player.play()
     }
 
-    override fun playUrl(url: String) {
-        val mediaItem = MediaItem.fromUri(url)
-        player.setMediaItem(mediaItem)
+    override fun playUrl(url: String,urlType: UrlType) {
+        if (urlType == UrlType.M3U8){
+            val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(url))
+            player.setMediaSource(hlsMediaSource)
+        }else{
+            player.setMediaItem(MediaItem.fromUri(url))
+        }
         player.prepare()
         mMediaPlayerHasPrepare = true
 
     }
 
-    override fun prepareUrl(url: String) {
-        val mediaItem = MediaItem.fromUri(url)
-        player.setMediaItem(mediaItem)
+    override fun prepareUrl(url: String,urlType: UrlType) {
+        if (urlType == UrlType.M3U8){
+            val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(url))
+            player.setMediaSource(hlsMediaSource)
+        }else{
+            player.setMediaItem(MediaItem.fromUri(url))
+        }
         player.prepare()
     }
 
@@ -79,7 +93,7 @@ class NickExoPlayer(private val context: Context): AbsPlayer() {
     }
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
-
+        player.setVideoSurfaceHolder(holder)
     }
 
     override fun release() {

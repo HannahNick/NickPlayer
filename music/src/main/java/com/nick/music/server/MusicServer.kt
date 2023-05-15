@@ -28,8 +28,8 @@ class MusicServer: Service() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onBind(intent: Intent?): IBinder {
-        val playerControl = NickPlayer()
-//        val playerControl = NickExoPlayer(this)
+//        val playerControl = NickPlayer()
+        val playerControl = NickExoPlayer(this)
         return MusicServerBinder(playerControl)
     }
 

@@ -16,6 +16,7 @@ import com.blankj.utilcode.util.PathUtils
 import com.blankj.utilcode.util.ServiceUtils
 import com.nick.base.BaseUrl
 import com.nick.base.vo.MusicVo
+import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
@@ -56,8 +57,8 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
 //        LogUtils.i("电影本地路径:${PathUtils.getExternalMoviesPath()}/bear.mp4  isExists: ${File(PathUtils.getExternalMoviesPath()+"/bear.mp4").exists()}")
         val initDataTask = Runnable {
             val data = listOf(
-                MusicVo("1","bear","bear","path","${BaseUrl.url}/movies/bear.mp4","123","123"),
-//                MusicVo("1","bear","bear","path","${PathUtils.getExternalMoviesPath()}/bear.mp4","123","123"),
+//                MusicVo("1","bear","bear","path","movies/bear.mp4","123","123"),
+                MusicVo("1","bear","bear","play/QbYVXQpd/index.m3u8",UrlType.M3U8,"123","123","123"),
             )
             mMusicBinder.setPlayList(data)
         }
@@ -105,6 +106,7 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         LogUtils.i("surfaceCreated")
+//        mMusicBinder.attachSurfaceHolder(holder)
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {

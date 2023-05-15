@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.nick.base.BaseUrl
 import com.nick.base.vo.MusicVo
+import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.kt.play
 import com.nick.music.player.PlayInfoCallBack
@@ -85,11 +86,11 @@ class NickPlayer: AbsPlayer(){
         mMediaPlayer.start()
     }
 
-    override fun playUrl(url: String) {
+    override fun playUrl(url: String,urlType: UrlType) {
         mMediaPlayer.play(url)
     }
 
-    override fun prepareUrl(url: String) {
+    override fun prepareUrl(url: String,urlType: UrlType) {
         mMediaPlayer.reset()
         mMediaPlayer.setDataSource(url)
         mMediaPlayer.prepareAsync()

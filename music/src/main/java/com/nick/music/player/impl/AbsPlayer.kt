@@ -3,6 +3,7 @@ package com.nick.music.player.impl
 import com.blankj.utilcode.util.LogUtils
 import com.nick.base.BaseUrl
 import com.nick.base.vo.MusicVo
+import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
@@ -127,7 +128,7 @@ abstract class AbsPlayer: PlayerControl {
         mPlayNow = true
         mMediaPlayerHasPrepare = false
         val musicVo = mMusicData[index]
-        playUrl("${BaseUrl.url}${musicVo.path}")
+        playUrl("${BaseUrl.url}/${musicVo.path}",musicVo.pathType)
         mHasRandomPlayData.setCurrentNode(musicVo)
     }
 
@@ -180,7 +181,8 @@ abstract class AbsPlayer: PlayerControl {
             return
         }
         setDataSource(data)
-        prepareUrl("${BaseUrl.url}${mMusicData[mIndex].path}")
+        val musicVo = mMusicData[mIndex]
+        prepareUrl("${BaseUrl.url}/${musicVo.path}",musicVo.pathType)
 
     }
 
@@ -192,12 +194,12 @@ abstract class AbsPlayer: PlayerControl {
     /**
      * 播放指定路径，需要准备
      */
-    abstract fun playUrl(url: String)
+    abstract fun playUrl(url: String,urlType: UrlType = UrlType.DEFAULT)
 
     /**
      * 准备播放路径
      */
-    abstract fun prepareUrl(url: String)
+    abstract fun prepareUrl(url: String,urlType: UrlType = UrlType.DEFAULT)
 
     /**
      * 播放暂停
@@ -208,6 +210,5 @@ abstract class AbsPlayer: PlayerControl {
      * 获取当前播放位置
      */
     abstract fun getPlayPosition(): Int
-
 
 }
