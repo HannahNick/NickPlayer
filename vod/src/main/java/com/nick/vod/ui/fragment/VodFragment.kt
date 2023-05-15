@@ -21,13 +21,13 @@ import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.binder.MusicBinder
-import com.nick.vod.databinding.FragmentVodBinding
+import com.nick.vod.databinding.LayoutLiveBinding
 import java.io.File
 import java.util.*
 
 class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolder.Callback {
 
-    private val mBindingView by lazy { FragmentVodBinding.inflate(layoutInflater) }
+    private val mBindingView by lazy { LayoutLiveBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
     private lateinit var mMusicBinder: MusicBinder
 
@@ -58,12 +58,14 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
         val initDataTask = Runnable {
             val data = listOf(
 //                MusicVo("1","bear","bear","path","movies/bear.mp4","123","123"),
-                MusicVo("1","bear","bear","play/QbYVXQpd/index.m3u8",UrlType.M3U8,"123","123","123"),
+//                MusicVo("1","bear","bear","play/QbYVXQpd/index.m3u8",UrlType.M3U8,"123","123","123"),
+                MusicVo("1","bear","bear","channels/lantian/channel001/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=edb9ed932efb100c8acc51590186e08e&t=1684153870",UrlType.M3U8,"123","123","123"),
             )
             mMusicBinder.setPlayList(data)
         }
         val registerCallBackTask = Runnable {
             mMusicBinder.registerCallBack(this)
+            mBindingView.gcLayer.initMusicBinder(mMusicBinder)
         }
         val initSurfaceHolderTask = Runnable {
             mMusicBinder.attachSurfaceHolder(mBindingView.svVideo.holder)
@@ -78,9 +80,6 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
         mBindingView.apply {
             ivPlay.setOnClickListener {
                 mMusicBinder.play()
-            }
-            ivPause.setOnClickListener {
-                mMusicBinder.pause()
             }
             svVideo.holder.addCallback(this@VodFragment)
         }

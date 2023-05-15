@@ -16,7 +16,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.server.PlayStatus
 
-class NickExoPlayer(private val context: Context): AbsPlayer() {
+class NickExoPlayer(context: Context): AbsPlayer() {
     private val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
     private val player = ExoPlayer.Builder(context).build()
     init {

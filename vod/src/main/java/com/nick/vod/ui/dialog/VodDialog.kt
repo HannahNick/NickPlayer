@@ -34,9 +34,6 @@ class VodDialog: DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.findViewById<AppCompatImageView>(R.id.iv_back).setOnClickListener {
-            dismissAllowingStateLoss()
-        }
         val window = dialog?.window
         val lp = window?.attributes
         lp?.width = WindowManager.LayoutParams.MATCH_PARENT
