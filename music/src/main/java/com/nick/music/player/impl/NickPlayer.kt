@@ -5,19 +5,11 @@ import android.os.Build
 import android.view.SurfaceHolder
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
-import com.nick.base.BaseUrl
-import com.nick.base.vo.MusicVo
 import com.nick.base.vo.enum.UrlType
-import com.nick.music.entity.PlayInfo
 import com.nick.music.kt.play
-import com.nick.music.player.PlayInfoCallBack
-import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
-import com.nick.music.util.MusicPlayNode
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class NickPlayer: AbsPlayer(){
@@ -43,7 +35,7 @@ class NickPlayer: AbsPlayer(){
                 LogUtils.i("TimedMetaDataAvailableListener:${data.timestamp}")
             }
             setOnPreparedListener {
-                mMediaPlayerHasPrepare = true
+                mPlayerHasPrepare = true
                 mDuration = it.duration
                 if (mPlayNow){
                     it.start()

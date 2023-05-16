@@ -77,17 +77,10 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
                 layoutManager = LinearLayoutManager(context)
                 mLiveAdapter.addData(data)
                 adapter = mLiveAdapter
-                mLiveAdapter.setOnItemClickListener(object : OnItemClickListener {
-                    override fun onItemClick(
-                        adapter: BaseQuickAdapter<*, *>,
-                        view: View,
-                        position: Int
-                    ) {
-                        mMusicBinder.play(position)
-                        mBindingView.gcLayer.setLiveName(mMusicBinder.getPlayInfo().liveName)
-                    }
-
-                })
+                mLiveAdapter.setOnItemClickListener { adapter, view, position ->
+                    mMusicBinder.play(position)
+                    mBindingView.gcLayer.setLiveName(mMusicBinder.getPlayInfo().liveName)
+                }
             }
         }
         val registerCallBackTask = Runnable {
@@ -132,6 +125,10 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
     }
 
     override fun prepareStart(playInfo: PlayInfo) {
+    }
+
+    override fun startPlay() {
+        mBindingView.gcLayer.setPlayStart()
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {

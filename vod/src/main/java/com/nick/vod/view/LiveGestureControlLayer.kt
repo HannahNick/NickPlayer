@@ -110,6 +110,12 @@ class LiveGestureControlLayer @JvmOverloads constructor(context: Context, attrs:
         mTvName.text = name
     }
 
+    fun setPlayStart(){
+        mIvPlay.setImageResource(R.drawable.ic_live_pause)
+        onToggleVisibility(true)
+    }
+
+
     interface GestureCallBack{
         fun fullScreen(){}
         fun back(){}

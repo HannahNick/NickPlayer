@@ -172,4 +172,8 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
             }
         }
     }
+
+    override fun startPlay() {
+
+    }
 }

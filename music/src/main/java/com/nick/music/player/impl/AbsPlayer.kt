@@ -1,7 +1,6 @@
 package com.nick.music.player.impl
 
 import com.blankj.utilcode.util.LogUtils
-import com.nick.base.BaseUrl
 import com.nick.base.vo.MusicVo
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
@@ -36,11 +35,13 @@ abstract class AbsPlayer: PlayerControl {
     //播放状态
     protected var mPlayStatus = PlayStatus.PAUSE
     //播放器是否准备完成(加载好资源)
-    protected var mMediaPlayerHasPrepare = false
+    protected var mPlayerHasPrepare = false
     //播放位置和信息的回调
     protected var mPositionCallBackList = HashSet<PlayInfoCallBack>()
     //是否立即播放
     protected var mPlayNow = false
+    //播放错误次数
+    protected var mErrorTimes = 0
 
     private val mTask = object : TimerTask(){
         override fun run() {
@@ -118,7 +119,7 @@ abstract class AbsPlayer: PlayerControl {
         if (mMusicData.isEmpty()){
             return
         }
-        if (mIndex == index && mMediaPlayerHasPrepare){
+        if (mIndex == index && mPlayerHasPrepare){
             if (mPlayStatus==PlayStatus.PAUSE){
                 startPlay()
                 mPlayStatus = PlayStatus.PLAY
@@ -127,7 +128,7 @@ abstract class AbsPlayer: PlayerControl {
         }
         mIndex = index
         mPlayNow = true
-        mMediaPlayerHasPrepare = false
+        mPlayerHasPrepare = false
         val musicVo = mMusicData[index]
         playUrl(musicVo.path,musicVo.pathType)
         mHasRandomPlayData.setCurrentNode(musicVo)

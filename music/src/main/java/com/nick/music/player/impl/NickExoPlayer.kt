@@ -3,16 +3,14 @@ package com.nick.music.player.impl
 import android.content.Context
 import android.view.SurfaceHolder
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.source.MediaSource
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.server.PlayStatus
 
@@ -30,9 +28,13 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                     if (mPlayNow){
                         player.play()
                         mPlayStatus = PlayStatus.PLAY
+                        mErrorTimes = 0
                     }
                     mPositionCallBackList.forEach { callback->
                         callback.prepareStart(getCurrentInfo())
+                        if (mPlayNow){
+                            callback.startPlay()
+                        }
                     }
                 }
             }
@@ -40,7 +42,15 @@ class NickExoPlayer(context: Context): AbsPlayer() {
             override fun onPlayerError(error: PlaybackException) {
                 super.onPlayerError(error)
                 LogUtils.e("onPlayerError: $error")
-
+                if (mErrorTimes==3){
+                    LogUtils.e("播放重试失败")
+                    ToastUtils.showLong("播放重试失败")
+                    return
+                }
+                mErrorTimes++
+                mPlayerHasPrepare = false
+                player.stop()
+                play(mCurrentPosition)
             }
 
         })
@@ -59,7 +69,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
             player.setMediaItem(MediaItem.fromUri(url))
         }
         player.prepare()
-        mMediaPlayerHasPrepare = true
+        mPlayerHasPrepare = true
 
     }
 

@@ -13,4 +13,9 @@ interface PlayInfoCallBack {
      * 播放器准备完毕
      */
     fun prepareStart(playInfo: PlayInfo)
+
+    /**
+     * 开始播放
+     */
+    fun startPlay()
 }
