@@ -50,7 +50,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                 mErrorTimes++
                 mPlayerHasPrepare = false
                 player.stop()
-                play(mCurrentPosition)
+                play(mIndex)
             }
 
         })
