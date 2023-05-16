@@ -42,9 +42,10 @@ dependencies {
     api "com.blankj:utilcodex:$dependencies_version.utilcodex"
     api "com.squareup.retrofit2:retrofit:$dependencies_version.retrofit"
     api "com.squareup.retrofit2:converter-gson:$dependencies_version.converterGson"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.4"
-    api "io.reactivex.rxjava3:rxjava:3.1.5"
-    api "io.reactivex.rxjava3:rxandroid:3.0.2"
+    api "com.github.CymChad:BaseRecyclerViewAdapterHelper:$dependencies_version.quickAdapter"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$dependencies_version.kotlinxCoroutinesRx2"
+    api "io.reactivex.rxjava3:rxjava:$dependencies_version.rxjava"
+    api "io.reactivex.rxjava3:rxandroid:$dependencies_version.rxandroid"
     api("com.github.ihsanbal:LoggingInterceptor:$dependencies_version.loggingInterceptor") {
         exclude group: 'org.json', module: 'json'
     }

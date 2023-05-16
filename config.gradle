@@ -15,6 +15,10 @@ ext {
             retrofit               : "2.9.0",
             converterGson          : "2.9.0",
             loggingInterceptor     : "3.1.0",
+            quickAdapter           : "3.0.10",
+            kotlinxCoroutinesRx2    : "1.6.4",
+            rxjava                  : "3.1.5",
+            rxandroid               : "3.0.2",
     ]
 
     getProjectName = { Project project ->
