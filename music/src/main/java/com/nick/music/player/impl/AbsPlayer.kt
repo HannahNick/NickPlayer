@@ -102,6 +102,7 @@ abstract class AbsPlayer: PlayerControl {
             duration = mDuration
             albumName = musicVo.albumName
             mainActor = musicVo.mainActors
+            liveName = musicVo.liveName
         }
     }
 
@@ -128,7 +129,7 @@ abstract class AbsPlayer: PlayerControl {
         mPlayNow = true
         mMediaPlayerHasPrepare = false
         val musicVo = mMusicData[index]
-        playUrl("${BaseUrl.url}/${musicVo.path}",musicVo.pathType)
+        playUrl(musicVo.path,musicVo.pathType)
         mHasRandomPlayData.setCurrentNode(musicVo)
     }
 
@@ -182,7 +183,7 @@ abstract class AbsPlayer: PlayerControl {
         }
         setDataSource(data)
         val musicVo = mMusicData[mIndex]
-        prepareUrl("${BaseUrl.url}/${musicVo.path}",musicVo.pathType)
+        prepareUrl(musicVo.path,musicVo.pathType)
 
     }
 

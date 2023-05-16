@@ -4,15 +4,15 @@ import com.nick.base.vo.enum.UrlType
 import java.util.Date
 
 data class MusicVo (
-    val id: String,
+    val id: String = "",
     /**
      * 专辑名
      */
-    val albumName: String,
+    val albumName: String = "",
     /**
      * 演唱者
      */
-    val mainActors:String,
+    val mainActors:String = "",
     /**
      * 外链地址
      */
@@ -24,13 +24,17 @@ data class MusicVo (
     /**
      * 图片地址
      */
-    val imgPath: String,
+    val imgPath: String = "",
     /**
      * 创建时间
      */
-    val createTime: String,
+    val createTime: String = "",
     /**
      * 更新时间
      */
-    val updateTime: String,
+    val updateTime: String = "",
+    /**
+     * 直播台名
+     */
+    val liveName: String = "",
 )

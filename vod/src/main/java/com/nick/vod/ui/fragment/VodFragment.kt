@@ -61,7 +61,8 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
             val data = listOf(
 //                MusicVo("1","bear","bear","path","movies/bear.mp4","123","123"),
 //                MusicVo("1","bear","bear","play/QbYVXQpd/index.m3u8",UrlType.M3U8,"123","123","123"),
-                MusicVo("1","bear","bear","channels/lantian/channel001/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=edb9ed932efb100c8acc51590186e08e&t=1684153870",UrlType.M3U8,"123","123","123"),
+                MusicVo(path = "http://ali-vl.cztv.com/channels/lantian/channel001/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=edb9ed932efb100c8acc51590186e08e&t=1684153870", pathType = UrlType.M3U8, liveName = "浙江卫视"),
+
             )
             mMusicBinder.setPlayList(data)
         }
@@ -69,6 +70,7 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
             mMusicBinder.registerCallBack(this)
             mBindingView.gcLayer.apply {
                 initMusicBinder(mMusicBinder)
+                setLiveName(mMusicBinder.getPlayInfo().liveName)
             }
 
         }
@@ -110,7 +112,6 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         LogUtils.i("surfaceCreated")
-//        mMusicBinder.attachSurfaceHolder(holder)
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {

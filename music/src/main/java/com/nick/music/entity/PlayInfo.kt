@@ -13,4 +13,5 @@ class PlayInfo {
     var mainActor = ""
     var currentPosition = 0
     var duration = 0
+    var liveName = ""
 }

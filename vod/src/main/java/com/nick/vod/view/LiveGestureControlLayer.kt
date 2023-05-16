@@ -106,6 +106,10 @@ class LiveGestureControlLayer @JvmOverloads constructor(context: Context, attrs:
         mMusicBinder = musicBinder
     }
 
+    fun setLiveName(name: String){
+        mTvName.text = name
+    }
+
     interface GestureCallBack{
         fun fullScreen(){}
         fun back(){}
