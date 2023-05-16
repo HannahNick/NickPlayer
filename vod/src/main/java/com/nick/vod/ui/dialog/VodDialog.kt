@@ -1,27 +1,35 @@
 package com.nick.vod.ui.dialog
 
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
-import androidx.appcompat.widget.AppCompatImageView
+import android.view.*
 import androidx.fragment.app.DialogFragment
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.nick.music.R
 import com.nick.vod.ui.fragment.VodFragment
+import com.nick.vod.view.LiveGestureControlLayer
+import com.nick.vod.wiget.GestureMessageCenter
 
-class VodDialog: DialogFragment() {
+
+class VodDialog: DialogFragment(),LiveGestureControlLayer.GestureCallBack {
 
     private val vodFragment = VodFragment()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val window = dialog?.window
+        window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        GestureMessageCenter.registerCallBack(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        LogUtils.i("Dialog onCreateView")
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val window = dialog?.window
         window?.decorView?.setPadding(0,0,0,0)
@@ -41,7 +49,24 @@ class VodDialog: DialogFragment() {
         lp?.gravity = Gravity.BOTTOM
         lp?.windowAnimations = R.style.AnimDownToTop
         window?.attributes = lp
+        LogUtils.i("Dialog onViewCreated")
     }
 
+    fun showStatus(show: Boolean){
+        val window = dialog?.window
+        if (show){
+            window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }else{
+            window?.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+        }
 
+    }
+
+    override fun back() {
+        super.back()
+        dismiss()
+    }
 }

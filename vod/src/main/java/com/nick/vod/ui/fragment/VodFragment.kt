@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.PathUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ServiceUtils
 import com.nick.base.BaseUrl
 import com.nick.base.vo.MusicVo
@@ -22,10 +23,11 @@ import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.binder.MusicBinder
 import com.nick.vod.databinding.LayoutLiveBinding
+import com.nick.vod.view.LiveGestureControlLayer
 import java.io.File
 import java.util.*
 
-class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolder.Callback {
+class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolder.Callback{
 
     private val mBindingView by lazy { LayoutLiveBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
@@ -65,7 +67,10 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
         }
         val registerCallBackTask = Runnable {
             mMusicBinder.registerCallBack(this)
-            mBindingView.gcLayer.initMusicBinder(mMusicBinder)
+            mBindingView.gcLayer.apply {
+                initMusicBinder(mMusicBinder)
+            }
+
         }
         val initSurfaceHolderTask = Runnable {
             mMusicBinder.attachSurfaceHolder(mBindingView.svVideo.holder)
@@ -109,9 +114,10 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        LogUtils.i("surfaceCreated>>> format:$format,width:$width,height:$height")
+        LogUtils.i("surfaceChanged>>> format:$format,width:$width,height:$height")
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
     }
+
 }

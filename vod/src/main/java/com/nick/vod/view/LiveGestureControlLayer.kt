@@ -14,9 +14,11 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
 import com.nick.vod.R
+import com.nick.vod.wiget.GestureMessageCenter
 
 class LiveGestureControlLayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     ConstraintLayout(context, attrs, defStyleAttr){
@@ -37,6 +39,7 @@ class LiveGestureControlLayer @JvmOverloads constructor(context: Context, attrs:
      */
     private lateinit var mIvPlay : AppCompatImageView
     private lateinit var mIvFullScreen: AppCompatImageView
+    private lateinit var mIvBack: AppCompatImageView
     private lateinit var mTvName: AppCompatTextView
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -45,20 +48,26 @@ class LiveGestureControlLayer @JvmOverloads constructor(context: Context, attrs:
             when (it.id){
                 R.id.iv_play -> mIvPlay = it as AppCompatImageView
                 R.id.iv_full_screen -> mIvFullScreen = it as AppCompatImageView
+                R.id.iv_back -> mIvBack = it as AppCompatImageView
                 R.id.tv_live_name -> mTvName = it as AppCompatTextView
             }
         }
         mIvPlay.setOnClickListener {
             playOrPause()
         }
+        mIvFullScreen.setOnClickListener {
+            GestureMessageCenter.sendFullScreen()
+        }
+        mIvBack.setOnClickListener {
+            GestureMessageCenter.sendBack()
+        }
     }
 
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-
-
         return mGestureDetectorCompat.onTouchEvent(event)
     }
+
 
     private fun playOrPause(){
         val playInfo = mMusicBinder.getPlayInfo()
@@ -75,6 +84,13 @@ class LiveGestureControlLayer @JvmOverloads constructor(context: Context, attrs:
     private fun onToggleVisibility(statusChange: Boolean = false) {
         mHandler.removeCallbacksAndMessages(null)
         children.forEach { v ->
+            if (statusChange){
+                mHandler.postDelayed({
+                    v.visibility = View.GONE
+                },3000)
+                return@forEach
+            }
+
             if (v.isVisible){
                 v.visibility = View.GONE
             }else{
@@ -86,11 +102,12 @@ class LiveGestureControlLayer @JvmOverloads constructor(context: Context, attrs:
         }
     }
 
-    private fun delayDismiss(){
-        // TODO: 延迟消失
-    }
-
     fun initMusicBinder(musicBinder: MusicBinder){
         mMusicBinder = musicBinder
+    }
+
+    interface GestureCallBack{
+        fun fullScreen(){}
+        fun back(){}
     }
 }
