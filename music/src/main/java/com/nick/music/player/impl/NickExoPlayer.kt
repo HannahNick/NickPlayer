@@ -38,7 +38,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                     }
                 }
                 if (playbackState == Player.STATE_ENDED){
-                    player.stop()
+                    player.seekTo(0)
                     player.play()
                     mPositionCallBackList.forEach { callback->
                         callback.prepareStart(getCurrentInfo())

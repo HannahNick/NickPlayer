@@ -198,7 +198,15 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
 
     }
 
+    fun pause(){
+        mValueAnimator.pause()
+    }
+
     fun startDraw(){
+        if (mValueAnimator.isPaused){
+            mValueAnimator.resume()
+            return
+        }
         mValueAnimator.start()
     }
 }

@@ -101,9 +101,11 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 LogUtils.i(GsonUtils.toJson(info))
                 if (info.playStatus == PlayStatus.PLAY){
                     mMusicBinder.pause()
+                    rtvRhythm.pause()
                     ivPlay.setImageResource(R.drawable.play)
                 }else{
                     mMusicBinder.play(info.dataIndex)
+                    rtvRhythm.startDraw()
                     ivPlay.setImageResource(R.drawable.pause)
                 }
             }
