@@ -37,6 +37,17 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                         }
                     }
                 }
+                if (playbackState == Player.STATE_ENDED){
+                    player.stop()
+                    player.play()
+                    mPositionCallBackList.forEach { callback->
+                        callback.prepareStart(getCurrentInfo())
+                        if (mPlayNow){
+                            callback.startPlay()
+                        }
+                    }
+                }
+
             }
 
             override fun onPlayerError(error: PlaybackException) {
@@ -66,6 +77,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
             val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(url))
             player.setMediaSource(hlsMediaSource)
         }else{
+            LogUtils.i("playUrl: $url")
             player.setMediaItem(MediaItem.fromUri(url))
         }
         player.prepare()

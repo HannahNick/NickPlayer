@@ -19,17 +19,24 @@ import com.blankj.utilcode.util.ServiceUtils.bindService
 import com.blankj.utilcode.util.TimeUtils
 import com.nick.base.BaseUrl
 import com.nick.base.http.HttpManager
+import com.nick.base.vo.MusicVo
 import com.nick.music.R
 import com.nick.music.databinding.FragmentMusicPlayBinding
 import com.nick.music.entity.PlayInfo
+import com.nick.music.krc.KrcLyricsFileReader
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
 import com.nick.music.util.Ring
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -58,11 +65,19 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
     private fun initData(){
         val initDataTask = Runnable {
             lifecycleScope.launchWhenResumed {
-                val data = withContext(Dispatchers.IO){
-                    return@withContext HttpManager.api.getAllMusic().data
+//                val data = withContext(Dispatchers.IO){
+//                    return@withContext HttpManager.api.getAllMusic().data
+//                }
+//                mMusicBinder.setPlayList(data?:ArrayList())
+                val krcInfo = withContext(Dispatchers.IO){
+                    val file = File("${context?.filesDir?.absolutePath}/krc","c.krc")
+                    KrcLyricsFileReader().readFile(file)
                 }
+                mBinding.rtvRhythm.setData(krcInfo)
+
+                val path = context?.filesDir?.absolutePath?:""
                 LogUtils.i("完成数据请求")
-                mMusicBinder.setPlayList(data?:ArrayList())
+                mMusicBinder.setPlayList(listOf(MusicVo("1","千千阙歌","陈慧娴","${path}/mc/a.flac")))
             }
         }
         val registerCallBackTask = Runnable {
@@ -174,6 +189,6 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
     }
 
     override fun startPlay() {
-
+        mBinding.rtvRhythm.startDraw()
     }
 }

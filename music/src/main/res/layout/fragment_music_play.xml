@@ -7,6 +7,15 @@
     android:background="@color/purple_200"
     tools:context=".ui.MusicPlayActivity">
 
+    <com.nick.music.view.RhythmView
+        android:id="@+id/rtv_rhythm"
+        android:layout_width="match_parent"
+        android:layout_height="100px"
+        android:layout_marginTop="100px"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_album_name"
         android:layout_width="wrap_content"
@@ -48,6 +57,7 @@
         app:layout_constraintBottom_toBottomOf="@id/iv_play"
         android:layout_marginEnd="@dimen/dp_30"
         android:src="@drawable/play_last"
+        android:visibility="gone"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -59,6 +69,7 @@
         app:layout_constraintBottom_toBottomOf="@id/iv_play"
         android:layout_marginStart="@dimen/dp_30"
         android:src="@drawable/play_next"
+        android:visibility="gone"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -70,6 +81,7 @@
         app:layout_constraintEnd_toStartOf="@id/iv_play_last"
         android:layout_marginEnd="@dimen/dp_30"
         android:src="@drawable/play_cycle"
+        android:visibility="gone"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -81,6 +93,7 @@
         app:layout_constraintStart_toEndOf="@id/iv_play_next"
         android:src="@drawable/play_list"
         android:layout_marginStart="@dimen/dp_30"
+        android:visibility="gone"
         />
 
     <SeekBar
