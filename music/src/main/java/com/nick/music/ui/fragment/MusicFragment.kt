@@ -131,7 +131,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
                     val seekPosition = seekBar.progress
                     mMusicBinder.seek(seekPosition)
-                    mBinding.rtvRhythm.seek(seekPosition)
+                    mBinding.rtvRhythm.seek(seekPosition.toLong())
                 }
 
             })

@@ -83,7 +83,8 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
                     invalidate()
                 }
                 doOnEnd {
-                    LogUtils.i("播放结束了")
+                    mValueAnimator.duration = totalTime
+                    mValueAnimator.setFloatValues(0f,1f)
                 }
             }
     }
@@ -157,6 +158,8 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     }
 
     fun setData(lyricsInfo: LyricsInfo){
+
+
         val lineInfoMap = lyricsInfo.lyricsLineInfoTreeMap
         val size = lineInfoMap.size
         if (size==0){
@@ -170,7 +173,10 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             LogUtils.e("total is empty")
             return
         }
-
+        if (mValueAnimator.isRunning){
+            mValueAnimator.pause()
+        }
+        clearData()
         lineInfoMap.forEach {
             val duration = it.value.wordsDisInterval
             val startTime = it.value.wordsStartTime
@@ -181,26 +187,20 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             rhythmWordIndexList.addAll(wordsIndex.toTypedArray())
             rhythmWordList.addAll(wordsList)
         }
-        LogUtils.i(rhythmWordIndexList)
 
         mValueAnimator.duration = totalTime
+        mValueAnimator.setFloatValues(0f,1f)
         maxRhythmStartX = timeToWidth(totalTime)
         mDataHasInit = true
         invalidate()
-//        mPlayAnimator.apply {
-//            duration = totalTime
-//            interpolator = LinearInterpolator()
-//            setIntValues(0,totalTime)
-//            addUpdateListener {
-//                moveWidth = viewWidth * (it.animatedValue as Float)
-//                invalidate()
-//            }
-//        }
 
+    }
 
-
-
-
+    private fun clearData(){
+        rhythmDurationList.clear()
+        rhythmStartTimeList.clear()
+        rhythmWordIndexList.clear()
+        rhythmWordList.clear()
     }
 
     /**
@@ -224,7 +224,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     /**
      * 跳播
      */
-    fun seek(position: Int){
+    fun seek(position: Long){
         val positionF = position.toFloat()
         val totalF = totalTime.toFloat()
         LogUtils.i("跳转播放: $position ,duration: ${totalTime - position},百分数: ${positionF/totalF}")
@@ -233,5 +233,9 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             duration = totalTime - position
             start()
         }
+    }
+
+    fun release(){
+        clearData()
     }
 }
