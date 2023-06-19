@@ -76,10 +76,10 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
 
     init {
         mValueAnimator.apply {
-                duration = 1000
                 interpolator = LinearInterpolator()
                 addUpdateListener {
                     mMoveWidth = maxRhythmStartX * (it.animatedValue as Float)
+//                    LogUtils.i("movewidth: $mMoveWidth")
                     invalidate()
                 }
                 doOnEnd {
@@ -173,7 +173,8 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             LogUtils.e("total is empty")
             return
         }
-        if (mValueAnimator.isRunning){
+        if (mValueAnimator.isStarted){
+            LogUtils.i("暂停了播放")
             mValueAnimator.pause()
         }
         clearData()
@@ -188,8 +189,9 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             rhythmWordList.addAll(wordsList)
         }
 
-        mValueAnimator.duration = totalTime
         mValueAnimator.setFloatValues(0f,1f)
+        mValueAnimator.duration = totalTime
+        LogUtils.i("totalTime: $totalTime")
         maxRhythmStartX = timeToWidth(totalTime)
         mDataHasInit = true
         invalidate()
@@ -218,6 +220,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             mValueAnimator.resume()
             return
         }
+        LogUtils.i("开始播放")
         mValueAnimator.start()
     }
 
@@ -237,5 +240,6 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
 
     fun release(){
         clearData()
+        mValueAnimator.cancel()
     }
 }

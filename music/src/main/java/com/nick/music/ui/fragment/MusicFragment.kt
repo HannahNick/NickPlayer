@@ -70,14 +70,14 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 //                }
 //                mMusicBinder.setPlayList(data?:ArrayList())
                 val krcInfo = withContext(Dispatchers.IO){
-                    val file = File("${context?.filesDir?.absolutePath}/krc","c.krc")
+                    val file = File("${context?.filesDir?.absolutePath}/krc","kg.krc")
                     KrcLyricsFileReader().readFile(file)
                 }
                 mBinding.rtvRhythm.setData(krcInfo)
 
                 val path = context?.filesDir?.absolutePath?:""
                 LogUtils.i("完成数据请求")
-                mMusicBinder.setPlayList(listOf(MusicVo("1","千千阙歌","陈慧娴","${path}/mc/a.flac")))
+                mMusicBinder.setPlayList(listOf(MusicVo("1","苦瓜","陈奕迅","${path}/mc/kg.mp3")))
             }
         }
         val registerCallBackTask = Runnable {
@@ -105,7 +105,6 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                     ivPlay.setImageResource(R.drawable.play)
                 }else{
                     mMusicBinder.play(info.dataIndex)
-                    rtvRhythm.startDraw()
                     ivPlay.setImageResource(R.drawable.pause)
                 }
             }
