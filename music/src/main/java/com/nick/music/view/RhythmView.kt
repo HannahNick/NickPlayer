@@ -7,6 +7,8 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
+import androidx.core.animation.addListener
+import androidx.core.animation.doOnEnd
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.model.LyricsInfo
@@ -14,7 +16,7 @@ import kotlin.collections.ArrayList
 
 /**
  * 节奏view
- * 用于显示每个歌词的时长
+ * 原理是加载歌词文件，把获取到的歌词持续时长换算成显示长度，然后通过mValueAnimator从零到一完成数值变化，其实就是0-100%的变化
  *
  */
 class RhythmView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0): View(context,attributeSet,defStyleAttr) {
@@ -79,6 +81,9 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
                 addUpdateListener {
                     mMoveWidth = maxRhythmStartX * (it.animatedValue as Float)
                     invalidate()
+                }
+                doOnEnd {
+                    LogUtils.i("播放结束了")
                 }
             }
     }
@@ -198,15 +203,35 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
 
     }
 
+    /**
+     * 暂停
+     */
     fun pause(){
         mValueAnimator.pause()
     }
 
+    /**
+     * 继续或开始
+     */
     fun startDraw(){
         if (mValueAnimator.isPaused){
             mValueAnimator.resume()
             return
         }
         mValueAnimator.start()
+    }
+
+    /**
+     * 跳播
+     */
+    fun seek(position: Int){
+        val positionF = position.toFloat()
+        val totalF = totalTime.toFloat()
+        LogUtils.i("跳转播放: $position ,duration: ${totalTime - position},百分数: ${positionF/totalF}")
+        mValueAnimator.apply {
+            setFloatValues(positionF/totalF,1F)
+            duration = totalTime - position
+            start()
+        }
     }
 }
