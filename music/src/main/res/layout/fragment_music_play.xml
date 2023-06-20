@@ -57,7 +57,6 @@
         app:layout_constraintBottom_toBottomOf="@id/iv_play"
         android:layout_marginEnd="@dimen/dp_30"
         android:src="@drawable/play_last"
-        android:visibility="gone"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -69,7 +68,6 @@
         app:layout_constraintBottom_toBottomOf="@id/iv_play"
         android:layout_marginStart="@dimen/dp_30"
         android:src="@drawable/play_next"
-        android:visibility="gone"
         />
 
     <androidx.appcompat.widget.AppCompatImageView

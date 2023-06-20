@@ -14,4 +14,5 @@ class PlayInfo {
     var currentPosition = 0
     var duration = 0
     var liveName = ""
+    var lyricPath = ""
 }

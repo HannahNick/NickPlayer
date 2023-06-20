@@ -19,27 +19,29 @@ class NickExoPlayer(context: Context): AbsPlayer() {
     private val player = ExoPlayer.Builder(context).build()
     init {
         player.addListener(object : Player.Listener{
-
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
                 if (playbackState == Player.STATE_READY){
                     LogUtils.i("duration: ${player.duration}")
                     mDuration = player.contentDuration.toInt()
+
+                    mPositionCallBackList.forEach { callback->
+                        LogUtils.i("回调准备开始")
+                        callback.prepareStart(getCurrentInfo())
+                    }
                     if (mPlayNow){
                         player.play()
+                        LogUtils.i("播放器已播放")
+                        mPositionCallBackList.forEach { callback->
+                            callback.startPlay()
+                        }
                         mPlayStatus = PlayStatus.PLAY
                         mErrorTimes = 0
                     }
-                    mPositionCallBackList.forEach { callback->
-                        callback.prepareStart(getCurrentInfo())
-                        if (mPlayNow){
-                            callback.startPlay()
-                        }
-                    }
+
                 }
                 if (playbackState == Player.STATE_ENDED){
-                    player.seekTo(0)
-                    player.play()
+                    next()
                     mPositionCallBackList.forEach { callback->
                         callback.prepareStart(getCurrentInfo())
                         if (mPlayNow){
@@ -104,6 +106,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
     }
 
     override fun seek(num: Int) {
+        LogUtils.i("seek: ${num.toLong()}")
         player.seekTo(num.toLong())
     }
 

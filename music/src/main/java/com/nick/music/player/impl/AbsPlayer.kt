@@ -43,11 +43,15 @@ abstract class AbsPlayer: PlayerControl {
     //播放错误次数
     protected var mErrorTimes = 0
 
+
     private val mTask = object : TimerTask(){
         override fun run() {
             io.reactivex.rxjava3.core.Observable.just("")
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { _ ->
+                    if (mPlayStatus == PlayStatus.PAUSE){
+                        return@subscribe
+                    }
                     mCurrentPosition = getPlayPosition()
                     mPositionCallBackList.forEach {
                         it.playPosition(mCurrentPosition)
@@ -99,11 +103,12 @@ abstract class AbsPlayer: PlayerControl {
             dataIndex = mIndex
             playStatus = mPlayStatus
             playMode = mPlayMode
-            currentPosition = mCurrentPosition
+            currentPosition = getPlayPosition()
             duration = mDuration
             albumName = musicVo.albumName
             mainActor = musicVo.mainActors
             liveName = musicVo.liveName
+            lyricPath = musicVo.lyricPath
         }
     }
 

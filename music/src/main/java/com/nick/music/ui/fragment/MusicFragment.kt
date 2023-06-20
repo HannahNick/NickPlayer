@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,28 +18,22 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ServiceUtils
 import com.blankj.utilcode.util.ServiceUtils.bindService
 import com.blankj.utilcode.util.TimeUtils
-import com.nick.base.BaseUrl
-import com.nick.base.http.HttpManager
 import com.nick.base.vo.MusicVo
 import com.nick.music.R
 import com.nick.music.databinding.FragmentMusicPlayBinding
 import com.nick.music.entity.PlayInfo
 import com.nick.music.krc.KrcLyricsFileReader
+import com.nick.music.model.LyricsTag
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
 import com.nick.music.util.Ring
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 
@@ -69,15 +64,28 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 //                    return@withContext HttpManager.api.getAllMusic().data
 //                }
 //                mMusicBinder.setPlayList(data?:ArrayList())
-                val krcInfo = withContext(Dispatchers.IO){
-                    val file = File("${context?.filesDir?.absolutePath}/krc","kg.krc")
-                    KrcLyricsFileReader().readFile(file)
-                }
-                mBinding.rtvRhythm.setData(krcInfo)
 
                 val path = context?.filesDir?.absolutePath?:""
                 LogUtils.i("完成数据请求")
-                mMusicBinder.setPlayList(listOf(MusicVo("1","苦瓜","陈奕迅","${path}/mc/kg.mp3")))
+                mMusicBinder.setPlayList(listOf(
+                    MusicVo("1","苦瓜","","$path/mc/kg.mp3", lyricPath = "$path/krc/kg.krc"),
+                    MusicVo("1","心恋","","$path/mc/xl.flac", lyricPath = "$path/krc/xl.krc"),
+                    MusicVo("1","像风一样自由","","$path/mc/fyyzy.mp3", lyricPath = "$path/krc/fyyzy.krc"),
+                    MusicVo("1","孤勇者","","$path/mc/gyz.mp3", lyricPath = "$path/krc/gyz.krc"),
+                    MusicVo("1","回头太难","","$path/mc/httn.mp3", lyricPath = "$path/krc/httn.krc"),
+                    MusicVo("1","K歌之王","","$path/mc/kgzw.mp3", lyricPath = "$path/krc/kgzw.krc"),
+                    MusicVo("1","明年今日","","$path/mc/mnjr.mp3", lyricPath = "$path/krc/mnjr.krc"),
+                    MusicVo("1","你最珍贵","","$path/mc/nzzg.mp3", lyricPath = "$path/krc/nzzg.krc"),
+                    MusicVo("1","葡萄成熟时","","$path/mc/ptcss.mp3", lyricPath = "$path/krc/ptcss.krc"),
+                    MusicVo("1","十面埋伏","","$path/mc/smmf.mp3", lyricPath = "$path/krc/smmf.krc"),
+                    MusicVo("1","Shall We Talk","","$path/mc/swt.mp3", lyricPath = "$path/krc/swt.krc"),
+                    MusicVo("1","相思风雨中","","$path/mc/xsfyz.mp3", lyricPath = "$path/krc/xsfyz.krc"),
+                    MusicVo("1","喜悦","","$path/mc/xy.mp3", lyricPath = "$path/krc/xy.krc"),
+                    MusicVo("1","夜空中最亮的星","","$path/mc/ykzzldx.mp3", lyricPath = "$path/krc/ykzzldx.krc"),
+                    MusicVo("1","因为爱情","","$path/mc/ywaq.mp3", lyricPath = "$path/krc/ywaq.krc"),
+                    MusicVo("1","一万次悲伤","","$path/mc/ywcbs.mp3", lyricPath = "$path/krc/ywcbs.krc"),
+                    MusicVo("1","遥远的她(粤语版)","","$path/mc/yydt.mp3", lyricPath = "$path/krc/yydt.krc"),
+                ))
             }
         }
         val registerCallBackTask = Runnable {
@@ -101,11 +109,12 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 LogUtils.i(GsonUtils.toJson(info))
                 if (info.playStatus == PlayStatus.PLAY){
                     mMusicBinder.pause()
-                    rtvRhythm.pause()
                     ivPlay.setImageResource(R.drawable.play)
+                    rtvRhythm.pause()
                 }else{
                     mMusicBinder.play(info.dataIndex)
                     ivPlay.setImageResource(R.drawable.pause)
+                    rtvRhythm.resume()
                 }
             }
             ivPlayNext.setOnClickListener {
@@ -125,12 +134,16 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {
+//                    mMusicBinder.pause()
+//                    rtvRhythm.pause()
+//                    mMusicBinder.seek(82425)
+//                    rtvRhythm.mResetData = true
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
                     val seekPosition = seekBar.progress
+                    LogUtils.i("onStopTrackingTouch: $seekPosition")
                     mMusicBinder.seek(seekPosition)
-                    mBinding.rtvRhythm.seek(seekPosition.toLong())
                 }
 
             })
@@ -176,21 +189,36 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
     }
 
     override fun prepareStart(playInfo: PlayInfo) {
-        val durationTime = TimeUtils.millis2String(playInfo.duration.toLong(),"mm:ss")
+        val playInfoDuration = playInfo.duration.toLong()
+        val durationTime = TimeUtils.millis2String(playInfoDuration,"mm:ss")
         mBinding.apply {
             skPositionBar.max = playInfo.duration
             tvDurationTime.text = durationTime
             tvAlbumName.text = playInfo.albumName
             tvMainActor.text = playInfo.mainActor
-            if (playInfo.playStatus == PlayStatus.PLAY){
-                ivPlay.setImageResource(R.drawable.pause)
-            }else{
-                ivPlay.setImageResource(R.drawable.play)
+            ivPlay.setImageResource(R.drawable.play)
+            rtvRhythm.seek(playInfo.currentPosition.toLong())
+            if (rtvRhythm.mTitle == playInfo.albumName){
+                return
             }
+            val path = playInfo.lyricPath
+            if (TextUtils.isEmpty(path)){
+                return
+            }
+            val krcInfo = KrcLyricsFileReader().readFile(File(path))
+            if (krcInfo!=null){
+                rtvRhythm.totalTime = playInfoDuration
+                rtvRhythm.setData(krcInfo)
+                tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
+                tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
+            }
+
         }
     }
 
     override fun startPlay() {
-        mBinding.rtvRhythm.startDraw()
+        mBinding.ivPlay.setImageResource(R.drawable.pause)
+        LogUtils.i("节奏已开始")
+        mBinding.rtvRhythm.start()
     }
 }

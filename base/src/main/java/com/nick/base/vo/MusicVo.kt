@@ -37,4 +37,8 @@ data class MusicVo (
      * 直播台名
      */
     val liveName: String = "",
+    /**
+     * 歌词路径
+     */
+    val lyricPath: String = "",
 )
