@@ -18,6 +18,9 @@ import kotlin.collections.ArrayList
  * 节奏view
  * 原理是加载歌词文件，把获取到的歌词持续时长换算成显示长度，然后通过mValueAnimator从零到一完成数值变化，其实就是0-100%的变化
  *
+
+ *
+ *
  */
 class RhythmView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0): View(context,attributeSet,defStyleAttr) {
 
@@ -32,9 +35,8 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     private val mRhythmWordIndexList = ArrayList<Int>()
     private val mRhythmWordList = ArrayList<String>()
     private var mDataHasInit = false
-    var mResetData = false
-    var mIsSeek = false
     var mTitle = ""
+    var mActor = ""
 
     /**
      * 目前移动的距离
@@ -62,14 +64,17 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     private var mSingLine = mViewWidth/3
 
     /**
-     * 节奏的最大宽度
+     * | -_- | -_ -_ --_ _--- -_ |
+     * 1     2                   3
+     * 1和2是屏幕的宽度
+     * 节奏全长的最大宽度 指的是1和3的宽度，由歌曲的时长换算得出
      */
     private var maxRhythmStartX = 0f
 
     /**
      * 总时长
      */
-    var totalTime = 0L
+    var mTotalTime = 0L
 
     /**
      * 一毫秒的宽度
@@ -82,18 +87,14 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
                 interpolator = LinearInterpolator()
                 addUpdateListener {
                     val animVal = it.animatedValue as Float
-                    if (mResetData){
-                        LogUtils.i("start AnimVal: $animVal , currentPlayTime: ${it.currentPlayTime}")
-
-                        mResetData = false
-                    }
                     mMoveWidth = maxRhythmStartX * animVal
 //                    LogUtils.i("movewidth: $mMoveWidth")
                     invalidate()
                 }
                 doOnEnd {
-                    mValueAnimator.duration = totalTime
+                    mValueAnimator.duration = mTotalTime
                     mValueAnimator.setFloatValues(0f,1f)
+                    LogUtils.i("结束并重置 duration: $duration")
                 }
             }
     }
@@ -147,13 +148,14 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      */
     private fun drawRhythm(canvas: Canvas, time: Long, lineIndex: Int, startTime: Long,words: String){
         val rhythmStartX = mSingLine + timeToWidth(startTime) - mMoveWidth
+        LogUtils.i("mSingLine: $mSingLine, startTime: $startTime, timeToWidth: ${timeToWidth(startTime)}, mMoveWidth: $mMoveWidth")
         val rhythmStopX = rhythmStartX + timeToWidth(time)
         //结束点在屏幕左边，开始点在屏幕右边
         if (rhythmStopX<0 || rhythmStartX > mViewWidth){
             return
         }
         val lineStartY = mLineHeight*lineIndex + 5
-//        LogUtils.i("lineStartX :$lineStartX, lineStartY: $lineStartY, lineStopX: $lineStopX, lineStopY: $lineStartY")
+        LogUtils.i("rhythmStartX :$rhythmStartX, lineStartY: $lineStartY, rhythmStopX: $rhythmStopX, lineStopY: $lineStartY")
         canvas.drawLine(rhythmStartX,lineStartY, rhythmStopX,lineStartY,mRhythmPaint)
         canvas.drawText(words,rhythmStartX,lineStartY+5,mWordsPaint)
     }
@@ -166,9 +168,10 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         return mOneMileSecondWidth*time
     }
 
-    fun setData(lyricsInfo: LyricsInfo){
+    fun setData(lyricsInfo: LyricsInfo,duration: Long){
         val title = lyricsInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
-        if (mTitle == title){
+        val actor = lyricsInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
+        if (mTitle == title && mActor == actor){
             LogUtils.e("data Has set")
             return
         }
@@ -190,15 +193,16 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             mRhythmWordIndexList.addAll(wordsIndex.toTypedArray())
             mRhythmWordList.addAll(wordsList)
         }
-
+        mTotalTime = duration
+        mValueAnimator.cancel()
         mValueAnimator.setFloatValues(0f,1f)
-        mValueAnimator.duration = totalTime
-        LogUtils.i("totalTime: $totalTime")
-        maxRhythmStartX = timeToWidth(totalTime)
+        mValueAnimator.duration = mTotalTime
+        LogUtils.i("totalTime: $mTotalTime")
+        maxRhythmStartX = timeToWidth(mTotalTime)
+        mMoveWidth = 0f
         mDataHasInit = true
-        mResetData = true
-        mIsSeek = false
         mTitle = title
+        mActor = actor
         invalidate()
 
     }
@@ -246,18 +250,15 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     fun seek(position: Long){
         if (mValueAnimator.isRunning){
             mValueAnimator.currentPlayTime = position
-            mIsSeek = true
             return
         }
-
-
         val positionF = position.toFloat()
-        val totalF = totalTime.toFloat()
+        val totalF = mTotalTime.toFloat()
         val presentF = positionF/totalF
-        LogUtils.i("seek: $position ,duration: ${totalTime - position},百分数: $presentF")
+        LogUtils.i("seek: $position ,duration: ${mTotalTime - position},百分数: $presentF")
         mValueAnimator.apply {
             setFloatValues(presentF,1F)
-            duration = totalTime - position
+            duration = mTotalTime - position
         }
         mMoveWidth = maxRhythmStartX * presentF
         invalidate()

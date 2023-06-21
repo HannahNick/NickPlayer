@@ -13,6 +13,7 @@ import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ServiceUtils
@@ -34,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 
@@ -65,27 +67,8 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 //                }
 //                mMusicBinder.setPlayList(data?:ArrayList())
 
-                val path = context?.filesDir?.absolutePath?:""
                 LogUtils.i("完成数据请求")
-                mMusicBinder.setPlayList(listOf(
-                    MusicVo("1","苦瓜","","$path/mc/kg.mp3", lyricPath = "$path/krc/kg.krc"),
-                    MusicVo("1","心恋","","$path/mc/xl.flac", lyricPath = "$path/krc/xl.krc"),
-                    MusicVo("1","像风一样自由","","$path/mc/fyyzy.mp3", lyricPath = "$path/krc/fyyzy.krc"),
-                    MusicVo("1","孤勇者","","$path/mc/gyz.mp3", lyricPath = "$path/krc/gyz.krc"),
-                    MusicVo("1","回头太难","","$path/mc/httn.mp3", lyricPath = "$path/krc/httn.krc"),
-                    MusicVo("1","K歌之王","","$path/mc/kgzw.mp3", lyricPath = "$path/krc/kgzw.krc"),
-                    MusicVo("1","明年今日","","$path/mc/mnjr.mp3", lyricPath = "$path/krc/mnjr.krc"),
-                    MusicVo("1","你最珍贵","","$path/mc/nzzg.mp3", lyricPath = "$path/krc/nzzg.krc"),
-                    MusicVo("1","葡萄成熟时","","$path/mc/ptcss.mp3", lyricPath = "$path/krc/ptcss.krc"),
-                    MusicVo("1","十面埋伏","","$path/mc/smmf.mp3", lyricPath = "$path/krc/smmf.krc"),
-                    MusicVo("1","Shall We Talk","","$path/mc/swt.mp3", lyricPath = "$path/krc/swt.krc"),
-                    MusicVo("1","相思风雨中","","$path/mc/xsfyz.mp3", lyricPath = "$path/krc/xsfyz.krc"),
-                    MusicVo("1","喜悦","","$path/mc/xy.mp3", lyricPath = "$path/krc/xy.krc"),
-                    MusicVo("1","夜空中最亮的星","","$path/mc/ykzzldx.mp3", lyricPath = "$path/krc/ykzzldx.krc"),
-                    MusicVo("1","因为爱情","","$path/mc/ywaq.mp3", lyricPath = "$path/krc/ywaq.krc"),
-                    MusicVo("1","一万次悲伤","","$path/mc/ywcbs.mp3", lyricPath = "$path/krc/ywcbs.krc"),
-                    MusicVo("1","遥远的她(粤语版)","","$path/mc/yydt.mp3", lyricPath = "$path/krc/yydt.krc"),
-                ))
+                mMusicBinder.setPlayList(loadData())
             }
         }
         val registerCallBackTask = Runnable {
@@ -93,6 +76,18 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
         }
         mTasks.add(initDataTask)
         mTasks.add(registerCallBackTask)
+
+    }
+
+    private fun loadData(): List<MusicVo>{
+        val filePath = context?.filesDir?.absolutePath?:""
+        val mcPath = "$filePath/mc"
+        val krcPath = "$filePath/krc"
+        val mcList = FileUtils.listFilesInDir(mcPath)
+        return mcList.map {
+            val albumName = it.name.substring(0,it.name.lastIndexOf("."))
+            MusicVo("1",albumName,"","$mcPath/${it.name}", lyricPath = "$krcPath/${albumName}.krc")
+        }
     }
 
     private fun initServer(){
@@ -198,7 +193,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
             tvMainActor.text = playInfo.mainActor
             ivPlay.setImageResource(R.drawable.play)
             rtvRhythm.seek(playInfo.currentPosition.toLong())
-            if (rtvRhythm.mTitle == playInfo.albumName){
+            if (rtvRhythm.mTitle == playInfo.albumName && rtvRhythm.mActor == playInfo.mainActor){
                 return
             }
             val path = playInfo.lyricPath
@@ -207,8 +202,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
             }
             val krcInfo = KrcLyricsFileReader().readFile(File(path))
             if (krcInfo!=null){
-                rtvRhythm.totalTime = playInfoDuration
-                rtvRhythm.setData(krcInfo)
+                rtvRhythm.setData(krcInfo,playInfoDuration)
                 tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
                 tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
             }
