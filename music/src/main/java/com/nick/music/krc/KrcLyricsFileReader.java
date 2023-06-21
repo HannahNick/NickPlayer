@@ -202,10 +202,8 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 //每个歌词在view的index
                 int wordsIndex[] = new int[lyricsWords.length];
                 //时间偏移量
-                long offset = Long.parseLong((String) lyricsTags.get(LyricsTag.TAG_OFFSET));
+//                long offset = Long.parseLong((String) lyricsTags.get(LyricsTag.TAG_OFFSET));
                 int index = 0;
-                int randomIndex = 3;
-                Random random = new Random();
                 while (lyricsWordsMatcher.find()) {
 
                     //验证

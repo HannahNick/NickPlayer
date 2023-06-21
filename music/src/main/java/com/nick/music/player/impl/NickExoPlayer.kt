@@ -23,7 +23,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                 super.onPlaybackStateChanged(playbackState)
                 if (playbackState == Player.STATE_READY){
                     LogUtils.i("duration: ${player.duration}")
-                    mDuration = player.contentDuration.toInt()
+                    mDuration = player.duration.toInt()
 
                     mPositionCallBackList.forEach { callback->
                         LogUtils.i("回调准备开始")

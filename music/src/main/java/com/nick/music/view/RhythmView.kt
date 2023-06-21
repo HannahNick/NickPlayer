@@ -92,9 +92,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
                     invalidate()
                 }
                 doOnEnd {
-                    mValueAnimator.duration = mTotalTime
-                    mValueAnimator.setFloatValues(0f,1f)
-                    LogUtils.i("结束并重置 duration: $duration")
+                    LogUtils.i("节奏结束 duration: $duration")
                 }
             }
     }
@@ -148,14 +146,14 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      */
     private fun drawRhythm(canvas: Canvas, time: Long, lineIndex: Int, startTime: Long,words: String){
         val rhythmStartX = mSingLine + timeToWidth(startTime) - mMoveWidth
-        LogUtils.i("mSingLine: $mSingLine, startTime: $startTime, timeToWidth: ${timeToWidth(startTime)}, mMoveWidth: $mMoveWidth")
+//        LogUtils.i("mSingLine: $mSingLine, startTime: $startTime, timeToWidth: ${timeToWidth(startTime)}, mMoveWidth: $mMoveWidth")
         val rhythmStopX = rhythmStartX + timeToWidth(time)
         //结束点在屏幕左边，开始点在屏幕右边
         if (rhythmStopX<0 || rhythmStartX > mViewWidth){
             return
         }
         val lineStartY = mLineHeight*lineIndex + 5
-        LogUtils.i("rhythmStartX :$rhythmStartX, lineStartY: $lineStartY, rhythmStopX: $rhythmStopX, lineStopY: $lineStartY")
+//        LogUtils.i("rhythmStartX :$rhythmStartX, lineStartY: $lineStartY, rhythmStopX: $rhythmStopX, lineStopY: $lineStartY")
         canvas.drawLine(rhythmStartX,lineStartY, rhythmStopX,lineStartY,mRhythmPaint)
         canvas.drawText(words,rhythmStartX,lineStartY+5,mWordsPaint)
     }
@@ -168,11 +166,11 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         return mOneMileSecondWidth*time
     }
 
-    fun setData(lyricsInfo: LyricsInfo,duration: Long){
+    fun setData(lyricsInfo: LyricsInfo, totalTime: Long){
         val title = lyricsInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
         val actor = lyricsInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
         if (mTitle == title && mActor == actor){
-            LogUtils.e("data Has set")
+            LogUtils.e("data Has set title: $mTitle, actor: $mActor")
             return
         }
 
@@ -193,7 +191,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             mRhythmWordIndexList.addAll(wordsIndex.toTypedArray())
             mRhythmWordList.addAll(wordsList)
         }
-        mTotalTime = duration
+        mTotalTime = totalTime
         mValueAnimator.cancel()
         mValueAnimator.setFloatValues(0f,1f)
         mValueAnimator.duration = mTotalTime
