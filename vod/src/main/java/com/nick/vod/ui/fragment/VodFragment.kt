@@ -125,7 +125,7 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
     override fun prepareStart(playInfo: PlayInfo) {
     }
 
-    override fun startPlay() {
+    override fun startPlay(position: Long) {
         mBindingView.gcLayer.setPlayStart()
     }
 

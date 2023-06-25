@@ -1,5 +1,6 @@
 package com.nick.music.view
 
+import android.animation.TypeEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -23,20 +24,45 @@ import kotlin.collections.ArrayList
  *
  */
 class RhythmView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0): View(context,attributeSet,defStyleAttr) {
-
+    /**
+     * 节奏画笔
+     */
     private val mRhythmPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
+     * 字画笔
+     */
     private val mWordsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
+     * 歌唱位置画笔
+     */
     private val mSingPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    private var mLineHeight = 10f
+    /**
+     * 播放数值发生器，是播放移动的核心0~100%变化
+     */
     private val mValueAnimator = ValueAnimator.ofFloat(0f,1f)
+
+    /**
+     * 每个字的持续时长
+     */
     private val mRhythmDurationList = ArrayList<Long>()
+
+    /**
+     * 每个字的绝对开始时间
+     */
     private val mRhythmStartTimeList = ArrayList<Long>()
+
+    /**
+     * 每个字的显示位置下标
+     */
     private val mRhythmWordIndexList = ArrayList<Int>()
+
+    /**
+     * 每个字的内容
+     */
     private val mRhythmWordList = ArrayList<String>()
-    private var mDataHasInit = false
-    var mTitle = ""
-    var mActor = ""
 
     /**
      * 目前移动的距离
@@ -64,6 +90,19 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     private var mSingLine = mViewWidth/3
 
     /**
+     * 节奏高度，
+     */
+    private var mLineHeight = 10f
+
+    /**
+     * 节奏高度偏移量
+     * 节奏是以一个点为垂直中点横向画的，假如从坐标(0,0)画一条宽度为100px，高度为10px的节奏也就是一个矩形，
+     *  实际上画的坐标位置是，(0,-5)(0,5)->(100,-5)(100,5)。
+     *  但是(0,-5)是超出屏幕的，所以需要这个高度偏移量来调整节奏绘制
+     */
+    private var mLineHeightOffset = mLineHeight/2
+
+    /**
      * | -_- | -_ -_ --_ _--- -_ |
      * 1     2                   3
      * 1和2是屏幕的宽度
@@ -81,6 +120,25 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      */
     private var mOneMileSecondWidth = mViewWidth/mShowRhythmTime
 
+    /**
+     * 当前唱的字
+     */
+    private var mCurrentWords = ""
+
+    /**
+     * 数据初始化标志
+     */
+    private var mDataHasInit = false
+
+    /**
+     * 当前播放的歌曲名
+     */
+    var mTitle = ""
+
+    /**
+     * 当前播放的歌手
+     */
+    var mActor = ""
 
     init {
         mValueAnimator.apply {
@@ -94,6 +152,15 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
                 doOnEnd {
                     LogUtils.i("节奏结束 duration: $duration")
                 }
+                setEvaluator(object : TypeEvaluator<Float>{
+                    override fun evaluate(
+                        fraction: Float,
+                        startValue: Float,
+                        endValue: Float
+                    ): Float {
+                        return fraction
+                    }
+                })
             }
     }
 
@@ -103,6 +170,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         mViewWidth = right.toFloat()
         mViewHeight = (bottom - top).toFloat()
         mLineHeight = mViewHeight/10
+        mLineHeightOffset = mLineHeight/2
         mSingLine = mViewWidth/3
         mOneMileSecondWidth = mViewWidth/mShowRhythmTime
         LogUtils.i("mOneMileSecondWidth: $mOneMileSecondWidth")
@@ -152,10 +220,15 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         if (rhythmStopX<0 || rhythmStartX > mViewWidth){
             return
         }
-        val lineStartY = mLineHeight*lineIndex + 5
+        val rhythmStartY = mLineHeight*lineIndex + mLineHeightOffset
+        //当前唱的字
+        if (rhythmStartX<mSingLine && rhythmStopX>mSingLine && mCurrentWords !=words){
+//            LogUtils.i(words)
+            mCurrentWords = words
+        }
 //        LogUtils.i("rhythmStartX :$rhythmStartX, lineStartY: $lineStartY, rhythmStopX: $rhythmStopX, lineStopY: $lineStartY")
-        canvas.drawLine(rhythmStartX,lineStartY, rhythmStopX,lineStartY,mRhythmPaint)
-        canvas.drawText(words,rhythmStartX,lineStartY+5,mWordsPaint)
+        canvas.drawLine(rhythmStartX,rhythmStartY, rhythmStopX,rhythmStartY,mRhythmPaint)
+        canvas.drawText(words,rhythmStartX,rhythmStartY+mLineHeightOffset,mWordsPaint)
     }
 
     private fun drawSingLine(canvas: Canvas){
@@ -216,8 +289,8 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      * 暂停
      */
     fun pause(){
-        LogUtils.i("节奏暂停")
         mValueAnimator.pause()
+        LogUtils.i("节奏暂停 position:${mValueAnimator.currentPlayTime}")
     }
 
     /**
@@ -237,8 +310,8 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      */
     fun resume(){
         if (mValueAnimator.isPaused){
-            LogUtils.i("节奏继续")
             mValueAnimator.resume()
+            LogUtils.i("节奏继续 position:${mValueAnimator.currentPlayTime}")
         }
     }
 
@@ -247,17 +320,15 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      */
     fun seek(position: Long){
         if (mValueAnimator.isRunning){
+            LogUtils.i("seek: $position")
             mValueAnimator.currentPlayTime = position
             return
         }
         val positionF = position.toFloat()
         val totalF = mTotalTime.toFloat()
         val presentF = positionF/totalF
-        LogUtils.i("seek: $position ,duration: ${mTotalTime - position},百分数: $presentF")
-        mValueAnimator.apply {
-            setFloatValues(presentF,1F)
-            duration = mTotalTime - position
-        }
+
+        mValueAnimator.setCurrentFraction(presentF)
         mMoveWidth = maxRhythmStartX * presentF
         invalidate()
     }

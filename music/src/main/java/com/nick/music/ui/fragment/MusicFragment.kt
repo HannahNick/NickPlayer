@@ -103,13 +103,9 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 val info = mMusicBinder.getPlayInfo()
                 LogUtils.i(GsonUtils.toJson(info))
                 if (info.playStatus == PlayStatus.PLAY){
-                    mMusicBinder.pause()
-                    ivPlay.setImageResource(R.drawable.play)
-                    rtvRhythm.pause()
+                    pause()
                 }else{
-                    mMusicBinder.play(info.dataIndex)
-                    ivPlay.setImageResource(R.drawable.pause)
-                    rtvRhythm.resume()
+                    play(info)
                 }
             }
             ivPlayNext.setOnClickListener {
@@ -159,6 +155,30 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 
     }
 
+    fun pause(){
+        mMusicBinder.pause()
+        LogUtils.i("player currentPosition: ${mMusicBinder.getPlayInfo().currentPosition}")
+        mBinding.apply {
+            ivPlay.setImageResource(R.drawable.play)
+            rtvRhythm.pause()
+        }
+
+    }
+
+    fun play(info: PlayInfo){
+        LogUtils.i("继续播放 position:${info.currentPosition}")
+        mMusicBinder.play(info.dataIndex)
+        mBinding.apply {
+            ivPlay.setImageResource(R.drawable.pause)
+            rtvRhythm.resume()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        pause()
+    }
+
     override fun onServiceConnected(name: ComponentName?, service: IBinder) {
         mMusicBinder = service as MusicBinder
         LogUtils.i("绑定服务回调成功")
@@ -192,7 +212,6 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
             tvAlbumName.text = playInfo.albumName
             tvMainActor.text = playInfo.mainActor
             ivPlay.setImageResource(R.drawable.play)
-            rtvRhythm.seek(playInfo.currentPosition.toLong())
             if (rtvRhythm.mTitle == playInfo.albumName && rtvRhythm.mActor == playInfo.mainActor){
                 return
             }
@@ -210,9 +229,12 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
         }
     }
 
-    override fun startPlay() {
-        mBinding.ivPlay.setImageResource(R.drawable.pause)
-        LogUtils.i("节奏已开始")
-        mBinding.rtvRhythm.start()
+    override fun startPlay(position: Long) {
+        mBinding.apply {
+            ivPlay.setImageResource(R.drawable.pause)
+            rtvRhythm.seek(position)
+            rtvRhythm.start()
+        }
+
     }
 }

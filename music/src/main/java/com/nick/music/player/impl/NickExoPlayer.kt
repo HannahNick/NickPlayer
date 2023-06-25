@@ -33,8 +33,9 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                         player.play()
                         LogUtils.i("播放器已播放")
                         mPositionCallBackList.forEach { callback->
-                            callback.startPlay()
+                            callback.startPlay(player.currentPosition)
                         }
+                        LogUtils.i("已回调开始播放")
                         mPlayStatus = PlayStatus.PLAY
                         mErrorTimes = 0
                     }
