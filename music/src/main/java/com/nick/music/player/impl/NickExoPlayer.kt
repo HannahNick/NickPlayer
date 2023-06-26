@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.SurfaceHolder
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -60,7 +61,6 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                 player.stop()
                 play(mIndex)
             }
-
         })
         super.init()
     }
@@ -103,6 +103,10 @@ class NickExoPlayer(context: Context): AbsPlayer() {
     override fun seek(num: Int) {
         LogUtils.i("seek: ${num.toLong()}")
         player.seekTo(num.toLong())
+    }
+
+    override fun setKey(key: Float) {
+        player.playbackParameters = PlaybackParameters(1f,key)
     }
 
     override fun replay() {

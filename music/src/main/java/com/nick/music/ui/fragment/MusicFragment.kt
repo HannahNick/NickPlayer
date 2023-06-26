@@ -138,6 +138,28 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 }
 
             })
+            skKeyBar.max = 8
+            skKeyBar.progress = 4
+            skKeyBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+                override fun onProgressChanged(
+                    seekBar: SeekBar,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    val keyPosition = seekBar.progress
+                    val keyValue = 1f+(keyPosition-4)*0.025f
+                    mMusicBinder.setKey(keyValue)
+                }
+            })
+
             ivMode.setOnClickListener {
                 val playMode = mPlayModeList.next()
                 when (playMode){

@@ -173,7 +173,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         mLineHeightOffset = mLineHeight/2
         mSingLine = mViewWidth/3
         mOneMileSecondWidth = mViewWidth/mShowRhythmTime
-        LogUtils.i("mOneMileSecondWidth: $mOneMileSecondWidth")
+//        LogUtils.i("mOneMileSecondWidth: $mOneMileSecondWidth")
         mRhythmPaint.apply {
             style = Paint.Style.STROKE
 //            strokeCap = Paint.Cap.ROUND

@@ -23,6 +23,10 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
         playerControl.seek(num)
     }
 
+    override fun setKey(key: Float) {
+        playerControl.setKey(key)
+    }
+
     override fun playNext() {
         playerControl.next()
     }

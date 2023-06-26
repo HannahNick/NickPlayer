@@ -58,6 +58,10 @@ class NickPlayer: AbsPlayer(){
         mMediaPlayer.seekTo(num)
     }
 
+    override fun setKey(key: Float) {
+        TODO("Not yet implemented")
+    }
+
     override fun replay() {
         mMediaPlayer.seekTo(0)
         if (!mMediaPlayer.isPlaying){

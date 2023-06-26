@@ -101,7 +101,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/iv_play"
-        android:layout_marginBottom="@dimen/dp_30"
+        android:layout_marginBottom="@dimen/dp_60"
         />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -124,5 +124,15 @@
         app:layout_constraintStart_toEndOf="@id/sk_position_bar"
         android:layout_marginStart="@dimen/dp_5"
         android:text="00:00"
+        />
+
+    <SeekBar
+        android:id="@+id/sk_key_bar"
+        android:layout_width="@dimen/dp_300"
+        android:layout_height="@dimen/dp_25"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sk_position_bar"
+        android:layout_marginTop="@dimen/dp_30"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,6 +23,11 @@ interface MusicBinder {
     fun seek(num: Int)
 
     /**
+     * 设置key
+     */
+    fun setKey(key: Float)
+
+    /**
      * 下一首
      */
     fun playNext()
