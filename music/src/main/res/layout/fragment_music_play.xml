@@ -133,6 +133,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/sk_position_bar"
-        android:layout_marginTop="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_20"
         />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_key_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sk_key_bar"
+        app:layout_constraintStart_toStartOf="@id/sk_key_bar"
+        app:layout_constraintEnd_toEndOf="@id/sk_position_bar"
+        android:layout_marginEnd="@dimen/dp_5"
+        android:text="0"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

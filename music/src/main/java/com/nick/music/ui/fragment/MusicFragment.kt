@@ -146,7 +146,8 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                     progress: Int,
                     fromUser: Boolean
                 ) {
-
+                    val keyPosition = seekBar.progress
+                    tvKeyNum.text = (keyPosition-4).toString()
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {
