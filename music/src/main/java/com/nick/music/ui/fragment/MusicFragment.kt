@@ -138,8 +138,8 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 }
 
             })
-            skKeyBar.max = 8
-            skKeyBar.progress = 4
+            skKeyBar.max = 24
+            skKeyBar.progress = 12
             skKeyBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
                 override fun onProgressChanged(
                     seekBar: SeekBar,
@@ -147,7 +147,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                     fromUser: Boolean
                 ) {
                     val keyPosition = seekBar.progress
-                    tvKeyNum.text = (keyPosition-4).toString()
+                    tvKeyNum.text = (keyPosition-12).toString()
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -156,7 +156,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
                     val keyPosition = seekBar.progress
-                    val keyValue = 1f+(keyPosition-4)*0.025f
+                    val keyValue = 1f+(keyPosition-12)*0.02f
                     mMusicBinder.setKey(keyValue)
                 }
             })

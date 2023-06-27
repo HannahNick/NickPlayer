@@ -28,6 +28,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      * 节奏画笔
      */
     private val mRhythmPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val mRhythmPaint2 = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
      * 字画笔
@@ -72,7 +73,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     /**
      * 整个view需要绘制多长时间的节奏单位 毫秒
      */
-    private val mShowRhythmTime = 5000L
+    private val mShowRhythmTime = 3000L
 
     /**
      * 控件宽度
@@ -93,6 +94,11 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      * 节奏高度，
      */
     private var mLineHeight = 10f
+
+    /**
+     * 线帽半径
+     */
+    private var mCapWidth = mLineHeight/2
 
     /**
      * 节奏高度偏移量
@@ -172,11 +178,16 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         mLineHeight = mViewHeight/10
         mLineHeightOffset = mLineHeight/2
         mSingLine = mViewWidth/3
+        mCapWidth = mLineHeight/2
         mOneMileSecondWidth = mViewWidth/mShowRhythmTime
 //        LogUtils.i("mOneMileSecondWidth: $mOneMileSecondWidth")
         mRhythmPaint.apply {
-            style = Paint.Style.STROKE
-//            strokeCap = Paint.Cap.ROUND
+            strokeCap = Paint.Cap.ROUND
+            strokeWidth = mLineHeight
+            color = context.resources.getColor(R.color.gray,null)
+        }
+        mRhythmPaint2.apply {
+            strokeCap = Paint.Cap.BUTT
             strokeWidth = mLineHeight
             color = context.resources.getColor(R.color.gray,null)
         }
@@ -213,8 +224,10 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      *
      */
     private fun drawRhythm(canvas: Canvas, time: Long, lineIndex: Int, startTime: Long,words: String){
+        //节奏开始位置: 歌唱竖线位置+绝对时间位置 - 位置偏移量
         val rhythmStartX = mSingLine + timeToWidth(startTime) - mMoveWidth
 //        LogUtils.i("mSingLine: $mSingLine, startTime: $startTime, timeToWidth: ${timeToWidth(startTime)}, mMoveWidth: $mMoveWidth")
+        //节奏结束位置: 开始位置+歌词持续时间位置
         val rhythmStopX = rhythmStartX + timeToWidth(time)
         //结束点在屏幕左边，开始点在屏幕右边
         if (rhythmStopX<0 || rhythmStartX > mViewWidth){
@@ -227,12 +240,14 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             mCurrentWords = words
         }
 //        LogUtils.i("rhythmStartX :$rhythmStartX, lineStartY: $lineStartY, rhythmStopX: $rhythmStopX, lineStopY: $lineStartY")
-        canvas.drawLine(rhythmStartX,rhythmStartY, rhythmStopX,rhythmStartY,mRhythmPaint)
+        canvas.drawLine(rhythmStartX+mCapWidth,rhythmStartY, rhythmStopX-mCapWidth,rhythmStartY,mRhythmPaint)
         canvas.drawText(words,rhythmStartX,rhythmStartY+mLineHeightOffset,mWordsPaint)
     }
 
     private fun drawSingLine(canvas: Canvas){
         canvas.drawLine(mSingLine,0f,mSingLine,mViewHeight,mSingPaint)
+//        canvas.drawLine(100f,mLineHeight,200f,mLineHeight,mRhythmPaint2)
+//        canvas.drawLine(100f+mLineHeight/2,mLineHeight+50,200f-mLineHeight/2,mLineHeight+50,mRhythmPaint)
     }
 
     private fun timeToWidth(time: Long): Float{
