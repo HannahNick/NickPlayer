@@ -28,7 +28,11 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      * 节奏画笔
      */
     private val mRhythmPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val mRhythmPaint2 = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
+     * 唱准的节奏画笔
+     */
+    private val mSingRhythmPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
      * 字画笔
@@ -146,6 +150,16 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      */
     var mActor = ""
 
+    /**
+     * 歌手唱歌标志位
+     */
+    private var mSingNow = false
+
+    /**
+     * 歌手开唱的x位置
+     */
+    private var mSingerStartX = 0f
+
     init {
         mValueAnimator.apply {
                 interpolator = LinearInterpolator()
@@ -186,10 +200,10 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             strokeWidth = mLineHeight
             color = context.resources.getColor(R.color.gray,null)
         }
-        mRhythmPaint2.apply {
-            strokeCap = Paint.Cap.BUTT
+        mSingRhythmPaint.apply {
+            strokeCap = Paint.Cap.ROUND
             strokeWidth = mLineHeight
-            color = context.resources.getColor(R.color.gray,null)
+            color = context.resources.getColor(R.color.sing_rhythm,null)
         }
         mWordsPaint.apply {
             textSize = 20f
@@ -240,10 +254,50 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             mCurrentWords = words
         }
 //        LogUtils.i("rhythmStartX :$rhythmStartX, lineStartY: $lineStartY, rhythmStopX: $rhythmStopX, lineStopY: $lineStartY")
+
         canvas.drawLine(rhythmStartX+mCapWidth,rhythmStartY, rhythmStopX-mCapWidth,rhythmStartY,mRhythmPaint)
+        drawSingRhythm(canvas, rhythmStartX, rhythmStopX, rhythmStartY)
         canvas.drawText(words,rhythmStartX,rhythmStartY+mLineHeightOffset,mWordsPaint)
     }
 
+    /**
+     * 画唱准的节奏
+     */
+    private fun drawSingRhythm(canvas: Canvas,rhythmStartX: Float,rhythmStopX: Float,rhythmStartY: Float){
+        //过了唱歌线就覆盖节奏
+        val startX = rhythmStartX + mCapWidth
+        val stopX = rhythmStopX - mCapWidth
+        val singStopX = mSingLine - mCapWidth
+        //如果没有这个条件，在最开始的绘制位置会出现 stop比start要大
+        val rhythmMinWidth = singStopX - startX
+        if (stopX<singStopX){
+            canvas.drawLine(startX,rhythmStartY, stopX,rhythmStartY,mSingRhythmPaint)
+        }else if (rhythmMinWidth >= 0 && startX <= mSingLine && stopX >singStopX ){
+            canvas.drawLine(startX,rhythmStartY, singStopX,rhythmStartY,mSingRhythmPaint)
+        }
+    }
+
+    private fun drawSingRhythm2(canvas: Canvas,rhythmStartX: Float,rhythmStopX: Float,rhythmStartY: Float,index: Int){
+        val startX = rhythmStartX + mCapWidth
+        val stopX = rhythmStopX - mCapWidth
+        val singStopX = mSingLine - mCapWidth
+
+        val rhythmMinWidth = singStopX - startX
+        if (stopX<singStopX){
+            sing(false)
+        }else if (rhythmMinWidth >= 0 && startX <= mSingLine && stopX >singStopX){
+            if (mSingNow){
+                mSingerStartX = startX
+                mSingIndex = index
+                canvas.drawLine(startX,rhythmStartY, singStopX,rhythmStartY,mSingRhythmPaint)
+            }
+
+        }
+    }
+
+    /**
+     * 唱歌竖线
+     */
     private fun drawSingLine(canvas: Canvas){
         canvas.drawLine(mSingLine,0f,mSingLine,mViewHeight,mSingPaint)
 //        canvas.drawLine(100f,mLineHeight,200f,mLineHeight,mRhythmPaint2)
@@ -357,4 +411,27 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         clearData()
         mValueAnimator.cancel()
     }
+
+    fun sing(sing: Boolean){
+        if (sing){
+            mStartRecordTime = System.currentTimeMillis()
+        }else{
+            mSingTime = System.currentTimeMillis() - mStartRecordTime
+            mSingerRhythmData.add(SingerRhythm(mSingerStartX,mSingerStartX+timeToWidth(mSingTime),mSingTime,mSingIndex))
+        }
+    }
+
+    /**
+     * 歌手已唱节奏数据
+     */
+    data class SingerRhythm(
+        var startX: Float,
+        var stopX: Float,
+        var time: Long,
+        var index: Int)
+
+    private var mSingTime = 0L
+    private var mSingIndex = 0
+    private var mStartRecordTime = System.currentTimeMillis()
+    private var mSingerRhythmData = ArrayList<SingerRhythm>()
 }
