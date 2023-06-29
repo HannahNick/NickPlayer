@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.os.IBinder
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
@@ -114,6 +116,20 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
 
             ivPlayLast.setOnClickListener {
                 mMusicBinder.playLast()
+            }
+
+
+            ivSing.setOnTouchListener { v, event ->
+
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        rtvRhythm.sing(true)
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        rtvRhythm.sing(false)
+                    }
+                }
+                true
             }
             skPositionBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
                 override fun onProgressChanged(

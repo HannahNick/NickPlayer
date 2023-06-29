@@ -79,7 +79,6 @@
         app:layout_constraintEnd_toStartOf="@id/iv_play_last"
         android:layout_marginEnd="@dimen/dp_30"
         android:src="@drawable/play_cycle"
-        android:visibility="gone"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -91,7 +90,17 @@
         app:layout_constraintStart_toEndOf="@id/iv_play_next"
         android:src="@drawable/play_list"
         android:layout_marginStart="@dimen/dp_30"
-        android:visibility="gone"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_sing"
+        android:layout_width="@dimen/dp_50"
+        android:layout_height="@dimen/dp_50"
+        app:layout_constraintTop_toTopOf="@id/iv_mode"
+        app:layout_constraintEnd_toStartOf="@id/iv_mode"
+        android:layout_marginEnd="@dimen/dp_20"
+        android:src="@drawable/mic"
+        android:padding="@dimen/dp_10"
         />
 
     <SeekBar
