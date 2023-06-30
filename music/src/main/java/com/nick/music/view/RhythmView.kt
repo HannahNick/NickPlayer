@@ -64,7 +64,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     /**
      * 整个view需要绘制多长时间的节奏单位 毫秒
      */
-    private val mShowRhythmTime = 3000L
+    private val mShowRhythmTime = 5000L
 
     /**
      * 控件宽度
@@ -125,6 +125,11 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      * 当前唱的字
      */
     private var mCurrentWords = ""
+
+    /**
+     * 当前行歌词
+     */
+    private var mCurrentLineLyrics = ""
 
     /**
      * 数据初始化标志
@@ -210,7 +215,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         super.onDraw(canvas)
         if (mDataHasInit){
             mRhythmList.forEachIndexed { index, l ->
-                drawRhythm(canvas,l.duration,l.wordIndex,l.startTime,l.word,index)
+                drawRhythm(canvas,l,index)
             }
         }
         drawSingLine(canvas)
@@ -224,7 +229,12 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      * startTime:节奏开始时间，要绝对时间。
      *
      */
-    private fun drawRhythm(canvas: Canvas, time: Long, lineIndex: Int, startTime: Long,words: String,dataIndex: Int){
+    private fun drawRhythm(canvas: Canvas, rhythm: Rhythm,dataIndex: Int){
+        val startTime = rhythm.startTime
+        val time = rhythm.duration
+        val lineIndex = rhythm.wordIndex
+        val words = rhythm.word
+        val lineLyrics = rhythm.lineLyrics
         //节奏开始位置: 歌唱竖线位置+绝对时间位置 - 位置偏移量
         val rhythmStartX = mSingLine + timeToWidth(startTime) - mMoveWidth
 //        LogUtils.i("mSingLine: $mSingLine, startTime: $startTime, timeToWidth: ${timeToWidth(startTime)}, mMoveWidth: $mMoveWidth")
@@ -236,21 +246,32 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         }
 
         val rhythmStartY = mLineHeight*lineIndex + mLineHeightOffset
-        //当前唱的字
-        if (rhythmStartX<=mSingLine && rhythmStopX>mSingLine && mCurrentWords !=words){
-            mCurrentDataIndex = dataIndex
-            mCurrentWords = words
+
+        if (rhythmStartX<=mSingLine && rhythmStopX>mSingLine){
+            if (mCurrentWords !=words){//当前唱的字
+                mCurrentDataIndex = dataIndex
+                mCurrentWords = words
+            }
+            if (mCurrentLineLyrics != lineLyrics ){//当前唱的行歌词
+                mCurrentLineLyrics = lineLyrics
+//                LogUtils.i("当前唱的行歌词 :$lineLyrics")
+            }
+
 //            LogUtils.i("words:$words , 数据下标:$dataIndex")
         }
 //        LogUtils.i("rhythmStartX :$rhythmStartX, lineStartY: $lineStartY, rhythmStopX: $rhythmStopX, lineStopY: $lineStartY")
 
         canvas.drawLine(rhythmStartX+mCapWidth,rhythmStartY, rhythmStopX-mCapWidth,rhythmStartY,mRhythmPaint)
-//        drawSingRhythm(canvas, rhythmStartX, rhythmStopX, rhythmStartY)
-        drawSingRhythm2(canvas, rhythmStartX, rhythmStopX, rhythmStartY,lineIndex,dataIndex)
-        drawHaveSingRhythm(canvas,dataIndex)
+        drawSingRhythm(canvas, rhythmStartX, rhythmStopX, rhythmStartY)
+//        drawSingRhythm2(canvas, rhythmStartX, rhythmStopX, rhythmStartY,lineIndex,dataIndex)
+//        drawHaveSingRhythm(canvas,dataIndex)
         canvas.drawText(words,rhythmStartX,rhythmStartY,mWordsPaint)
-        if (rhythmStopX < mSingLine){
-            mRhythmList[dataIndex].wordHaveSing = true
+        if (rhythmStopX < mSingLine && !rhythm.wordHaveSing){//字歌词已唱完
+            rhythm.wordHaveSing = true
+            if (rhythm.isLastWord && !rhythm.lineLyricsHaveSing){//行歌词已唱完
+                rhythm.lineLyricsHaveSing = true
+//                LogUtils.i("当前唱的行歌词 :$lineLyrics 已唱完")
+            }
         }
     }
 
@@ -264,9 +285,9 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         val singStopX = mSingLine - mCapWidth
         //如果没有这个条件，在最开始的绘制位置会出现 stop比start要大
         val rhythmMinWidth = singStopX - startX
-        if (stopX<singStopX){
+        if (stopX<=singStopX){
             canvas.drawLine(startX,rhythmStartY, stopX,rhythmStartY,mSingRhythmPaint)
-        }else if (rhythmMinWidth >= 0 && startX <= mSingLine && stopX >singStopX ){
+        }else if (rhythmMinWidth >= 0 && startX <= mSingLine){
             canvas.drawLine(startX,rhythmStartY, singStopX,rhythmStartY,mSingRhythmPaint)
         }
     }
@@ -282,10 +303,10 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         //用户歌唱位置
         val singStartX = mSingLine + timeToWidth(mStartRecordTime) - mMoveWidth
         val rhythmMinWidth = singStopX - startX
-        if (stopX<singStopX){
+        if (stopX<=singStopX){
 //            LogUtils.i("数据:$dataIndex 结束了")
             sing(false,dataIndex)
-        }else if (rhythmMinWidth >= 0 && startX <= mSingLine && stopX >singStopX){//节奏宽度要大于0，开始唱的位置在黑线左边，原节奏结束的位置要在黑线右边
+        }else if (rhythmMinWidth >= 0 && startX <= mSingLine){//节奏宽度要大于0，开始唱的位置在黑线左边，原节奏结束的位置要在黑线右边
             if (mSingNow && singStopX>(singStartX+ mCapWidth)){
                 canvas.drawLine(singStartX + mCapWidth,rhythmStartY, singStopX,rhythmStartY ,mSingRhythmPaint)
 //                LogUtils.i("画数据下标:$dataIndex")
@@ -330,24 +351,24 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             LogUtils.e("lyricsInfo is empty")
             return
         }
-        clearData()
+        release()
         lineInfoMap.forEach {
             val duration = it.value.wordsDisInterval
             val startTime = it.value.wordsStartTime
             val wordsIndex = it.value.wordsIndex
             val wordsList = it.value.lyricsWords
+            val lineLyrics = it.value.lineLyrics
             duration.forEachIndexed { index, l ->
-                mRhythmList.add(Rhythm(l,startTime[index],wordsIndex[index],wordsList[index]))
+                val lastWord = duration.size == index+1
+                mRhythmList.add(Rhythm(l,startTime[index],wordsIndex[index],wordsList[index],lineLyrics,lastWord))
             }
 
         }
         mTotalTime = totalTime
-        mValueAnimator.cancel()
         mValueAnimator.setFloatValues(0f,1f)
         mValueAnimator.duration = mTotalTime
         LogUtils.i("totalTime: $mTotalTime")
         maxRhythmStartX = timeToWidth(mTotalTime)
-        mMoveWidth = 0f
         mDataHasInit = true
         mTitle = title
         mActor = actor
@@ -362,7 +383,9 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         mStartRecordTime = 0L
         mCurrentDataIndex = 0
         mCurrentWords = ""
+        mCurrentLineLyrics = ""
         mSingNow = false
+        mMoveWidth = 0f
     }
 
     /**
@@ -484,8 +507,23 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         var word:String,
 
         /**
-         * 词已唱完
+         * 所在的歌词行
+         */
+        var lineLyrics: String,
+
+        /**
+         * 是否最后一个字
+         */
+        var isLastWord: Boolean,
+
+        /**
+         * 单个歌词已唱完
          */
         var wordHaveSing: Boolean = false,
+
+        /**
+         * 一行歌词已唱完
+         */
+        var lineLyricsHaveSing: Boolean = false,
     )
 }
