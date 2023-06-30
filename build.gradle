@@ -26,6 +26,10 @@ buildscript {
             url "http://4dcloud.f3322.net:8081/repository/4cloud/"
             allowInsecureProtocol true
         }
+        maven{
+            name = "TarsosDSP repository"
+            url = "https://mvn.0110.be/releases"
+        }
     }
 }
 
@@ -36,6 +40,10 @@ allprojects {
         maven {
             url "http://4dcloud.f3322.net:8081/repository/4cloud/"
             allowInsecureProtocol true
+        }
+        maven{
+            name = "TarsosDSP repository"
+            url "https://mvn.0110.be/releases"
         }
         maven {
             url "https://jitpack.io"

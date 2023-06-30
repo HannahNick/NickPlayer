@@ -17,6 +17,16 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_lyric"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/rtv_rhythm"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="@dimen/sp_20"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_album_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,6 +46,8 @@
         app:layout_constraintTop_toBottomOf="@id/tv_album_name"
         android:text="表演者"
         />
+
+
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_play"
