@@ -15,6 +15,7 @@
         </activity>
 
         <service android:name=".server.MusicServer" />
+        <service android:name=".server.KTVServer" />
     </application>
 
 </manifest>

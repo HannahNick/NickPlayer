@@ -32,7 +32,7 @@ interface PlayerControl {
     fun seek(num: Int)
 
     /**
-     * 设置key
+     * 设置升降key
      */
     fun setKey(key: Float)
 

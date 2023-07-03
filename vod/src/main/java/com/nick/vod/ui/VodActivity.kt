@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.ScreenUtils
 import com.nick.music.ui.dialog.MusicDialog
 import com.nick.vod.R
 import com.nick.vod.databinding.ActivityVodBinding
+import com.nick.vod.ui.dialog.TwoPlayerDialog
 import com.nick.vod.ui.dialog.VodDialog
 import com.nick.vod.view.LiveGestureControlLayer
 import com.nick.vod.wiget.GestureMessageCenter
@@ -18,7 +19,8 @@ import com.nick.vod.wiget.GestureMessageCenter
 class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack {
 
     private val mBinding by lazy { ActivityVodBinding.inflate(layoutInflater) }
-    private val mVodDialog by lazy { VodDialog() }
+//    private val mVodDialog by lazy { VodDialog() }
+    private val mVodDialog by lazy { TwoPlayerDialog() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
