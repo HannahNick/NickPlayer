@@ -36,4 +36,8 @@ class TwoPlayerServerBinder(private val vodControl: PlayerControl, private val m
         vodControl.setPlayList(data)
     }
 
+    override fun muteVod(){
+        vodControl.mute()
+    }
+
 }

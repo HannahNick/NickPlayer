@@ -95,4 +95,9 @@ interface PlayerControl {
      * 绑定SurfaceHolder
      */
     fun attachSurfaceHolder(holder: SurfaceHolder)
+
+    /**
+     * 静音
+     */
+    fun mute()
 }

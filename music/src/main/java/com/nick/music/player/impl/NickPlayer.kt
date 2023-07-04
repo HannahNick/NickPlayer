@@ -104,4 +104,8 @@ class NickPlayer: AbsPlayer(){
         mMediaPlayer.setDisplay(holder)
     }
 
+    override fun mute() {
+        TODO("Not yet implemented")
+    }
+
 }

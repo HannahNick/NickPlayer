@@ -15,6 +15,7 @@ import com.blankj.utilcode.util.ServiceUtils
 import com.nick.base.vo.MusicVo
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.server.KTVServer
+import com.nick.music.server.PlayMode
 import com.nick.music.server.binder.impl.TwoPlayerServerBinder
 import com.nick.vod.databinding.FragmentTwoPlayerBinding
 import java.util.*
@@ -41,7 +42,7 @@ class TwoPlayerFragment: Fragment(), ServiceConnection {
 
     private fun initData(){
         val initDataTask = Runnable {
-            val vodPath = "${context?.filesDir?.absolutePath}/vod/abc.webp"
+            val vodPath = "${context?.filesDir?.absolutePath}/vod/abc.mp4"
             mTwoPlayerBinder.setVodPlayerList(listOf(MusicVo(path = vodPath, pathType = UrlType.DEFAULT, liveName = "浙江卫视")))
             mTwoPlayerBinder.setMusicPlayList(
                 loadData()
@@ -52,6 +53,8 @@ class TwoPlayerFragment: Fragment(), ServiceConnection {
         }
         val playerTask = Runnable {
             mTwoPlayerBinder.play()
+            mTwoPlayerBinder.setPlayMode(PlayMode.SINGLE)
+            mTwoPlayerBinder.muteVod()
         }
         mTasks.add(initDataTask)
         mTasks.add(initSurfaceHolderTask)

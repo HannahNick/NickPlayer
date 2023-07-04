@@ -34,4 +34,9 @@ interface TwoPlayerBinder {
      * 设置视频播放列表
      */
     fun setVodPlayerList(data: List<MusicVo>)
+
+    /**
+     * 视频静音
+     */
+    fun muteVod()
 }

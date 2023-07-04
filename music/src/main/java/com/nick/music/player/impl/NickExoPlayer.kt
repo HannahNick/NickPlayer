@@ -2,10 +2,7 @@ package com.nick.music.player.impl
 
 import android.content.Context
 import android.view.SurfaceHolder
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.PlaybackParameters
-import androidx.media3.common.Player
+import androidx.media3.common.*
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
@@ -13,6 +10,7 @@ import androidx.media3.exoplayer.hls.HlsMediaSource
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.nick.base.vo.enum.UrlType
+import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 
 class NickExoPlayer(context: Context): AbsPlayer() {
@@ -61,8 +59,30 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                 player.stop()
                 play(mIndex)
             }
+
+            override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
+                if(reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION){//当设置单曲循环的时候，会走这个回调函数而不会走 上面的 playbackState == Player.STATE_ENDED
+                    LogUtils.i("onPositionDiscontinuity")
+                }
+
+            }
         })
         super.init()
+    }
+
+    override fun setPlayMode(playMode: PlayMode) {
+        super.setPlayMode(playMode)
+        when (playMode) {
+            PlayMode.SINGLE -> {
+                player.repeatMode = Player.REPEAT_MODE_ONE
+            }
+            PlayMode.CYCLE -> {
+                player.repeatMode = Player.REPEAT_MODE_ALL
+            }
+            else -> {
+                player.repeatMode = Player.REPEAT_MODE_OFF
+            }
+        }
     }
 
     override fun startPlay() {
@@ -118,6 +138,10 @@ class NickExoPlayer(context: Context): AbsPlayer() {
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
         player.setVideoSurfaceHolder(holder)
+    }
+
+    override fun mute() {
+        player.volume = 0f
     }
 
     override fun release() {
