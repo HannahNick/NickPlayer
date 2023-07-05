@@ -1,6 +1,7 @@
 package com.nick.music.server.binder
 
 import android.view.SurfaceHolder
+import android.view.SurfaceView
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
@@ -85,5 +86,5 @@ interface MusicBinder {
     /**
      * 播放器和surfaceHolder绑定
      */
-    fun attachSurfaceHolder(holder: SurfaceHolder)
+    fun attachSurfaceHolder(surfaceHolder: SurfaceHolder)
 }

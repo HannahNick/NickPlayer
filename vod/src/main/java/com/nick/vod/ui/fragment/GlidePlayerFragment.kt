@@ -3,11 +3,10 @@ package com.nick.vod.ui.fragment
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.SurfaceHolder
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -16,24 +15,31 @@ import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ServiceUtils
+import com.blankj.utilcode.util.TimeUtils
+import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.webp.decoder.WebpDrawable
+import com.bumptech.glide.integration.webp.decoder.WebpDrawableResource
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.nick.base.vo.MusicVo
-import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
-import com.nick.music.server.KTVServer
 import com.nick.music.server.MusicServer
-import com.nick.music.server.PlayMode
-import com.nick.music.server.binder.impl.TwoPlayerServerBinder
-import com.nick.vod.databinding.FragmentTwoPlayerBinding
+import com.nick.music.server.binder.MusicBinder
+import com.nick.music.server.binder.impl.MusicServerBinder
+import com.nick.vod.databinding.FragmentGlidePlayerBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.*
 
-class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolder.Callback {
+class GlidePlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack {
 
-    private val mBinding by lazy { FragmentTwoPlayerBinding.inflate(layoutInflater) }
+    private val mBinding by lazy { FragmentGlidePlayerBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
-    private lateinit var mTwoPlayerBinder : TwoPlayerServerBinder
+    private lateinit var mMusicBinder: MusicBinder
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,36 +53,51 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
         super.onViewCreated(view, savedInstanceState)
         initData()
         initServer()
-        initView()
-    }
-
-    private fun initView(){
-        mBinding.svVideo.holder.addCallback(this)
+        loadGif()
     }
 
     private fun initData(){
         val initDataTask = Runnable {
-            val vodPath = "${context?.filesDir?.absolutePath}/vod/aba.mp4"
-            mTwoPlayerBinder.setVodPlayerList(listOf(MusicVo(path = vodPath, pathType = UrlType.DEFAULT, liveName = "浙江卫视")))
-            mTwoPlayerBinder.setMusicPlayList(
-                loadData()
-            )
-        }
-        val initSurfaceHolderTask = Runnable {
-            mTwoPlayerBinder.attachSurfaceHolder(mBinding.svVideo.holder)
+            mMusicBinder.setPlayList(loadData())
         }
         val playerTask = Runnable {
-            mTwoPlayerBinder.play()
-            mTwoPlayerBinder.setPlayMode(PlayMode.SINGLE)
-            mTwoPlayerBinder.muteVod()
+            mMusicBinder.play()
         }
         val registerCallBackTask = Runnable {
-            mTwoPlayerBinder.registerCallBack(this)
+            mMusicBinder.registerCallBack(this)
         }
         mTasks.add(registerCallBackTask)
         mTasks.add(initDataTask)
-        mTasks.add(initSurfaceHolderTask)
         mTasks.add(playerTask)
+    }
+
+    private fun loadGif(){
+        Glide.with(this)
+            .load(File("${context?.filesDir?.absolutePath}/vod/abc.webp"))
+            .addListener(object :RequestListener<Drawable>{
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    if (resource is WebpDrawable){
+                        resource.loopCount = -1
+                    }
+                    return false
+                }
+            })
+            .into(mBinding.ivGif)
     }
 
     private fun loadData(): List<MusicVo>{
@@ -91,48 +112,46 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
     }
 
     private fun initServer(){
-        if (!ServiceUtils.isServiceRunning(KTVServer::class.java)){
-            val intent = Intent(context, KTVServer::class.java)
+        if (!ServiceUtils.isServiceRunning(MusicServer::class.java)){
+            val intent = Intent(context, MusicServer::class.java)
             ServiceUtils.bindService(intent, this, AppCompatActivity.BIND_AUTO_CREATE)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (this::mTwoPlayerBinder.isInitialized){
-            mTwoPlayerBinder.setPlayWhenReady(false)
         }
     }
 
     override fun onStart() {
         super.onStart()
-        if (this::mTwoPlayerBinder.isInitialized){
-            mTwoPlayerBinder.setPlayWhenReady(true)
+        if (this::mMusicBinder.isInitialized){
+            mMusicBinder.play()
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mMusicBinder.pause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        LogUtils.i("onDestroy")
         ServiceUtils.unbindService(this)
-        ServiceUtils.stopService(Intent(context, KTVServer::class.java))
-//        if (this::mTwoPlayerBinder.isInitialized){
-//            mTwoPlayerBinder.release()
-//        }
+        ServiceUtils.stopService(Intent(context, MusicServer::class.java))
+//        mMusicBinder.removeCallBack(this)
     }
 
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        mTwoPlayerBinder = service as TwoPlayerServerBinder
+        mMusicBinder = service as MusicServerBinder
         while (mTasks.isNotEmpty()){
             mTasks.poll()?.run()
         }
     }
 
-    override fun onServiceDisconnected(name: ComponentName) {
-        LogUtils.i("onServiceDisconnected :${name.className}")
+    override fun onServiceDisconnected(name: ComponentName?) {
+
     }
 
     override fun playPosition(position: Int) {
+
         lifecycleScope.launchWhenResumed {
             withContext(Dispatchers.Main){
                 mBinding.apply {
@@ -149,24 +168,6 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
     }
 
     override fun startPlay(position: Long) {
-    }
-
-    override fun surfaceCreated(holder: SurfaceHolder) {
-//        if (this::mTwoPlayerBinder.isInitialized){
-//            mTwoPlayerBinder.attachSurfaceHolder(holder)
-//        }
-        LogUtils.i("surfaceCreated :")
-    }
-
-    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        LogUtils.i("surfaceChanged :")
-    }
-
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-//        if (this::mTwoPlayerBinder.isInitialized){
-//            mTwoPlayerBinder.clearSurfaceHolder(holder)
-//        }
-        LogUtils.i("surfaceDestroyed :")
     }
 
 }

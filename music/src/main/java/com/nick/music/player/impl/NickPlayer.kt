@@ -100,12 +100,18 @@ class NickPlayer: AbsPlayer(){
         return mMediaPlayer.currentPosition
     }
 
+    override fun setPlayWhenReady(ready: Boolean) {
+    }
+
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
         mMediaPlayer.setDisplay(holder)
     }
 
+    override fun clearSurfaceHolder(holder: SurfaceHolder) {
+        mMediaPlayer.setDisplay(null)
+    }
+
     override fun mute() {
-        TODO("Not yet implemented")
     }
 
 }

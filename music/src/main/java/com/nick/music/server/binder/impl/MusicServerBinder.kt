@@ -2,6 +2,7 @@ package com.nick.music.server.binder.impl
 
 import android.os.Binder
 import android.view.SurfaceHolder
+import android.view.SurfaceView
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack

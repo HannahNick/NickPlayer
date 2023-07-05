@@ -2,6 +2,7 @@ package com.nick.music.player.impl
 
 import android.content.Context
 import android.view.SurfaceHolder
+import android.view.SurfaceView
 import androidx.media3.common.*
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -120,6 +121,10 @@ class NickExoPlayer(context: Context): AbsPlayer() {
         return player.currentPosition.toInt()
     }
 
+    override fun setPlayWhenReady(ready: Boolean) {
+        player.playWhenReady = ready
+    }
+
     override fun seek(num: Int) {
         LogUtils.i("seek: ${num.toLong()}")
         player.seekTo(num.toLong())
@@ -138,6 +143,10 @@ class NickExoPlayer(context: Context): AbsPlayer() {
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
         player.setVideoSurfaceHolder(holder)
+    }
+
+    override fun clearSurfaceHolder(holder: SurfaceHolder) {
+        player.clearVideoSurfaceHolder(holder)
     }
 
     override fun mute() {

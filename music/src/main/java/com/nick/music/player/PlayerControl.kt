@@ -11,6 +11,8 @@ interface PlayerControl {
      */
     fun play(index: Int = 0)
 
+    fun setPlayWhenReady(ready: Boolean)
+
     /**
      * 随机播放下一首
      */
@@ -95,6 +97,11 @@ interface PlayerControl {
      * 绑定SurfaceHolder
      */
     fun attachSurfaceHolder(holder: SurfaceHolder)
+
+    /**
+     * 清除SurfaceHolder
+     */
+    fun clearSurfaceHolder(holder: SurfaceHolder)
 
     /**
      * 静音

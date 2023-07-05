@@ -6,14 +6,12 @@ import android.view.*
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
-import com.nick.vod.ui.fragment.TwoPlayerFragment
-import com.nick.vod.view.LiveGestureControlLayer
-import com.nick.vod.wiget.GestureMessageCenter
+import com.nick.vod.ui.fragment.GlidePlayerFragment
 
 
-class TwoPlayerDialog: DialogFragment() {
+class GlidePlayerDialog: DialogFragment() {
 
-    private val towPlayerDialog = TwoPlayerFragment()
+    private val glidePlayerFragment = GlidePlayerFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +30,7 @@ class TwoPlayerDialog: DialogFragment() {
         window?.decorView?.setPadding(0,0,0,0)
         window?.setBackgroundDrawable(ColorDrawable())
         childFragmentManager.beginTransaction()
-            .replace(R.id.root,towPlayerDialog)
+            .replace(R.id.root,glidePlayerFragment)
             .commitAllowingStateLoss()
         return inflater.inflate(R.layout.dialog_music, container, false)
     }
@@ -47,11 +45,6 @@ class TwoPlayerDialog: DialogFragment() {
         lp?.windowAnimations = R.style.AnimDownToTop
         window?.attributes = lp
         LogUtils.i("Dialog onViewCreated")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        LogUtils.i("onDestroy")
     }
 
     fun showStatus(show: Boolean){

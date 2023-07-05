@@ -5,12 +5,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Button
-        android:id="@+id/btn_show_dialog"
+        android:id="@+id/btn_vod_dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="播放弹窗"
+        android:text="视频弹窗"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
 
+    <Button
+        android:id="@+id/btn_gif_dialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="动图弹窗"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_vod_dialog"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

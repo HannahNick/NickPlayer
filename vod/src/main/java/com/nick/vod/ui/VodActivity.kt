@@ -4,13 +4,11 @@ import android.Manifest
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.SurfaceHolder
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.ScreenUtils
-import com.nick.music.ui.dialog.MusicDialog
-import com.nick.vod.R
 import com.nick.vod.databinding.ActivityVodBinding
+import com.nick.vod.ui.dialog.GlidePlayerDialog
 import com.nick.vod.ui.dialog.TwoPlayerDialog
 import com.nick.vod.ui.dialog.VodDialog
 import com.nick.vod.view.LiveGestureControlLayer
@@ -19,8 +17,9 @@ import com.nick.vod.wiget.GestureMessageCenter
 class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack {
 
     private val mBinding by lazy { ActivityVodBinding.inflate(layoutInflater) }
-//    private val mVodDialog by lazy { VodDialog() }
-    private val mVodDialog by lazy { TwoPlayerDialog() }
+    private val mVodDialog by lazy { VodDialog() }
+    private val mGlidePlayerDialog by lazy { GlidePlayerDialog() }
+    private val mTwoPlayerDialog by lazy { TwoPlayerDialog() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +30,12 @@ class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack 
 
     private fun initListener(){
         mBinding.apply {
-            btnShowDialog.setOnClickListener {
-                mVodDialog.show(supportFragmentManager,"VodDialog")
+            btnVodDialog.setOnClickListener {
+//                mVodDialog.show(supportFragmentManager,"VodDialog")
+                mTwoPlayerDialog.show(supportFragmentManager,"TwoPlayerDialog")
+            }
+            btnGifDialog.setOnClickListener {
+                mGlidePlayerDialog.show(supportFragmentManager,"GlidePlayer")
             }
         }
         GestureMessageCenter.registerCallBack(this)
@@ -61,10 +64,10 @@ class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack 
         super.onConfigurationChanged(newConfig)
         if (ScreenUtils.isLandscape()){
             BarUtils.setStatusBarVisibility(this,false)
-            mVodDialog.showStatus(false)
+            mGlidePlayerDialog.showStatus(false)
         }else{
             BarUtils.setStatusBarVisibility(this,true)
-            mVodDialog.showStatus(true)
+            mGlidePlayerDialog.showStatus(true)
         }
     }
 

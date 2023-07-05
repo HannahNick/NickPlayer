@@ -13,7 +13,8 @@ import com.nick.music.server.binder.impl.TwoPlayerServerBinder
 class KTVServer: Service() {
 
 //    private val playerControl = NickPlayer()
-
+    val vodControl by lazy {   NickExoPlayer(this) }
+    val musicControl by lazy {   NickExoPlayer(this) }
     override fun onCreate() {
         super.onCreate()
 
@@ -28,13 +29,14 @@ class KTVServer: Service() {
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onBind(intent: Intent?): IBinder {
 //        val playerControl = NickPlayer()
-        val vodControl = NickExoPlayer(this)
-        val musicControl = NickExoPlayer(this)
+
         return TwoPlayerServerBinder(vodControl,musicControl)
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
+        vodControl.release()
+        musicControl.release()
     }
 }

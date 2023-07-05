@@ -3,6 +3,7 @@ package com.nick.music.server.binder.impl
 import android.os.Binder
 import android.view.SurfaceHolder
 import com.nick.base.vo.MusicVo
+import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayMode
 import com.nick.music.server.binder.TwoPlayerBinder
@@ -13,11 +14,15 @@ class TwoPlayerServerBinder(private val vodControl: PlayerControl, private val m
         musicControl.play(index)
     }
 
+    override fun setPlayWhenReady(ready: Boolean) {
+        vodControl.setPlayWhenReady(ready)
+        musicControl.setPlayWhenReady(ready)
+    }
+
     override fun pause() {
         vodControl.pause()
         musicControl.pause()
     }
-
 
     override fun setPlayMode(playMode: PlayMode) {
         vodControl.setPlayMode(playMode)
@@ -26,6 +31,10 @@ class TwoPlayerServerBinder(private val vodControl: PlayerControl, private val m
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
         vodControl.attachSurfaceHolder(holder)
+    }
+
+    override fun clearSurfaceHolder(holder: SurfaceHolder) {
+        vodControl.clearSurfaceHolder(holder)
     }
 
     override fun setMusicPlayList(data: List<MusicVo>) {
@@ -38,6 +47,18 @@ class TwoPlayerServerBinder(private val vodControl: PlayerControl, private val m
 
     override fun muteVod(){
         vodControl.mute()
+    }
+
+    override fun registerCallBack(callBack: PlayInfoCallBack) {
+        musicControl.registerCallBack(callBack)
+    }
+
+    override fun removeCallBack(callBack: PlayInfoCallBack) {
+        musicControl.removeCallBack(callBack)
+    }
+
+    override fun release() {
+        vodControl.release()
     }
 
 }

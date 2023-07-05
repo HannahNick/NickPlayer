@@ -25,4 +25,26 @@
 
     <color name="colorAccent">#39A6FF</color>
     <color name="colorAccentTransparent">#4D39A6FF</color>
+
+    <color name="white_10">#19FFFFFF</color>
+    <color name="white_100">#FFFFFFFF</color>
+    <color name="white_20">#32FFFFFF</color>
+    <color name="white_30">#4cFFFFFF</color>
+    <color name="white_40">#64FFFFFF</color>
+    <color name="white_50">#80FFFFFF</color>
+    <color name="white_60">#96FFFFFF</color>
+    <color name="white_70">#B2FFFFFF</color>
+    <color name="white_80">#C8FFFFFF</color>
+    <color name="white_90">#E1FFFFFF</color>
+
+    <color name="black_10">#19000000</color>
+    <color name="black_100">#FF000000</color>
+    <color name="black_20">#32000000</color>
+    <color name="black_30">#4c000000</color>
+    <color name="black_40">#64000000</color>
+    <color name="black_50">#80000000</color>
+    <color name="black_60">#96000000</color>
+    <color name="black_70">#B2000000</color>
+    <color name="black_80">#C8000000</color>
+    <color name="black_90">#E1000000</color>
 </resources>

@@ -218,6 +218,11 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
         pause()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mMusicBinder.removeCallBack(this)
+    }
+
     override fun onServiceConnected(name: ComponentName?, service: IBinder) {
         mMusicBinder = service as MusicBinder
         LogUtils.i("绑定服务回调成功")
