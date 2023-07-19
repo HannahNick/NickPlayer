@@ -26,6 +26,15 @@
         android:textSize="@dimen/sp_20"
         />
 
+    <com.nick.music.view.KrcLineView
+        android:id="@+id/krc_lyric"
+        android:layout_width="match_parent"
+        android:layout_height="100px"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_album_name"
         android:layout_width="wrap_content"
