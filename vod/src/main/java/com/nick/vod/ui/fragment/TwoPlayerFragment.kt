@@ -56,7 +56,7 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
 
     private fun initData(){
         val initDataTask = Runnable {
-            val vodPath = "${context?.filesDir?.absolutePath}/vod/aac.mp4"
+            val vodPath = "${context?.filesDir?.absolutePath}/vod/Glitch66.mp4"
             mTwoPlayerBinder.setVodPlayerList(listOf(MusicVo(path = vodPath, pathType = UrlType.DEFAULT, liveName = "浙江卫视")))
             mTwoPlayerBinder.setMusicPlayList(
                 loadData()
