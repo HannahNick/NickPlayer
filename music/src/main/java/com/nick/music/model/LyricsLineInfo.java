@@ -2,6 +2,8 @@ package com.nick.music.model;
 
 import android.text.TextUtils;
 
+import com.blankj.utilcode.util.LogUtils;
+
 import java.util.List;
 
 /**

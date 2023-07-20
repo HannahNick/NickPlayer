@@ -259,6 +259,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
                 mBinding.apply {
                     skPositionBar.progress = position
                     tvPlayTime.text = playTime
+                    krcLyric.setCurrentPosition(position.toLong())
                 }
             }
         }
@@ -283,6 +284,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
             val krcInfo = KrcLyricsFileReader().readFile(File(path))
             if (krcInfo!=null){
                 rtvRhythm.setData(krcInfo,playInfoDuration)
+                krcLyric.setData(krcInfo)
                 tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
                 tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
             }

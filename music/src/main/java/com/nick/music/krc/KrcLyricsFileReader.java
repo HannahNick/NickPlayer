@@ -168,7 +168,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 // 获取行的出现时间和结束时间
                 int mStartIndex = matcher.start();
                 int mEndIndex = matcher.end();
-                String lineTime[] = lineInfo.substring(mStartIndex + 1,
+                String[] lineTime = lineInfo.substring(mStartIndex + 1,
                         mEndIndex - 1).split(",");
                 //
 
@@ -191,16 +191,16 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 }
 
                 // 歌词分隔
-                String lineLyricsTemp[] = lineContent.split(regex);
+                String[] lineLyricsTemp = lineContent.split(regex);
                 String[] lyricsWords = getLyricsWords(lineLyricsTemp);
                 lyricsLineInfo.setLyricsWords(lyricsWords);
 
                 // 获取每个歌词的时间
-                long wordsDisInterval[] = new long[lyricsWords.length];
+                long[] wordsDisInterval = new long[lyricsWords.length];
                 //每个歌词开始时间
-                long wordsStartTime[] = new long[lyricsWords.length];
+                long[] wordsStartTime = new long[lyricsWords.length];
                 //每个歌词在view的index
-                int wordsIndex[] = new int[lyricsWords.length];
+                int[] wordsIndex = new int[lyricsWords.length];
                 //时间偏移量
 //                long offset = Long.parseLong((String) lyricsTags.get(LyricsTag.TAG_OFFSET));
                 int index = 0;
@@ -217,7 +217,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                     String wordsDisIntervalStrTemp = wordsDisIntervalStr
                             .substring(wordsDisIntervalStr.indexOf('<') + 1, wordsDisIntervalStr.lastIndexOf('>'));
                     // 得到 xx,xxx,0的数据再以,拆分
-                    String wordsDisIntervalTemp[] = wordsDisIntervalStrTemp
+                    String[] wordsDisIntervalTemp = wordsDisIntervalStrTemp
                             .split(",");
 
                     //
