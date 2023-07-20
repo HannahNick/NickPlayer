@@ -13,29 +13,69 @@ import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.model.LyricsInfo
 
-class KrcLineView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0): View(context,attributeSet,defStyleAttr) {
+open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0): View(context,attributeSet,defStyleAttr) {
+    /**
+     * 歌词画笔
+     */
+    protected val mWordsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    private val mWordsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val mWordsSingPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val mRectPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val mMeasureRect = Rect()
-    private val mWordsSingRect = RectF()
+    /**
+     * 已唱歌词画笔
+     */
+    protected val mWordsSingPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
+     * 歌词长度测量框框
+     */
+    protected val mMeasureRect = Rect()
+
+    /**
+     * 已唱歌词测量框框
+     */
+    protected val mWordsSingRect = RectF()
 
     /**
      * 歌词数据
      */
-    private val mRhythmList = ArrayList<RhythmView.Rhythm>()
-    private var mCurrentPlayDataIndex: Int = 0
+    protected val mRhythmList = ArrayList<RhythmView.Rhythm>()
 
-    private var mCurrentWord: String = ""
-    private var mLineLyrics: String = ""
-    private var mCurrentWordIndex: Int = 0
-    private var mCurrentPlayPosition: Long = 0
-    private var mCurrentWordStartTime: Long = 0
-    private var mCurrentWordDuration: Long = 0
+    /**
+     * 当前唱的字在rhythmList的下标
+     */
+    protected var mCurrentPlayDataIndex: Int = 0
 
-    //显示位置
-    private var mStartPosition: Float = 0f
+    /**
+     * 当前唱的字
+     */
+    protected var mCurrentWord: String = ""
+
+    /**
+     * 当前行歌词
+     */
+    protected var mLineLyrics: String = ""
+
+    /**
+     * 当前字在行的下标
+     */
+    protected var mCurrentWordIndex: Int = 0
+
+    /**
+     * 播放器的播放位置
+     */
+    protected var mCurrentPlayPosition: Long = 0
+
+    /**
+     * 当前字的开始时间
+     */
+    protected var mCurrentWordStartTime: Long = 0
+
+    /**
+     * 当前字的时长
+     */
+    protected var mCurrentWordDuration: Long = 0
+
+    //文本在x轴上的显示位置
+    protected var mStartPosition: Float = 0f
 
     private val mHandler = Handler(Looper.getMainLooper())
 
@@ -50,27 +90,11 @@ class KrcLineView @JvmOverloads constructor(context: Context, attributeSet: Attr
             textSize = 20f
             color = context.resources.getColor(R.color.sing_rhythm,null)
         }
-        mRectPaint.apply {
-            color = context.resources.getColor(R.color.sing_rhythm,null)
-            style = Paint.Style.STROKE
-            strokeWidth = 2f
-        }
         mStartPosition = (right/3).toFloat()
     }
 
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        // 绘制文本
-        canvas.drawText(mLineLyrics, mStartPosition, mWordsPaint.textSize, mWordsPaint)
-        measureHaveSingRect()
-        canvas.save()
-        canvas.clipRect(mWordsSingRect)
-        canvas.drawText(mLineLyrics,mStartPosition,mWordsSingPaint.textSize,mWordsSingPaint)
-        canvas.restore()
-    }
-
-    private fun measureHaveSingRect(){
+    protected fun measureHaveSingRect(){
         if (mLineLyrics.isEmpty()){
             return
         }
@@ -91,7 +115,7 @@ class KrcLineView @JvmOverloads constructor(context: Context, attributeSet: Attr
         mWordsSingRect.right = ((mCurrentPlayPosition - mCurrentWordStartTime)*currentWordsWidth/mCurrentWordDuration) + haveSingTextWidth +mStartPosition
     }
 
-    private fun getWillSingWordsLength():Int {
+    protected fun getWillSingWordsLength():Int {
         var wordsLength = 0
 
         var currentIndex = mCurrentWordIndex
@@ -105,7 +129,7 @@ class KrcLineView @JvmOverloads constructor(context: Context, attributeSet: Attr
         return wordsLength
     }
 
-    private fun getHaveSingWordsLength():Int{
+    protected fun getHaveSingWordsLength():Int{
         var wordsLength = 0
 
         //取前一个字的下标
