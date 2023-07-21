@@ -11,9 +11,13 @@ import android.util.AttributeSet
 import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
+import com.nick.music.callback.PositionInitFinishListener
 import com.nick.music.model.LyricsInfo
+import com.nick.music.model.LyricsLineInfo
+import java.util.*
+import kotlin.collections.ArrayList
 
-open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0): View(context,attributeSet,defStyleAttr) {
+abstract class KrcLineView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0): View(context,attributeSet,defStyleAttr) {
     /**
      * 歌词画笔
      */
@@ -38,6 +42,11 @@ open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet:
      * 歌词数据
      */
     protected val mRhythmList = ArrayList<RhythmView.Rhythm>()
+
+    /**
+     * 行歌词数据
+     */
+    protected val mLineLyricsList = ArrayList<String>()
 
     /**
      * 当前唱的字在rhythmList的下标
@@ -77,22 +86,54 @@ open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet:
     //文本在x轴上的显示位置
     protected var mStartPosition: Float = 0f
 
+    /**
+     * 是否是预览歌词
+     */
+    private var isDrawPreview = false
+
     private val mHandler = Handler(Looper.getMainLooper())
+
+    var positionInitFinishListener: PositionInitFinishListener? = null
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         mWordsPaint.apply {
-            textSize = 20f
+            textSize = (bottom-top)*3/4.toFloat()
             color = context.resources.getColor(R.color.black,null)
             clipBounds
         }
         mWordsSingPaint.apply {
-            textSize = 20f
+            textSize = (bottom-top)*3/4.toFloat()
             color = context.resources.getColor(R.color.sing_rhythm,null)
         }
-        mStartPosition = (right/3).toFloat()
     }
 
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        if (isDrawPreview){
+            drawPreView(canvas)
+        }else{
+            doDraw(canvas)
+        }
+//        measureHaveSingRect()
+//        // 绘制歌词
+//        canvas.drawText(mLineLyrics, mStartPosition, mWordsPaint.textSize, mWordsPaint)
+//        canvas.save()
+//        canvas.clipRect(mWordsSingRect)
+//        canvas.drawText(mLineLyrics,mStartPosition,mWordsSingPaint.textSize,mWordsSingPaint)
+//        canvas.restore()
+    }
+
+    /**
+     * 子类实现画
+     */
+    abstract fun doDraw(canvas: Canvas)
+    /**
+     * 画预览歌词
+     */
+    abstract fun drawPreView(canvas: Canvas)
+
+    abstract fun isTopLyrics(): Boolean
 
     protected fun measureHaveSingRect(){
         if (mLineLyrics.isEmpty()){
@@ -116,6 +157,9 @@ open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet:
     }
 
     protected fun getWillSingWordsLength():Int {
+        if (mRhythmList.isEmpty()){
+            return 0
+        }
         var wordsLength = 0
 
         var currentIndex = mCurrentWordIndex
@@ -130,9 +174,11 @@ open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet:
     }
 
     protected fun getHaveSingWordsLength():Int{
+        if (mRhythmList.isEmpty()){
+            return 0
+        }
         var wordsLength = 0
 
-        //取前一个字的下标
         var currentIndex = mCurrentWordIndex
         if (currentIndex == 0){
             return 0
@@ -150,23 +196,21 @@ open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet:
     }
 
 
-    fun setCurrentPosition(position: Long){
+    open fun setCurrentPosition(position: Long){
         if (mRhythmList.isEmpty()){
             LogUtils.i("lyricsInfo is empty")
             return
         }
         val rhythm = findCurrentLyrics(position)
         if (rhythm==null){
-            mHandler.postDelayed({
-                mCurrentWord = ""
-                mLineLyrics = ""
-                mCurrentWordIndex = 0
-                mCurrentWordStartTime = 0
-                mCurrentWordDuration = 0
-                mCurrentPlayPosition = 0
-                invalidate()
-            },2000)
-
+            //已经唱完最后一个字了
+            if (mCurrentPlayDataIndex == mRhythmList.size-1){
+                mHandler.postDelayed({
+                    mCurrentWord = ""
+                    mLineLyrics = ""
+                    invalidate()
+                },2000)
+            }
             return
         }
         mHandler.removeCallbacksAndMessages(null)
@@ -176,6 +220,9 @@ open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet:
         mCurrentWordStartTime = rhythm.startTime
         mCurrentWordDuration = rhythm.duration
         mCurrentPlayPosition = position
+        isDrawPreview = false
+        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mLineLyrics},rhythm:$rhythm")
+        positionInitFinishListener?.showPreView(rhythm.lineLyricsDataIndex,!isTopLyrics())
         invalidate()
     }
 
@@ -202,21 +249,20 @@ open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet:
         return null
     }
 
-    fun setData(lyricsInfo: LyricsInfo){
-        val lineInfoMap = lyricsInfo.lyricsLineInfoTreeMap
-
-        val size = lineInfoMap.size
+    fun setData(map: SortedMap<Int, LyricsLineInfo>){
+        val size = map.size
         if (size==0){
             LogUtils.e("lyricsInfo is empty")
             return
         }
         release()
-        lineInfoMap.forEach {
+        map.forEach {
             val duration = it.value.wordsDisInterval
             val startTime = it.value.wordsStartTime
             val wordsIndex = it.value.wordsIndex
             val wordsList = it.value.lyricsWords
             val lineLyrics = it.value.lineLyrics
+            mLineLyricsList.add(lineLyrics)
             duration.forEachIndexed { index, l ->
                 val lastWord = duration.size == index+1
                 mRhythmList.add(RhythmView.Rhythm(
@@ -226,14 +272,28 @@ open class KrcLineView @JvmOverloads constructor(context: Context, attributeSet:
                         wordsList[index],
                         lineLyrics,
                         lastWord,
-                        index
+                        index,
+                        lineLyricsDataIndex = mLineLyricsList.size-1
                     )
                 )
             }
         }
+//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}行歌词设置完毕 $mLineLyricsList")
+//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}歌词设置完毕 $mRhythmList")
     }
 
     private fun release(){
         mRhythmList.clear()
+    }
+
+    fun drawNext(index: Int){
+        if (mLineLyricsList.size==index-1){
+            return
+        }
+        mLineLyrics = mLineLyricsList[index]
+//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}收到: 下标:$index, 当前需要预展示的歌词:$mLineLyrics")
+        isDrawPreview = true
+        invalidate()
+
     }
 }

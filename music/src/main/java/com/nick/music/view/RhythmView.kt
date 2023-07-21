@@ -371,7 +371,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             val lineLyrics = it.value.lineLyrics
             duration.forEachIndexed { index, l ->
                 val lastWord = duration.size == index+1
-                mRhythmList.add(Rhythm(l,startTime[index],wordsIndex[index],wordsList[index],lineLyrics,lastWord,index))
+                mRhythmList.add(Rhythm(l,startTime[index],wordsIndex[index],wordsList[index],lineLyrics,lastWord,index,-1))
             }
 
         }
@@ -591,6 +591,11 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         var wordInLineIndex: Int,
 
         /**
+         * 歌词在所有数据的下标,目前只有基础歌词会需要这个字段
+         */
+        val lineLyricsDataIndex: Int,
+
+        /**
          * 单个歌词已唱完
          */
         var wordHaveSing: Boolean = false,
@@ -599,6 +604,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
          * 一行歌词已唱完
          */
         var lineLyricsHaveSing: Boolean = false,
+
 
 
     )

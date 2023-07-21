@@ -13,8 +13,20 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         mViewWith = right.toFloat()
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+    override fun doDraw(canvas: Canvas) {
+        drawSingLyrics(canvas)
+    }
+
+    override fun drawPreView(canvas: Canvas) {
+        measureLyrics()
+        canvas.drawText(mLineLyrics, mViewWith - mMeasureRect.right, mWordsPaint.textSize, mWordsPaint)
+    }
+
+    override fun isTopLyrics(): Boolean {
+        return false
+    }
+
+    private fun drawSingLyrics(canvas: Canvas){
         measureLyrics()
         // 绘制歌词
         canvas.drawText(mLineLyrics, mViewWith - mMeasureRect.right, mWordsPaint.textSize, mWordsPaint)
@@ -28,6 +40,9 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
      * 测量要显示的歌词
      */
     private fun measureLyrics(){
+        if (mLineLyrics.isEmpty()){
+            return
+        }
         mWordsPaint.getTextBounds(mLineLyrics, 0, mLineLyrics.length, mMeasureRect)
         //居右显示
         mWordsSingRect.left = mViewWith-mMeasureRect.right
@@ -41,6 +56,6 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         }
         val currentWordsWidth = mWordsPaint.measureText(mLineLyrics.substring(0 until getWillSingWordsLength())) - haveSingTextWidth
         //描绘已唱部分核心
-        mWordsSingRect.right = ((mCurrentPlayPosition - mCurrentWordStartTime)*currentWordsWidth/mCurrentWordDuration) + haveSingTextWidth +mStartPosition
+        mWordsSingRect.right = ((mCurrentPlayPosition - mCurrentWordStartTime)*currentWordsWidth/mCurrentWordDuration) + haveSingTextWidth + mWordsSingRect.left
     }
 }
