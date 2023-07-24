@@ -4,14 +4,25 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.callback.PositionInitFinishListener
 import com.nick.music.model.LyricsInfo
+import com.nick.music.model.LyricsTag
 
 class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0):FrameLayout(context, attributeSet, defStyleAttr),PositionInitFinishListener {
 
     private val topLyricsView:TopLyricsView
     private val bottomLyricsView:BottomLyricsView
+    /**
+     * 当前播放的歌曲名
+     */
+    var mTitle = ""
+
+    /**
+     * 当前播放的歌手
+     */
+    var mActor = ""
 
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.view_lyrics,this,false)
@@ -25,6 +36,15 @@ class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     fun setData(lyricsInfo: LyricsInfo){
         val topMap = lyricsInfo.lyricsLineInfoTreeMap.filter { it.key%2 ==0 }.toSortedMap()
         val bottomMap = lyricsInfo.lyricsLineInfoTreeMap.filter { it.key%2 ==1 }.toSortedMap()
+        val title = lyricsInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
+        val actor = lyricsInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
+        if (mTitle == title && mActor == actor){
+            LogUtils.e("data Has set title: $mTitle, actor: $mActor")
+            return
+        }
+        mTitle = title
+        mActor = actor
+
         topLyricsView.setData(topMap)
         bottomLyricsView.setData(bottomMap)
     }

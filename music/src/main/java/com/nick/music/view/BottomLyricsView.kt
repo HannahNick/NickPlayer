@@ -18,7 +18,7 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
     }
 
     override fun drawPreView(canvas: Canvas) {
-        measureLyrics()
+        measurePreViewLyrics()
         canvas.drawText(mLineLyrics, mViewWith - mMeasureRect.right, mWordsPaint.textSize, mWordsPaint)
     }
 
@@ -57,5 +57,10 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         val currentWordsWidth = mWordsPaint.measureText(mLineLyrics.substring(0 until getWillSingWordsLength())) - haveSingTextWidth
         //描绘已唱部分核心
         mWordsSingRect.right = ((mCurrentPlayPosition - mCurrentWordStartTime)*currentWordsWidth/mCurrentWordDuration) + haveSingTextWidth + mWordsSingRect.left
+    }
+
+    private fun measurePreViewLyrics(){
+        //测量文本边界
+        mWordsPaint.getTextBounds(mLineLyrics, 0, mLineLyrics.length, mMeasureRect)
     }
 }

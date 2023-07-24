@@ -221,7 +221,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         mCurrentWordDuration = rhythm.duration
         mCurrentPlayPosition = position
         isDrawPreview = false
-        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mLineLyrics},rhythm:$rhythm")
+//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mLineLyrics},rhythm:$rhythm")
         positionInitFinishListener?.showPreView(rhythm.lineLyricsDataIndex,!isTopLyrics())
         invalidate()
     }
@@ -229,7 +229,6 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     private fun findCurrentLyrics(currentTime: Long): RhythmView.Rhythm? {
         var left = 0
         var right = mRhythmList.size - 1
-
         while (left <= right) {
             val mid = left + (right - left) / 2
             val data = mRhythmList[mid]
@@ -284,14 +283,22 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
 
     private fun release(){
         mRhythmList.clear()
+        mLineLyricsList.clear()
+        mCurrentWord = ""
+        mLineLyrics = ""
+        mCurrentWordIndex= 0
+        mCurrentPlayPosition = 0
+        mCurrentWordStartTime= 0
+        mCurrentWordDuration = 0
     }
 
     fun drawNext(index: Int){
-        if (mLineLyricsList.size==index-1){
-            return
-        }
-        mLineLyrics = mLineLyricsList[index]
+        if (mLineLyricsList.size-1<index){
+            mLineLyrics = ""
+        }else{
+            mLineLyrics = mLineLyricsList[index]
 //        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}收到: 下标:$index, 当前需要预展示的歌词:$mLineLyrics")
+        }
         isDrawPreview = true
         invalidate()
 
