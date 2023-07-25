@@ -44,6 +44,7 @@ class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         }
         mTitle = title
         mActor = actor
+        lyricsInfo.initColor()
 
         topLyricsView.setData(topMap)
         bottomLyricsView.setData(bottomMap)

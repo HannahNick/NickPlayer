@@ -1,10 +1,7 @@
 package com.nick.music.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.RectF
+import android.graphics.*
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
@@ -12,10 +9,9 @@ import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.callback.PositionInitFinishListener
-import com.nick.music.model.LyricsInfo
+import com.nick.music.krc.KrcLyricsFileReader
 import com.nick.music.model.LyricsLineInfo
 import java.util.*
-import kotlin.collections.ArrayList
 
 abstract class KrcLineView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0): View(context,attributeSet,defStyleAttr) {
     /**
@@ -47,6 +43,11 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
      * 行歌词数据
      */
     protected val mLineLyricsList = ArrayList<String>()
+
+    /**
+     * 行歌词颜色
+     */
+    private val mLineLyricsColorList = ArrayList<Int>()
 
     /**
      * 当前唱的字在rhythmList的下标
@@ -104,7 +105,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         }
         mWordsSingPaint.apply {
             textSize = (bottom-top)*3/4.toFloat()
-            color = context.resources.getColor(R.color.sing_rhythm,null)
+            color = context.resources.getColor(R.color.male_voice,null)
         }
     }
 
@@ -151,11 +152,15 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         }else{
             mWordsPaint.measureText(mLineLyrics.substring(0 until getHaveSingWordsLength()))
         }
+        //测量当前在唱的字的宽度
         val currentWordsWidth = mWordsPaint.measureText(mLineLyrics.substring(0 until getWillSingWordsLength())) - haveSingTextWidth
         //描绘已唱部分核心
         mWordsSingRect.right = ((mCurrentPlayPosition - mCurrentWordStartTime)*currentWordsWidth/mCurrentWordDuration) + haveSingTextWidth +mStartPosition
     }
 
+    /**
+     * 获取要唱的歌词长度
+     */
     protected fun getWillSingWordsLength():Int {
         if (mRhythmList.isEmpty()){
             return 0
@@ -173,6 +178,9 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         return wordsLength
     }
 
+    /**
+     * 获取已唱的歌词长度
+     */
     protected fun getHaveSingWordsLength():Int{
         if (mRhythmList.isEmpty()){
             return 0
@@ -202,6 +210,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             return
         }
         val rhythm = findCurrentLyrics(position)
+        mWordsSingPaint.color = context.resources.getColor(rhythm?.wordsColor?:R.color.male_voice,null)
         if (rhythm==null){
             //已经唱完最后一个字了
             if (mCurrentPlayDataIndex == mRhythmList.size-1){
@@ -261,6 +270,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             val wordsIndex = it.value.wordsIndex
             val wordsList = it.value.lyricsWords
             val lineLyrics = it.value.lineLyrics
+            val wordColor = it.value.wordColors
             mLineLyricsList.add(lineLyrics)
             duration.forEachIndexed { index, l ->
                 val lastWord = duration.size == index+1
@@ -272,7 +282,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
                         lineLyrics,
                         lastWord,
                         index,
-                        lineLyricsDataIndex = mLineLyricsList.size-1
+                        mLineLyricsList.size-1,
+                        wordColor[index]
                     )
                 )
             }

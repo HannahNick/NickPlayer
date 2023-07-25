@@ -3,6 +3,7 @@ package com.nick.music.model;
 import android.text.TextUtils;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.nick.music.R;
 
 import java.util.List;
 
@@ -30,6 +31,11 @@ public class LyricsLineInfo {
      * 歌词数组，用来分隔每个歌词
      */
     private String[] mLyricsWords;
+
+    /**
+     * 颜色数组，用来表示每个歌词描的颜色
+     */
+    private int[] mWordsColors;
     /**
      * 数组，用来存放每个歌词的时间
      */
@@ -125,6 +131,14 @@ public class LyricsLineInfo {
         if (!TextUtils.isEmpty(mLineLyrics)) {
             this.mLineLyrics = mLineLyrics.replaceAll("\r|\n", "");
         }
+    }
+
+    public void setWordColors(int[] wordsColors){
+        this.mWordsColors = wordsColors;
+    }
+
+    public int[] getWordColors(){
+        return mWordsColors;
     }
 
 //    /**

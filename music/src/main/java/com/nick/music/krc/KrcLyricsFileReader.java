@@ -1,9 +1,11 @@
 package com.nick.music.krc;
 
+import android.graphics.Color;
 import android.util.Base64;
 
 
 import com.blankj.utilcode.util.FileIOUtils;
+import com.nick.music.R;
 import com.nick.music.model.LyricsInfo;
 import com.nick.music.model.LyricsLineInfo;
 import com.nick.music.model.LyricsTag;
@@ -235,7 +237,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 lyricsLineInfo.setWordsStartTime(wordsStartTime);
                 lyricsLineInfo.setWordsIndex(wordsIndex);
 
-                // 获取当行歌词
+                // 获取行歌词
                 String lineLyrics = lyricsWordsMatcher.replaceAll("");
                 lyricsLineInfo.setLineLyrics(lineLyrics);
             }
@@ -348,7 +350,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
      * @return
      */
     private String[] getLyricsWords(String[] lineLyricsTemp) throws Exception {
-        String temp[] = null;
+        String[] temp = null;
         if (lineLyricsTemp.length < 2) {
             return new String[lineLyricsTemp.length];
         }
@@ -358,6 +360,40 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             temp[i - 1] = lineLyricsTemp[i];
         }
         return temp;
+    }
+
+    private int[] getWordsColor(String[] lineLyricsTemp){
+        int[] intTemp;
+        if (lineLyricsTemp.length < 2) {
+            return new int[lineLyricsTemp.length];
+        }
+        intTemp = new int[lineLyricsTemp.length];
+        int currentColor = R.color.male_voice;
+
+        for (int i = 0; i < lineLyricsTemp.length; i++) {
+            String word = lineLyricsTemp[i];
+            currentColor = changeColorFlag(word,currentColor);
+            intTemp[i] = currentColor;
+        }
+        return intTemp;
+    }
+
+    private static final String MAIL = "男：";
+    private static final String FEMAIL = "女：";
+    private static final String ALL = "合：";
+
+    private int changeColorFlag(String word,int currentColor){
+        if (word.contains(MAIL)){
+            return R.color.male_voice;
+        }
+        if (word.contains(FEMAIL)){
+            return R.color.female_voice;
+        }
+        if (word.contains(ALL)){
+            return R.color.all_voice;
+        }
+
+        return currentColor;
     }
 
     @Override

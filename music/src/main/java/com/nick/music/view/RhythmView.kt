@@ -596,6 +596,11 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         val lineLyricsDataIndex: Int,
 
         /**
+         * 当前字的颜色
+         */
+        val wordsColor: Int = R.color.male_voice,
+
+        /**
          * 单个歌词已唱完
          */
         var wordHaveSing: Boolean = false,

@@ -3,4 +3,7 @@
     <color name="gray">#c7bccc</color>
     <color name="black">#000000</color>
     <color name="sing_rhythm">#e03131</color>
+    <color name="male_voice">#228be6</color>
+    <color name="female_voice">#e64980</color>
+    <color name="all_voice">#8ce99a</color>
 </resources>

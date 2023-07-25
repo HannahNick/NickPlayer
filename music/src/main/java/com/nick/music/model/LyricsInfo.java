@@ -1,5 +1,8 @@
 package com.nick.music.model;
 
+import com.nick.music.R;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -194,5 +197,34 @@ public class LyricsInfo {
 
     public int getLyricsType() {
         return mLyricsType;
+    }
+
+    private static final String MAIL = "男：";
+    private static final String FEMAIL = "女：";
+    private static final String ALL = "合：";
+
+    private int changeColorFlag(String word,int currentColor){
+        if (word.contains(MAIL)){
+            return R.color.male_voice;
+        }
+        if (word.contains(FEMAIL)){
+            return R.color.female_voice;
+        }
+        if (word.contains(ALL)){
+            return R.color.all_voice;
+        }
+
+        return currentColor;
+    }
+
+    private int mTempColor = R.color.male_voice;
+    public void initColor(){
+        mLyricsLineInfoTreeMap.forEach((integer, lyricsLineInfo) -> {
+            String lineLyrics = lyricsLineInfo.getLineLyrics();
+            mTempColor = changeColorFlag(lineLyrics, mTempColor);
+            int []wordsColor = new int[lyricsLineInfo.getLyricsWords().length];
+            Arrays.fill(wordsColor, mTempColor);
+            lyricsLineInfo.setWordColors(wordsColor);
+        });
     }
 }
