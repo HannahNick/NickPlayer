@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import android.view.View
@@ -19,14 +19,15 @@ import com.blankj.utilcode.util.ServiceUtils
 import com.nick.base.vo.MusicVo
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
+import com.nick.music.krc.KrcLyricsFileReader
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.KTVServer
-import com.nick.music.server.MusicServer
 import com.nick.music.server.PlayMode
 import com.nick.music.server.binder.impl.TwoPlayerServerBinder
 import com.nick.vod.databinding.FragmentTwoPlayerBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.*
 
 class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolder.Callback {
@@ -56,7 +57,7 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
 
     private fun initData(){
         val initDataTask = Runnable {
-            val vodPath = "${context?.filesDir?.absolutePath}/vod/Glitch66.mp4"
+            val vodPath = "${context?.filesDir?.absolutePath}/vod/adc.mp4"
             mTwoPlayerBinder.setVodPlayerList(listOf(MusicVo(path = vodPath, pathType = UrlType.DEFAULT, liveName = "浙江卫视")))
             mTwoPlayerBinder.setMusicPlayList(
                 loadData()
@@ -137,14 +138,23 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
             withContext(Dispatchers.Main){
                 mBinding.apply {
                     skPosition.progress = position
+                    ktvLyric.setCurrentPosition(position.toLong())
                 }
             }
         }
     }
 
     override fun prepareStart(playInfo: PlayInfo) {
+        val path = playInfo.lyricPath
+        if (TextUtils.isEmpty(path)){
+            return
+        }
+        val krcInfo = KrcLyricsFileReader().readFile(File(path))
         mBinding.apply {
             skPosition.max = playInfo.duration
+            if (krcInfo!=null){
+                ktvLyric.setData(krcInfo)
+            }
         }
     }
 

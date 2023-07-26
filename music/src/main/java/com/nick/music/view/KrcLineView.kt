@@ -100,7 +100,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         super.onLayout(changed, left, top, right, bottom)
         mWordsPaint.apply {
             textSize = (bottom-top)*3/4.toFloat()
-            color = context.resources.getColor(R.color.black,null)
+            color = context.resources.getColor(R.color.white,null)
             clipBounds
         }
         mWordsSingPaint.apply {

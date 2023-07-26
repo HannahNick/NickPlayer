@@ -26,7 +26,6 @@ class TwoPlayerServerBinder(private val vodControl: PlayerControl, private val m
 
     override fun setPlayMode(playMode: PlayMode) {
         vodControl.setPlayMode(playMode)
-        musicControl.setPlayMode(playMode)
     }
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
