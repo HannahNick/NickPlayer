@@ -151,6 +151,11 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
      */
     private var mSingNow = false
 
+    /**
+     * 当前唱的行歌词回调
+     */
+    var lyricCallBackListener: LyricCallBackListener? = null
+
     init {
         mValueAnimator.apply {
                 interpolator = LinearInterpolator()
@@ -254,6 +259,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             }
             if (mCurrentLineLyrics != lineLyrics ){//当前唱的行歌词
                 mCurrentLineLyrics = lineLyrics
+                lyricCallBackListener?.currentSingLyric(lineLyrics)
 //                LogUtils.i("当前唱的行歌词 :$lineLyrics")
             }
 
@@ -262,9 +268,9 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
 //        LogUtils.i("rhythmStartX :$rhythmStartX, lineStartY: $lineStartY, rhythmStopX: $rhythmStopX, lineStopY: $lineStartY")
 
         canvas.drawLine(rhythmStartX+mCapWidth,rhythmStartY, rhythmStopX-mCapWidth,rhythmStartY,mRhythmPaint)
-        drawSingRhythm(canvas, rhythmStartX, rhythmStopX, rhythmStartY)
-//        drawSingRhythm2(canvas, rhythmStartX, rhythmStopX, rhythmStartY,lineIndex,dataIndex)
-//        drawHaveSingRhythm(canvas,dataIndex)
+//        drawSingRhythm(canvas, rhythmStartX, rhythmStopX, rhythmStartY)
+        drawSingRhythm2(canvas, rhythmStartX, rhythmStopX, rhythmStartY,dataIndex)
+        drawHaveSingRhythm(canvas,dataIndex)
         canvas.drawText(words,rhythmStartX,rhythmStartY,mWordsPaint)
         if (rhythmStopX < mSingLine && !rhythm.wordHaveSing){//字歌词已唱完
             rhythm.wordHaveSing = true
@@ -292,8 +298,10 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         }
     }
 
-
-    private fun drawSingRhythm2(canvas: Canvas, rhythmStartX: Float, rhythmStopX: Float, rhythmStartY: Float, lineIndex: Int,dataIndex: Int){
+    /**
+     * 画用户正在唱的节奏
+     */
+    private fun drawSingRhythm2(canvas: Canvas, rhythmStartX: Float, rhythmStopX: Float, rhythmStartY: Float,dataIndex: Int){
         //原节奏开始位置
         val startX = rhythmStartX + mCapWidth
         //原节奏结束位置
@@ -303,9 +311,9 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         //用户歌唱位置
         val singStartX = mSingLine + timeToWidth(mStartRecordTime) - mMoveWidth
         val rhythmMinWidth = singStopX - startX
-        if (stopX<=singStopX){
+        if (stopX<=singStopX){//唱的字结束了
 //            LogUtils.i("数据:$dataIndex 结束了")
-            sing(false,dataIndex)
+            addSingFinishData(dataIndex)
         }else if (rhythmMinWidth >= 0 && startX <= mSingLine){//节奏宽度要大于0，开始唱的位置在黑线左边，原节奏结束的位置要在黑线右边
             if (mSingNow && singStopX>(singStartX+ mCapWidth)){
                 canvas.drawLine(singStartX + mCapWidth,rhythmStartY, singStopX,rhythmStartY ,mSingRhythmPaint)
@@ -314,11 +322,14 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         }
     }
 
+    /**
+     * 画用户已唱完的节奏
+     */
     private fun drawHaveSingRhythm(canvas: Canvas,dataIndex: Int){
         mSingerRhythmData[dataIndex]?.forEach {
             val rhythmStartX = mSingLine + timeToWidth(it.startTime) - mMoveWidth
             val rhythmStopX = rhythmStartX + timeToWidth(it.time)
-            if (rhythmStopX<0){
+            if (rhythmStopX<0){//超出屏幕就不要画了
                 return@forEach
             }
             val rhythmStartY = mLineHeight*it.lineIndex + mLineHeightOffset
@@ -360,7 +371,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             val lineLyrics = it.value.lineLyrics
             duration.forEachIndexed { index, l ->
                 val lastWord = duration.size == index+1
-                mRhythmList.add(Rhythm(l,startTime[index],wordsIndex[index],wordsList[index],lineLyrics,lastWord))
+                mRhythmList.add(Rhythm(l,startTime[index],wordsIndex[index],wordsList[index],lineLyrics,lastWord,index,-1))
             }
 
         }
@@ -386,6 +397,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         mCurrentLineLyrics = ""
         mSingNow = false
         mMoveWidth = 0f
+        lyricCallBackListener?.currentSingLyric("")
     }
 
     /**
@@ -448,20 +460,28 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     }
 
     fun sing(sing: Boolean,dataIndex: Int = mCurrentDataIndex){
+        if (!mValueAnimator.isRunning){
+            return
+        }
+
         if (mSingNow == sing){
             return
         }
         //如果原节奏已经唱完了，就不往下走了
         if (mRhythmList[dataIndex].wordHaveSing){
+            if (!sing){//这种情况是，原节奏已经结束了，用户还在唱，此时的mSingNow还是true，这样会造成下一段节奏来时，用户不唱，也会画已唱的节奏
+                mSingNow = sing
+            }
             return
         }
 
-        if (sing){
+        if (sing){//记录开唱时间
 //            LogUtils.i("开始唱")
             mStartRecordTime = mValueAnimator.currentPlayTime
-        }else{
+        }else{//不唱了要把用户的
 //            LogUtils.i("不唱了")
-            mSingTime = mValueAnimator.currentPlayTime - mStartRecordTime
+            val currentPlayTime = mValueAnimator.currentPlayTime
+            mSingTime = currentPlayTime - mStartRecordTime
             var singerRhythmList = mSingerRhythmData[dataIndex]
             if (singerRhythmList ==null){
                 singerRhythmList = ArrayList()
@@ -473,6 +493,56 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
     }
 
     /**
+     * 添加唱完数据
+     * 用户正在唱，但是这个字的节奏结束了，那么就需要记录一下
+     * 这个场景是用户一直唱，然后一个字已唱完，下一个字就不需要重新开始唱来记录，
+     */
+    private fun addSingFinishData(dataIndex: Int){
+        //没有在唱就不添加
+        if (!mSingNow){
+            return
+        }
+        //如果原节奏已经唱完了，就不往下走了
+        if (mRhythmList[dataIndex].wordHaveSing){
+            return
+        }
+
+        mSingTime = mValueAnimator.currentPlayTime - mStartRecordTime
+        var singerRhythmList = mSingerRhythmData[dataIndex]
+        if (singerRhythmList ==null){
+            singerRhythmList = ArrayList()
+        }
+        singerRhythmList.add(SingerRhythm(mStartRecordTime,mSingTime,mRhythmList[dataIndex].wordIndex))
+        mSingerRhythmData[dataIndex] = singerRhythmList
+
+        if (dataIndex+1<=mRhythmList.size-1){//下一个字的开始时间就是开始唱的时间
+            mStartRecordTime = mRhythmList[dataIndex+1].startTime
+        }
+    }
+
+    /**
+     * 用户已经唱了的时长
+     */
+    private var mSingTime = 0L
+
+    /**
+     * 用户开始唱的时间
+     */
+    private var mStartRecordTime = 0L
+
+    /**
+     * 用户唱歌数据
+     */
+    private var mSingerRhythmData = SparseArray<ArrayList<SingerRhythm>>()
+
+    /**
+     * 当前播放歌词回调
+     */
+    interface LyricCallBackListener{
+        fun currentSingLyric(lyric: String)
+    }
+
+    /**
      * 歌手已唱节奏数据
      */
     data class SingerRhythm(
@@ -480,10 +550,9 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         var time: Long,
         var lineIndex: Int)
 
-    private var mSingTime = 0L
-    private var mStartRecordTime = 0L
-    private var mSingerRhythmData = SparseArray<ArrayList<SingerRhythm>>()
-
+    /**
+     * 节奏数据
+     */
     data class Rhythm(
 
         /**
@@ -517,6 +586,21 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         var isLastWord: Boolean,
 
         /**
+         * 该字在该行的下标
+         */
+        var wordInLineIndex: Int,
+
+        /**
+         * 歌词在所有数据的下标,目前只有基础歌词会需要这个字段
+         */
+        val lineLyricsDataIndex: Int,
+
+        /**
+         * 当前字的颜色
+         */
+        val wordsColor: Int = R.color.male_voice,
+
+        /**
          * 单个歌词已唱完
          */
         var wordHaveSing: Boolean = false,
@@ -525,5 +609,8 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
          * 一行歌词已唱完
          */
         var lineLyricsHaveSing: Boolean = false,
+
+
+
     )
 }

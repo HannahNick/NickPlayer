@@ -9,7 +9,6 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
@@ -33,13 +32,13 @@ import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
 import com.nick.music.util.Ring
+import com.nick.music.view.RhythmView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
-class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
+class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.LyricCallBackListener {
 
     private val mBinding by lazy { FragmentMusicPlayBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
@@ -59,6 +58,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
         initData()
         initServer()
         initListener()
+        initAudio()
     }
 
     private fun initData(){
@@ -190,8 +190,30 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
             ivMusicList.setOnClickListener {
                 LogUtils.json(GsonUtils.toJson(mMusicBinder.getRandomMusicList()))
             }
+            rtvRhythm.lyricCallBackListener = this@MusicFragment
         }
 
+    }
+
+    private fun initAudio(){
+//        val dispatcherFactory = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0)
+//        val pitchHandler = PitchDetectionHandler { pitchDetectionResult, audioEvent ->
+//            val resultHz = pitchDetectionResult.pitch
+//            lifecycleScope.launchWhenResumed {
+//                withContext(Dispatchers.Main){
+//                    mBinding.rtvRhythm.apply {
+//                        if (resultHz==-1f){
+//                            sing(false)
+//                        }else{
+//                            sing(true)
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        val processor = PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 44100f, 1024, pitchHandler)
+//        dispatcherFactory.addAudioProcessor(processor)
+//        Thread(dispatcherFactory,"Audio Dispatcher").start()
     }
 
     fun pause(){
@@ -242,6 +264,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
                 mBinding.apply {
                     skPositionBar.progress = position
                     tvPlayTime.text = playTime
+                    ktvLyric.setCurrentPosition(position.toLong())
                 }
             }
         }
@@ -266,6 +289,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
             val krcInfo = KrcLyricsFileReader().readFile(File(path))
             if (krcInfo!=null){
                 rtvRhythm.setData(krcInfo,playInfoDuration)
+                ktvLyric.setData(krcInfo)
                 tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
                 tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
             }
@@ -280,5 +304,9 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack {
             rtvRhythm.start()
         }
 
+    }
+
+    override fun currentSingLyric(lyric: String) {
+        mBinding.tvLyric.text = lyric
     }
 }
