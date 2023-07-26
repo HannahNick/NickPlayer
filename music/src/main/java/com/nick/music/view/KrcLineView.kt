@@ -210,7 +210,6 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             return
         }
         val rhythm = findCurrentLyrics(position)
-        mWordsSingPaint.color = context.resources.getColor(rhythm?.wordsColor?:R.color.male_voice,null)
         if (rhythm==null){
             //已经唱完最后一个字了
             if (mCurrentPlayDataIndex == mRhythmList.size-1){
@@ -223,6 +222,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             return
         }
         mHandler.removeCallbacksAndMessages(null)
+        mWordsSingPaint.color = context.resources.getColor(rhythm.wordsColor,null)
         mCurrentWord = rhythm.word
         mLineLyrics = rhythm.lineLyrics
         mCurrentWordIndex = rhythm.wordInLineIndex
@@ -230,7 +230,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         mCurrentWordDuration = rhythm.duration
         mCurrentPlayPosition = position
         isDrawPreview = false
-//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mLineLyrics},rhythm:$rhythm")
+        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mLineLyrics},rhythm:$rhythm")
         positionInitFinishListener?.showPreView(rhythm.lineLyricsDataIndex,!isTopLyrics())
         invalidate()
     }

@@ -362,40 +362,6 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         return temp;
     }
 
-    private int[] getWordsColor(String[] lineLyricsTemp){
-        int[] intTemp;
-        if (lineLyricsTemp.length < 2) {
-            return new int[lineLyricsTemp.length];
-        }
-        intTemp = new int[lineLyricsTemp.length];
-        int currentColor = R.color.male_voice;
-
-        for (int i = 0; i < lineLyricsTemp.length; i++) {
-            String word = lineLyricsTemp[i];
-            currentColor = changeColorFlag(word,currentColor);
-            intTemp[i] = currentColor;
-        }
-        return intTemp;
-    }
-
-    private static final String MAIL = "男：";
-    private static final String FEMAIL = "女：";
-    private static final String ALL = "合：";
-
-    private int changeColorFlag(String word,int currentColor){
-        if (word.contains(MAIL)){
-            return R.color.male_voice;
-        }
-        if (word.contains(FEMAIL)){
-            return R.color.female_voice;
-        }
-        if (word.contains(ALL)){
-            return R.color.all_voice;
-        }
-
-        return currentColor;
-    }
-
     @Override
     public boolean isFileSupported(String ext) {
         return ext.equalsIgnoreCase("krc");
