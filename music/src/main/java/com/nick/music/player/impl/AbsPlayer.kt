@@ -42,6 +42,8 @@ abstract class AbsPlayer: PlayerControl {
     protected var mPlayNow = false
     //播放错误次数
     protected var mErrorTimes = 0
+    //是否绑定了Surface
+    protected var mHasAttachSurfaceHolder = false
 
 
     private val mTask = object : TimerTask(){
@@ -109,6 +111,7 @@ abstract class AbsPlayer: PlayerControl {
             mainActor = musicVo.mainActors
             liveName = musicVo.liveName
             lyricPath = musicVo.lyricPath
+            url = musicVo.path
         }
     }
 
@@ -191,6 +194,10 @@ abstract class AbsPlayer: PlayerControl {
         val musicVo = mMusicData[mIndex]
         prepareUrl(musicVo.path,musicVo.pathType)
 
+    }
+
+    override fun hasAttachSurfaceHolder(): Boolean {
+        return mHasAttachSurfaceHolder
     }
 
     /**

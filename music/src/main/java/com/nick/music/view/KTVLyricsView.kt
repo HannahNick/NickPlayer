@@ -55,6 +55,11 @@ class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         bottomLyricsView.setCurrentPosition(playPosition)
     }
 
+    fun release(){
+        topLyricsView.release()
+        bottomLyricsView.release()
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         for (i in 0 until childCount) {

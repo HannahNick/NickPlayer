@@ -105,10 +105,12 @@ class NickPlayer: AbsPlayer(){
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
         mMediaPlayer.setDisplay(holder)
+        mHasAttachSurfaceHolder = true
     }
 
     override fun clearSurfaceHolder(holder: SurfaceHolder) {
         mMediaPlayer.setDisplay(null)
+        mHasAttachSurfaceHolder = false
     }
 
     override fun mute() {

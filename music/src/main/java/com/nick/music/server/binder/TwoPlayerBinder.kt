@@ -11,13 +11,15 @@ interface TwoPlayerBinder {
      */
     fun play(index:Int = 0)
 
-
-    fun setPlayWhenReady(ready:Boolean)
-
     /**
      * 暂停播放
      */
     fun pause()
+
+
+    fun setPlayWhenReady(ready:Boolean)
+
+    fun loopHasAttach(): Boolean
 
     /**
      * 设置播放模式
@@ -25,14 +27,29 @@ interface TwoPlayerBinder {
     fun setPlayMode(playMode: PlayMode)
 
     /**
-     * 播放器和surfaceHolder绑定
+     * 循环视频播放器和surfaceHolder绑定
      */
-    fun attachSurfaceHolder(holder: SurfaceHolder)
+    fun attachLoopVideoHolder(holder: SurfaceHolder)
+
+    /**
+     * 音乐播放器和surfaceHolder绑定
+     */
+    fun attachMusicHolder(holder: SurfaceHolder)
 
     /**
      * 清除surfaceHolder绑定
      */
     fun clearSurfaceHolder(holder: SurfaceHolder)
+
+    /**
+     * 清除循环视频播放器的surfaceHolder
+     */
+    fun clearLoopHolder(holder: SurfaceHolder)
+
+    /**
+     * 清除音乐播放器的surfaceHolder
+     */
+    fun clearMusicHolder(holder: SurfaceHolder)
 
     /**
      * 设置音乐播放列表

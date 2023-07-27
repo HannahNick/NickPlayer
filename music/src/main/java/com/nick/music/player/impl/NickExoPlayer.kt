@@ -98,6 +98,9 @@ class NickExoPlayer(context: Context): AbsPlayer() {
             LogUtils.i("playUrl: $url")
             player.setMediaItem(MediaItem.fromUri(url))
         }
+        if (url.endsWith(".mp3")){
+
+        }
         player.prepare()
         mPlayerHasPrepare = true
 
@@ -143,10 +146,12 @@ class NickExoPlayer(context: Context): AbsPlayer() {
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
         player.setVideoSurfaceHolder(holder)
+        mHasAttachSurfaceHolder = true
     }
 
     override fun clearSurfaceHolder(holder: SurfaceHolder) {
         player.clearVideoSurfaceHolder(holder)
+        mHasAttachSurfaceHolder = false
     }
 
     override fun mute() {

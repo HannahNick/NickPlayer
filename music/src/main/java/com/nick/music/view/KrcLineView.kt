@@ -45,11 +45,6 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     protected val mLineLyricsList = ArrayList<String>()
 
     /**
-     * 行歌词颜色
-     */
-    private val mLineLyricsColorList = ArrayList<Int>()
-
-    /**
      * 当前唱的字在rhythmList的下标
      */
     protected var mCurrentPlayDataIndex: Int = 0
@@ -101,7 +96,6 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         mWordsPaint.apply {
             textSize = (bottom-top)*3/4.toFloat()
             color = context.resources.getColor(R.color.white,null)
-            clipBounds
         }
         mWordsSingPaint.apply {
             textSize = (bottom-top)*3/4.toFloat()
@@ -145,8 +139,9 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
 
         mWordsSingRect.left = mStartPosition
         mWordsSingRect.top = 0f
-        mWordsSingRect.bottom = (mMeasureRect.height()+20).toFloat()
+        mWordsSingRect.bottom = height.toFloat()
 
+        //已唱的宽度
         val haveSingTextWidth = if (mCurrentWordIndex==0){
             0f
         }else{
@@ -206,7 +201,6 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
 
     open fun setCurrentPosition(position: Long){
         if (mRhythmList.isEmpty()){
-            LogUtils.i("lyricsInfo is empty")
             return
         }
         val rhythm = findCurrentLyrics(position)
@@ -230,7 +224,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         mCurrentWordDuration = rhythm.duration
         mCurrentPlayPosition = position
         isDrawPreview = false
-        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mLineLyrics},rhythm:$rhythm")
+//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mLineLyrics},rhythm:$rhythm")
         positionInitFinishListener?.showPreView(rhythm.lineLyricsDataIndex,!isTopLyrics())
         invalidate()
     }
@@ -292,7 +286,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
 //        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}歌词设置完毕 $mRhythmList")
     }
 
-    private fun release(){
+    fun release(){
         mRhythmList.clear()
         mLineLyricsList.clear()
         mCurrentWord = ""

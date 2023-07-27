@@ -47,7 +47,7 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         //居右显示
         mWordsSingRect.left = mViewWith-mMeasureRect.right
         mWordsSingRect.top = 0f
-        mWordsSingRect.bottom = (mMeasureRect.height()+20).toFloat()
+        mWordsSingRect.bottom = height.toFloat()
 
         val haveSingTextWidth = if (mCurrentWordIndex==0){
             0f

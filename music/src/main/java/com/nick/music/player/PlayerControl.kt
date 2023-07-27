@@ -107,4 +107,9 @@ interface PlayerControl {
      * 静音
      */
     fun mute()
+
+    /**
+     * 是否绑定了SurfaceHolder
+     */
+    fun hasAttachSurfaceHolder(): Boolean
 }

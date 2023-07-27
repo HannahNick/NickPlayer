@@ -15,4 +15,5 @@ class PlayInfo {
     var duration = 0
     var liveName = ""
     var lyricPath = ""
+    var url = ""
 }

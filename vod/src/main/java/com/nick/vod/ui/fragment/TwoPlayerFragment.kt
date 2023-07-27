@@ -24,6 +24,7 @@ import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.KTVServer
 import com.nick.music.server.PlayMode
 import com.nick.music.server.binder.impl.TwoPlayerServerBinder
+import com.nick.music.util.UrlUtil
 import com.nick.vod.databinding.FragmentTwoPlayerBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -59,12 +60,10 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
         val initDataTask = Runnable {
             val vodPath = "${context?.filesDir?.absolutePath}/vod/adc.mp4"
             mTwoPlayerBinder.setVodPlayerList(listOf(MusicVo(path = vodPath, pathType = UrlType.DEFAULT, liveName = "浙江卫视")))
-            mTwoPlayerBinder.setMusicPlayList(
-                loadData()
-            )
+            mTwoPlayerBinder.setMusicPlayList(loadData())
         }
         val initSurfaceHolderTask = Runnable {
-            mTwoPlayerBinder.attachSurfaceHolder(mBinding.svVideo.holder)
+            mTwoPlayerBinder.attachMusicHolder(mBinding.svVideo.holder)
         }
         val playerTask = Runnable {
             mTwoPlayerBinder.play()
@@ -80,7 +79,7 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
         mTasks.add(playerTask)
     }
 
-    private fun loadData(): List<MusicVo>{
+    private fun loadData(): MutableList<MusicVo>{
         val filePath = context?.filesDir?.absolutePath?:""
         val mcPath = "$filePath/mc"
         val krcPath = "$filePath/krc"
@@ -88,7 +87,7 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
         return mcList.map {
             val albumName = it.name.substring(0,it.name.lastIndexOf("."))
             MusicVo("1",albumName,"","$mcPath/${it.name}", lyricPath = "$krcPath/${albumName}.krc")
-        }
+        }.toMutableList()
     }
 
     private fun initServer(){
@@ -149,12 +148,27 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
         if (TextUtils.isEmpty(path)){
             return
         }
-        val krcInfo = KrcLyricsFileReader().readFile(File(path))
+
         mBinding.apply {
-            skPosition.max = playInfo.duration
-            if (krcInfo!=null){
-                ktvLyric.setData(krcInfo)
+            if (UrlUtil.isAudioUrl(playInfo.url)){
+                if (!mTwoPlayerBinder.loopHasAttach()){
+                    mTwoPlayerBinder.clearMusicHolder(svVideo.holder)
+                    mTwoPlayerBinder.attachLoopVideoHolder(svVideo.holder)
+                }
+
+                val krcInfo = KrcLyricsFileReader().readFile(File(path))
+                if (krcInfo!=null){
+                    ktvLyric.setData(krcInfo)
+                }
+            }else{
+                if (mTwoPlayerBinder.loopHasAttach()){
+                    mTwoPlayerBinder.clearLoopHolder(svVideo.holder)
+                    mTwoPlayerBinder.attachMusicHolder(svVideo.holder)
+                    ktvLyric.release()
+                }
             }
+            skPosition.max = playInfo.duration
+
         }
     }
 

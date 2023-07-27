@@ -19,6 +19,10 @@ class TwoPlayerServerBinder(private val vodControl: PlayerControl, private val m
         musicControl.setPlayWhenReady(ready)
     }
 
+    override fun loopHasAttach(): Boolean {
+        return vodControl.hasAttachSurfaceHolder()
+    }
+
     override fun pause() {
         vodControl.pause()
         musicControl.pause()
@@ -28,12 +32,25 @@ class TwoPlayerServerBinder(private val vodControl: PlayerControl, private val m
         vodControl.setPlayMode(playMode)
     }
 
-    override fun attachSurfaceHolder(holder: SurfaceHolder) {
+    override fun attachLoopVideoHolder(holder: SurfaceHolder) {
         vodControl.attachSurfaceHolder(holder)
+    }
+
+    override fun attachMusicHolder(holder: SurfaceHolder) {
+        musicControl.attachSurfaceHolder(holder)
     }
 
     override fun clearSurfaceHolder(holder: SurfaceHolder) {
         vodControl.clearSurfaceHolder(holder)
+        musicControl.clearSurfaceHolder(holder)
+    }
+
+    override fun clearLoopHolder(holder: SurfaceHolder) {
+        vodControl.clearSurfaceHolder(holder)
+    }
+
+    override fun clearMusicHolder(holder: SurfaceHolder) {
+        musicControl.clearSurfaceHolder(holder)
     }
 
     override fun setMusicPlayList(data: List<MusicVo>) {
