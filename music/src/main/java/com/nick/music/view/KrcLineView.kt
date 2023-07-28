@@ -295,6 +295,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         mCurrentPlayPosition = 0
         mCurrentWordStartTime= 0
         mCurrentWordDuration = 0
+        mCurrentPlayDataIndex= 0
+        isDrawPreview = false
     }
 
     fun drawNext(index: Int){

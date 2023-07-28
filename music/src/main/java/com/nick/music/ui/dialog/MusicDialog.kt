@@ -44,5 +44,10 @@ class MusicDialog: DialogFragment() {
         window?.attributes = lp
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+    }
+
 
 }
