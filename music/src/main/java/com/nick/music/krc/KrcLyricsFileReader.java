@@ -4,7 +4,10 @@ import android.graphics.Color;
 import android.util.Base64;
 
 
+import androidx.core.util.Pair;
+
 import com.blankj.utilcode.util.FileIOUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.nick.music.R;
 import com.nick.music.model.LyricsInfo;
 import com.nick.music.model.LyricsLineInfo;
@@ -18,6 +21,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,8 +82,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
 
     @Override
     public LyricsInfo readInputStream(InputStream in) throws Exception {
-        LyricsInfo lyricsIfno = new LyricsInfo();
-        return lyricsIfno;
+        return new LyricsInfo();
     }
 
     public LyricsInfo readFile(File file) throws Exception {
@@ -89,17 +92,28 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         TreeMap<Integer, LyricsLineInfo> lyricsLineInfos = new TreeMap<Integer, LyricsLineInfo>();
         Map<String, Object> lyricsTags = new HashMap<String, Object>();
         int index = 0;
-
-        for (int i = 0; i < lyricsTexts.length; i++) {
-            String lineInfo = lyricsTexts[i];
-
+        List<LyricsLineInfo> tempList = new ArrayList<>();
+        for (String lineInfo : lyricsTexts) {
             // 行读取，并解析每行歌词的内容
             LyricsLineInfo lyricsLineInfo = parserLineInfos(lyricsTags,
                     lineInfo, lyricsInfo);
-            if (lyricsLineInfo != null) {
-                lyricsLineInfos.put(index, lyricsLineInfo);
-                index++;
+            if (lyricsLineInfo == null) {
+                continue;
             }
+            checkLineIsStartSex(tempList, lyricsLineInfo);
+            if (tempList.size() == 1) {
+                continue;
+            }
+            LyricsLineInfo appendLyricsLineInfo = mergeLyricsLine(tempList);
+            if (appendLyricsLineInfo != null) {
+                lyricsLineInfos.put(index, appendLyricsLineInfo);
+                index++;
+                tempList.clear();
+                continue;
+            }
+
+            lyricsLineInfos.put(index, lyricsLineInfo);
+            index++;
         }
         // 设置歌词的标签类
         lyricsInfo.setLyricsTags(lyricsTags);
@@ -107,6 +121,73 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         lyricsInfo.setLyricsLineInfoTreeMap(lyricsLineInfos);
         return lyricsInfo;
     }
+
+    //检测是否是对唱类型开头
+    private void checkLineIsStartSex(List<LyricsLineInfo> tempList,LyricsLineInfo lyricsLineInfo){
+        if (tempList.size()==1){
+            tempList.add(lyricsLineInfo);
+        }
+        String lineLyrics = lyricsLineInfo.getLineLyrics();
+        //如果是 男: 女: 这种类型开头
+        if (lineLyrics.length()==2&&(lineLyrics.contains("：")||lineLyrics.contains(":"))){
+            tempList.add(lyricsLineInfo);
+        }
+    }
+
+    //开始拼接歌词
+    private LyricsLineInfo mergeLyricsLine(List<LyricsLineInfo> tempList){
+        if (tempList.size()==2){
+            LogUtils.i("开始拼接数据:"+tempList);
+            LyricsLineInfo sexSingInfo = tempList.get(0);
+            LyricsLineInfo lyricsLineInfo = tempList.get(1);
+            //拼接行歌词
+            String sexLineLyrics = sexSingInfo.getLineLyrics();
+            String lineLyrics = lyricsLineInfo.getLineLyrics();
+            String appendLineLyrics = sexLineLyrics.concat(lineLyrics);
+            //拼接歌词字
+            String[] sexLyricsWords = sexSingInfo.getLyricsWords();
+            String[] lyricsWords = lyricsLineInfo.getLyricsWords();
+            String[] appendLyricsWord = new String[sexLyricsWords.length+lyricsWords.length];
+            //拼接歌词字时长
+            long[] sexSingInfoWordsDisInterval = sexSingInfo.getWordsDisInterval();
+            long[] wordsDisInterval = lyricsLineInfo.getWordsDisInterval();
+            long[] appendWordsDisInterval = new long[sexSingInfoWordsDisInterval.length+wordsDisInterval.length];
+            //拼接歌词在RhythmView显示位置下标
+            int[] sexWordsIndex = sexSingInfo.getWordsIndex();
+            int[] wordsIndex = lyricsLineInfo.getWordsIndex();
+            int[] appendWordsIndex = new int[sexWordsIndex.length+wordsIndex.length];
+            //歌词开始时间和结束时间
+            long startTime = sexSingInfo.getStartTime();
+            long endTime = lyricsLineInfo.getEndTime();
+            //拼接歌词字的绝对开始时间
+            long[] sexWordsStartTime = sexSingInfo.getWordsStartTime();
+            long[] wordsStartTime = lyricsLineInfo.getWordsStartTime();
+            long[] appendWordsStartTime = new long[sexWordsStartTime.length+ wordsStartTime.length];
+
+            for (int i = 0; i < sexLyricsWords.length; i++) {
+                appendLyricsWord[i] = sexLyricsWords[i];
+                appendWordsDisInterval[i] = sexSingInfoWordsDisInterval[i];
+                appendWordsIndex[i] = sexWordsIndex[i];
+                appendWordsStartTime[i] = sexWordsStartTime[i];
+            }
+            for (int i = 0; i < lyricsWords.length; i++) {
+                appendLyricsWord[sexLyricsWords.length+i] = lyricsWords[i];
+                appendWordsDisInterval[sexSingInfoWordsDisInterval.length+i] = wordsDisInterval[i];
+                appendWordsIndex[sexWordsIndex.length+i] = wordsIndex[i];
+                appendWordsStartTime[sexWordsStartTime.length+i] = wordsStartTime[i];
+            }
+            sexSingInfo.setLineLyrics(appendLineLyrics);
+            sexSingInfo.setLyricsWords(appendLyricsWord);
+            sexSingInfo.setWordsDisInterval(appendWordsDisInterval);
+            sexSingInfo.setWordsIndex(appendWordsIndex);
+            sexSingInfo.setStartTime(startTime);
+            sexSingInfo.setEndTime(endTime);
+            sexSingInfo.setWordsStartTime(appendWordsStartTime);
+            return sexSingInfo;
+        }
+        return null;
+    }
+
 
     /**
      * 解析歌词

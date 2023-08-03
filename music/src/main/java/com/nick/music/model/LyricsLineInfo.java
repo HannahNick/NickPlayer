@@ -37,7 +37,7 @@ public class LyricsLineInfo {
      */
     private int[] mWordsColors;
     /**
-     * 数组，用来存放每个歌词的时间
+     * 数组，用来存放每个歌词的持续时间
      */
     private long[] mWordsDisInterval;
 
@@ -50,20 +50,6 @@ public class LyricsLineInfo {
      * 数组，用来存放歌词在节奏view上的下标
      */
     private int[] mWordsIndex;
-
-    /**
-     * 分割歌词行歌词
-     */
-    private List<LyricsLineInfo> mSplitDynamicLrcLineInfos;
-
-    public List<LyricsLineInfo> getSplitLyricsLineInfos() {
-        return mSplitDynamicLrcLineInfos;
-    }
-
-    public void setSplitLyricsLineInfos(
-            List<LyricsLineInfo> splitDynamicLrcLineInfos) {
-        this.mSplitDynamicLrcLineInfos = splitDynamicLrcLineInfos;
-    }
 
     public String[] getLyricsWords() {
         return mLyricsWords;
