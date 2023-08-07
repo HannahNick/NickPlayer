@@ -255,8 +255,8 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                         mEndIndex - 1).split(",");
                 //
 
-                long startTime = Long.parseLong(lineTime[0]);
-                long endTime = startTime + Long.parseLong(lineTime[1]);
+                long startTime = modifyNumber(Long.parseLong(lineTime[0]));
+                long endTime = modifyNumber(startTime + Long.parseLong(lineTime[1]));
                 lyricsLineInfo.setEndTime(endTime);
                 lyricsLineInfo.setStartTime(startTime);
                 // 获取歌词信息，将开始的行时间[xxx,xxx]去掉
@@ -305,10 +305,9 @@ public class KrcLyricsFileReader extends LyricsFileReader {
 
                     //
                     //获取字的绝对开始时间
-                    wordsStartTime[index] = Long.parseLong(wordsDisIntervalTemp[0])+startTime;
+                    wordsStartTime[index] = modifyNumber(Long.parseLong(wordsDisIntervalTemp[0])+startTime);
                     //获取每个字的持续时间
-                    wordsDisInterval[index] = Long
-                            .parseLong(wordsDisIntervalTemp[1]);
+                    wordsDisInterval[index] = modifyNumber(Long.parseLong(wordsDisIntervalTemp[1]));
                     //设置每个歌词在view中的显示下标
                     wordsIndex[index] = RandomIndexUtil.getInstance().getRandom();
                     index++;
@@ -325,6 +324,15 @@ public class KrcLyricsFileReader extends LyricsFileReader {
 
         }
         return lyricsLineInfo;
+    }
+
+    private long modifyNumber(long x){
+        long digit = x % 10;
+        if (digit == 0) {
+            return x;
+        }else {
+            return x + 10 - digit;
+        }
     }
 
     /**
