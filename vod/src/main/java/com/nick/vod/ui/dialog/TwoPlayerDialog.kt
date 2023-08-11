@@ -7,13 +7,14 @@ import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.vod.ui.fragment.TwoPlayerFragment
+import com.nick.vod.ui.fragment.TwoPlayerFragment2
 import com.nick.vod.view.LiveGestureControlLayer
 import com.nick.vod.wiget.GestureMessageCenter
 
 
 class TwoPlayerDialog: DialogFragment() {
 
-    private val towPlayerDialog = TwoPlayerFragment()
+    private val towPlayerDialog = TwoPlayerFragment2()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
