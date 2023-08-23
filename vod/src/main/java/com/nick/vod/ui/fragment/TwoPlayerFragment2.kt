@@ -48,6 +48,10 @@ class TwoPlayerFragment2: Fragment(), ServiceConnection, PlayInfoCallBack, Surfa
         super.onViewCreated(view, savedInstanceState)
         initData()
         initServer()
+        mBinding.btnChangeTrack.setOnClickListener {
+            mBinding.ktvLyricParent.changeTrack()
+        }
+
     }
 
     private fun initData(){

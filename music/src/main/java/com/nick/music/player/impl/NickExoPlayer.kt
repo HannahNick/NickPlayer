@@ -10,6 +10,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.google.common.collect.ImmutableList
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
@@ -24,7 +25,6 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                 if (playbackState == Player.STATE_READY){
                     LogUtils.i("duration: ${player.duration}")
                     mDuration = player.duration.toInt()
-
                     mPositionCallBackList.forEach { callback->
                         LogUtils.i("回调准备开始")
                         callback.prepareStart(getCurrentInfo())
@@ -66,6 +66,12 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                     LogUtils.i("onPositionDiscontinuity")
                 }
 
+            }
+
+            override fun onTracksChanged(tracks: Tracks) {
+                super.onTracksChanged(tracks)
+                //当音轨切换成功后，更新UI
+                trackLog(tracks.groups)
             }
         })
         super.init()
@@ -156,6 +162,41 @@ class NickExoPlayer(context: Context): AbsPlayer() {
 
     override fun mute() {
         player.volume = 0f
+    }
+
+    override fun changeTrack() {
+        val groups = player.currentTracks.groups
+        var tempTrackGroup: TrackGroup = groups[0].mediaTrackGroup
+
+        for (trackGroup in groups){
+            if (trackGroup.isSelected){
+                continue
+            }
+            tempTrackGroup = trackGroup.mediaTrackGroup
+        }
+
+        player.trackSelectionParameters = player.trackSelectionParameters
+                .buildUpon()
+                .setOverrideForType(
+                    TrackSelectionOverride(tempTrackGroup, 0)
+                )
+                .build()
+    }
+    private fun trackLog(groups: ImmutableList<Tracks.Group>){
+        for (trackGroup in groups) {
+            // Group level information.
+            val trackType = trackGroup.type
+            val trackInGroupIsSelected = trackGroup.isSelected
+            val trackInGroupIsSupported = trackGroup.isSupported
+            for (i in 0 until trackGroup.length) {
+                // Individual track information.
+                val isSupported = trackGroup.isTrackSupported(i)
+                val isSelected = trackGroup.isTrackSelected(i)
+                val trackFormat = trackGroup.getTrackFormat(i)
+                LogUtils.i("isSupported: $isSupported, isSelected: $isSelected ,trackFormat: $trackFormat")
+            }
+            LogUtils.i("trackType: $trackType,trackInGroupIsSelected: $trackInGroupIsSelected \n trackInGroupIsSupported: $trackInGroupIsSupported")
+        }
     }
 
     override fun release() {

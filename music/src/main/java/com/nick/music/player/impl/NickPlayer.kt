@@ -116,4 +116,8 @@ class NickPlayer: AbsPlayer(){
     override fun mute() {
     }
 
+    override fun changeTrack() {
+
+    }
+
 }

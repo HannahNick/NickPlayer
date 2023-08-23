@@ -112,4 +112,9 @@ interface PlayerControl {
      * 是否绑定了SurfaceHolder
      */
     fun hasAttachSurfaceHolder(): Boolean
+
+    /**
+     * 切换音轨
+     */
+    fun changeTrack()
 }
