@@ -4,6 +4,7 @@ import android.view.SurfaceHolder
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.server.PlayMode
+import com.nick.music.server.TrackType
 
 interface PlayerControl {
     /**
@@ -116,5 +117,5 @@ interface PlayerControl {
     /**
      * 切换音轨
      */
-    fun changeTrack()
+    fun changeTrack(trackType: TrackType)
 }

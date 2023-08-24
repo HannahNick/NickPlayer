@@ -137,7 +137,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
     //开始拼接歌词
     private LyricsLineInfo mergeLyricsLine(List<LyricsLineInfo> tempList){
         if (tempList.size()==2){
-            LogUtils.i("开始拼接数据:"+tempList);
+//            LogUtils.i("开始拼接数据:"+tempList);
             LyricsLineInfo sexSingInfo = tempList.get(0);
             LyricsLineInfo lyricsLineInfo = tempList.get(1);
             //拼接行歌词

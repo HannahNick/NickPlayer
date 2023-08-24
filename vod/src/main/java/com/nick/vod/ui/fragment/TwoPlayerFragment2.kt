@@ -22,6 +22,7 @@ import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.KTVServer
 import com.nick.music.server.MusicServer
 import com.nick.music.server.PlayMode
+import com.nick.music.server.TrackType
 import com.nick.music.server.binder.impl.MusicServerBinder
 import com.nick.music.util.UrlUtil
 import com.nick.vod.databinding.FragmentTwoPlayer2Binding
@@ -49,7 +50,7 @@ class TwoPlayerFragment2: Fragment(), ServiceConnection, PlayInfoCallBack, Surfa
         initData()
         initServer()
         mBinding.btnChangeTrack.setOnClickListener {
-            mBinding.ktvLyricParent.changeTrack()
+            mMusicBinder.changeTrack(TrackType.ORIGIN)
         }
 
     }

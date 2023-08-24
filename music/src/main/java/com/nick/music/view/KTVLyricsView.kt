@@ -40,7 +40,7 @@ class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         val actor = lyricsInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
         if (mTitle == title && mActor == actor){
             LogUtils.e("data Has set title: $mTitle, actor: $mActor")
-            return
+//            return
         }
         mTitle = title
         mActor = actor

@@ -8,6 +8,7 @@ import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayMode
+import com.nick.music.server.TrackType
 import com.nick.music.server.binder.MusicBinder
 
 class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),MusicBinder{
@@ -74,6 +75,10 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
         playerControl.attachSurfaceHolder(holder)
+    }
+
+    override fun changeTrack(trackType: TrackType) {
+        playerControl.changeTrack(trackType)
     }
 
 }

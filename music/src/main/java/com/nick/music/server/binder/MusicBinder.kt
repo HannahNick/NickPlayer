@@ -6,6 +6,7 @@ import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.PlayMode
+import com.nick.music.server.TrackType
 
 interface MusicBinder {
     /**
@@ -87,4 +88,9 @@ interface MusicBinder {
      * 播放器和surfaceHolder绑定
      */
     fun attachSurfaceHolder(surfaceHolder: SurfaceHolder)
+
+    /**
+     * 切换音轨
+     */
+    fun changeTrack(trackType: TrackType)
 }

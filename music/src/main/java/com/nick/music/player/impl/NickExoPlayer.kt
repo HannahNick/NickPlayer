@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
+import com.nick.music.server.TrackType
 
 class NickExoPlayer(context: Context): AbsPlayer() {
     private val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
@@ -164,17 +165,12 @@ class NickExoPlayer(context: Context): AbsPlayer() {
         player.volume = 0f
     }
 
-    override fun changeTrack() {
+    override fun changeTrack(trackType: TrackType) {
         val groups = player.currentTracks.groups
-        var tempTrackGroup: TrackGroup = groups[0].mediaTrackGroup
-
-        for (trackGroup in groups){
-            if (trackGroup.isSelected){
-                continue
-            }
-            tempTrackGroup = trackGroup.mediaTrackGroup
+        var tempTrackGroup: TrackGroup = groups.first().mediaTrackGroup
+        if (TrackType.ACC == trackType){
+            tempTrackGroup = groups.last().mediaTrackGroup
         }
-
         player.trackSelectionParameters = player.trackSelectionParameters
                 .buildUpon()
                 .setOverrideForType(

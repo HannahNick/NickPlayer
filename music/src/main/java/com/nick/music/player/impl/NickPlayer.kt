@@ -9,6 +9,7 @@ import com.nick.base.vo.enum.UrlType
 import com.nick.music.kt.play
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
+import com.nick.music.server.TrackType
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -116,7 +117,7 @@ class NickPlayer: AbsPlayer(){
     override fun mute() {
     }
 
-    override fun changeTrack() {
+    override fun changeTrack(trackType: TrackType) {
 
     }
 
