@@ -9,7 +9,7 @@ import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.callback.PositionInitFinishListener
-import com.nick.music.krc.KrcLyricsFileReader
+import com.nick.music.entity.SrcLyricsInfoVo
 import com.nick.music.model.LyricsLineInfo
 import java.util.*
 
@@ -165,8 +165,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         var currentIndex = mCurrentWordIndex
         while (currentIndex>=0){
             val rhythm = mRhythmList[mCurrentPlayDataIndex-currentIndex]
-            if (rhythm.word.isNotEmpty()){
-                wordsLength+=rhythm.word.length
+            if (rhythm.originalWord.isNotEmpty()){
+                wordsLength+=rhythm.originalWord.length
                 currentIndex--
             }
         }
@@ -188,8 +188,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         }
         while (currentIndex>=1){
             val rhythm = mRhythmList[mCurrentPlayDataIndex-currentIndex]
-            if (rhythm.word.isNotEmpty()){
-                wordsLength+=rhythm.word.length
+            if (rhythm.originalWord.isNotEmpty()){
+                wordsLength+=rhythm.originalWord.length
 //                LogUtils.i("已唱:${rhythm.word},长度:${rhythm.word.length},wordsLength:${wordsLength}")
                 currentIndex--
             }
@@ -217,7 +217,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         }
         mHandler.removeCallbacksAndMessages(null)
         mWordsSingPaint.color = context.resources.getColor(rhythm.wordsColor,null)
-        mCurrentWord = rhythm.word
+        mCurrentWord = rhythm.originalWord
         mLineLyrics = rhythm.lineLyrics
         mCurrentWordIndex = rhythm.wordInLineIndex
         mCurrentWordStartTime = rhythm.startTime
@@ -269,21 +269,51 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             duration.forEachIndexed { index, l ->
                 val lastWord = duration.size == index+1
                 mRhythmList.add(RhythmView.Rhythm(
-                        l,
-                        startTime[index],
-                        wordsIndex[index],
-                        wordsList[index],
-                        lineLyrics,
-                        lastWord,
-                        index,
-                        mLineLyricsList.size-1,
-                        wordColor[index]
+                    duration = l,
+                    startTime = startTime[index],
+                    wordIndex = wordsIndex[index],
+                    originalWord = wordsList[index],
+                    lineLyrics = lineLyrics,
+                    isLastWord = lastWord,
+                    wordInLineIndex = index,
+                    lineLyricsDataIndex = mLineLyricsList.size-1,
+                    wordsColor = wordColor[index]
                     )
                 )
             }
         }
 //        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}行歌词设置完毕 $mLineLyricsList")
 //        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}歌词设置完毕 $mRhythmList")
+    }
+
+    fun setData(lyricsLineBeanList: List<SrcLyricsInfoVo.LyricsLineBean>){
+        if (lyricsLineBeanList.isEmpty()){
+            LogUtils.e("lyricsInfo is empty")
+            return
+        }
+        release()
+        lyricsLineBeanList.forEach { lyricsLineBean ->
+            mLineLyricsList.add(lyricsLineBean.originalLineWords)
+            val duration = lyricsLineBean.wordsDetail.duration
+            duration.forEachIndexed { index, l ->
+                val lastWord = duration.size == index+1
+                mRhythmList.add(RhythmView.Rhythm(
+                        duration = l,
+                        startTime = lyricsLineBean.wordsDetail.startTime[index],
+                        wordIndex = 0,
+                        originalWord = lyricsLineBean.wordsDetail.originalWords[index],
+                        translateWord = lyricsLineBean.wordsDetail.translateWords[index],
+                        phoneticWord = lyricsLineBean.wordsDetail.phoneticWords[index],
+                        lineLyrics = lyricsLineBean.originalLineWords,
+                        isLastWord = lastWord,
+                        wordInLineIndex = index,
+                        lineLyricsDataIndex = mLineLyricsList.size-1,
+                        wordsColor = R.color.male_voice
+                    )
+                )
+            }
+
+        }
     }
 
     fun release(){

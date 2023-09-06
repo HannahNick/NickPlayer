@@ -14,7 +14,6 @@ import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.model.LyricsInfo
 import com.nick.music.model.LyricsTag
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
 
 /**
@@ -238,7 +237,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         val startTime = rhythm.startTime
         val time = rhythm.duration
         val lineIndex = rhythm.wordIndex
-        val words = rhythm.word
+        val words = rhythm.originalWord
         val lineLyrics = rhythm.lineLyrics
         //节奏开始位置: 歌唱竖线位置+绝对时间位置 - 位置偏移量
         val rhythmStartX = mSingLine + timeToWidth(startTime) - mMoveWidth
@@ -371,7 +370,17 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
             val lineLyrics = it.value.lineLyrics
             duration.forEachIndexed { index, l ->
                 val lastWord = duration.size == index+1
-                mRhythmList.add(Rhythm(l,startTime[index],wordsIndex[index],wordsList[index],lineLyrics,lastWord,index,-1))
+                mRhythmList.add(Rhythm(
+                        duration = l,
+                        startTime = startTime[index],
+                        wordIndex = wordsIndex[index],
+                        originalWord = wordsList[index],
+                        lineLyrics = lineLyrics,
+                        isLastWord = lastWord,
+                        wordInLineIndex = index,
+                        lineLyricsDataIndex = -1
+                    )
+                )
             }
 
         }
@@ -566,14 +575,24 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         var startTime: Long,
 
         /**
-         * 每个字的显示位置下标
+         * 每个字的显示位置下标,这个字段只有在节奏View中才会用到
          */
         var wordIndex:Int,
 
         /**
-         * 每个字的内容
+         * 原版字的内容
          */
-        var word:String,
+        var originalWord: String,
+
+        /**
+         * 翻译字的内容
+         */
+        var translateWord: String = "",
+
+        /**
+         * 注音字的内容
+         */
+        var phoneticWord: String = "",
 
         /**
          * 所在的歌词行
@@ -612,5 +631,5 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
 
 
 
-    )
+        )
 }

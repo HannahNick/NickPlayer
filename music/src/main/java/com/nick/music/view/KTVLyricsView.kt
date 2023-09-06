@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.callback.PositionInitFinishListener
+import com.nick.music.entity.SrcLyricsInfoVo
 import com.nick.music.model.LyricsInfo
 import com.nick.music.model.LyricsTag
 
@@ -48,6 +49,19 @@ class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
 
         topLyricsView.setData(topMap)
         bottomLyricsView.setData(bottomMap)
+    }
+
+    fun setData(srcLyricsInfoVo: SrcLyricsInfoVo){
+        val topData = srcLyricsInfoVo.lyricsLineInfo.filterIndexed { index, _ -> index%2 ==0 }
+        val bottomData = srcLyricsInfoVo.lyricsLineInfo.filterIndexed { index, _ -> index%2 ==1 }
+        val title = srcLyricsInfoVo.statements.ti
+        val actor = srcLyricsInfoVo.statements.ar
+        if (mTitle == title && mActor == actor){
+            LogUtils.e("data Has set title: $mTitle, actor: $mActor")
+//            return
+        }
+        mTitle = title
+        mActor = actor
     }
 
     fun setCurrentPosition(playPosition: Long){
