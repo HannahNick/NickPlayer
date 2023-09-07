@@ -10,6 +10,7 @@ import com.nick.music.callback.PositionInitFinishListener
 import com.nick.music.entity.SrcLyricsInfoVo
 import com.nick.music.model.LyricsInfo
 import com.nick.music.model.LyricsTag
+import java.util.ArrayList
 
 class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0):FrameLayout(context, attributeSet, defStyleAttr),PositionInitFinishListener {
 
@@ -35,8 +36,14 @@ class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     }
 
     fun setData(lyricsInfo: LyricsInfo){
-        val topMap = lyricsInfo.lyricsLineInfoTreeMap.filter { it.key%2 ==0 }.toSortedMap()
-        val bottomMap = lyricsInfo.lyricsLineInfoTreeMap.filter { it.key%2 ==1 }.toSortedMap()
+
+        val topTranslateLrcLineInfo = lyricsInfo.translateLrcLineInfos?.filterIndexed { index, _ -> index%2 ==0 }?:ArrayList()
+        val bottomTranslateLrcLineInfo = lyricsInfo.translateLrcLineInfos?.filterIndexed { index, _ -> index%2 ==1 }?:ArrayList()
+        val topTransliterationLrcLineInfo = lyricsInfo.transliterationLrcLineInfos?.filterIndexed { index, _ -> index % 2 == 0 }?:ArrayList()
+        val bottomTransliterationLrcLineInfo = lyricsInfo.transliterationLrcLineInfos?.filterIndexed { index, _ -> index%2 ==1 }?:ArrayList()
+
+        val topOriginal = lyricsInfo.lyricsLineInfoTreeMap.filter { it.key%2 ==0 }.toSortedMap()
+        val bottomOriginal = lyricsInfo.lyricsLineInfoTreeMap.filter { it.key%2 ==1 }.toSortedMap()
         val title = lyricsInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
         val actor = lyricsInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
         if (mTitle == title && mActor == actor){
@@ -47,21 +54,8 @@ class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         mActor = actor
         lyricsInfo.initColor()
 
-        topLyricsView.setData(topMap)
-        bottomLyricsView.setData(bottomMap)
-    }
-
-    fun setData(srcLyricsInfoVo: SrcLyricsInfoVo){
-        val topData = srcLyricsInfoVo.lyricsLineInfo.filterIndexed { index, _ -> index%2 ==0 }
-        val bottomData = srcLyricsInfoVo.lyricsLineInfo.filterIndexed { index, _ -> index%2 ==1 }
-        val title = srcLyricsInfoVo.statements.ti
-        val actor = srcLyricsInfoVo.statements.ar
-        if (mTitle == title && mActor == actor){
-            LogUtils.e("data Has set title: $mTitle, actor: $mActor")
-//            return
-        }
-        mTitle = title
-        mActor = actor
+        topLyricsView.setData(topOriginal,topTranslateLrcLineInfo,topTransliterationLrcLineInfo)
+        bottomLyricsView.setData(bottomOriginal,bottomTranslateLrcLineInfo,bottomTransliterationLrcLineInfo)
     }
 
     fun setCurrentPosition(playPosition: Long){

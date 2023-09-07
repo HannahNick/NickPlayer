@@ -19,7 +19,14 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
 
     override fun drawPreView(canvas: Canvas) {
         measurePreViewLyrics()
-        canvas.drawText(mLineLyrics, mViewWith - mMeasureRect.right, mWordsPaint.textSize, mWordsPaint)
+        canvas.drawText(mOriginLineLyrics, mViewWith - mMeasureRect.right,mOriginStartPositionY, mOriginWordsPaint)
+        canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+    }
+
+    override fun drawSingFinish(canvas: Canvas) {
+        measurePreViewLyrics()
+        canvas.drawText(mOriginLineLyrics,mViewWith - mMeasureRect.right,mOriginStartPositionY,mWordsSingPaint)
+        canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
     }
 
     override fun isTopLyrics(): Boolean {
@@ -29,10 +36,11 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
     private fun drawSingLyrics(canvas: Canvas){
         measureLyrics()
         // 绘制歌词
-        canvas.drawText(mLineLyrics, mViewWith - mMeasureRect.right, mWordsPaint.textSize, mWordsPaint)
+        canvas.drawText(mOriginLineLyrics, mViewWith - mMeasureRect.right, mOriginStartPositionY, mOriginWordsPaint)
+        canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
         canvas.save()
         canvas.clipRect(mWordsSingRect)
-        canvas.drawText(mLineLyrics,mViewWith - mMeasureRect.right,mWordsSingPaint.textSize,mWordsSingPaint)
+        canvas.drawText(mOriginLineLyrics,mViewWith - mMeasureRect.right,mOriginStartPositionY,mWordsSingPaint)
         canvas.restore()
     }
 
@@ -40,10 +48,10 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
      * 测量要显示的歌词
      */
     private fun measureLyrics(){
-        if (mLineLyrics.isEmpty()){
+        if (mOriginLineLyrics.isEmpty()){
             return
         }
-        mWordsPaint.getTextBounds(mLineLyrics, 0, mLineLyrics.length, mMeasureRect)
+        mOriginWordsPaint.getTextBounds(mOriginLineLyrics, 0, mOriginLineLyrics.length, mMeasureRect)
         //居右显示
         mWordsSingRect.left = mViewWith-mMeasureRect.right
         mWordsSingRect.top = 0f
@@ -52,15 +60,15 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         val haveSingTextWidth = if (mCurrentWordIndex==0){
             0f
         }else{
-            mWordsPaint.measureText(mLineLyrics.substring(0 until getHaveSingWordsLength()))
+            mOriginWordsPaint.measureText(mOriginLineLyrics.substring(0 until getHaveSingWordsLength()))
         }
-        val currentWordsWidth = mWordsPaint.measureText(mLineLyrics.substring(0 until getWillSingWordsLength())) - haveSingTextWidth
+        val currentWordsWidth = mOriginWordsPaint.measureText(mOriginLineLyrics.substring(0 until getWillSingWordsLength())) - haveSingTextWidth
         //描绘已唱部分核心
         mWordsSingRect.right = ((mCurrentPlayPosition - mCurrentWordStartTime)*currentWordsWidth/mCurrentWordDuration) + haveSingTextWidth + mWordsSingRect.left
     }
 
     private fun measurePreViewLyrics(){
         //测量文本边界
-        mWordsPaint.getTextBounds(mLineLyrics, 0, mLineLyrics.length, mMeasureRect)
+        mOriginWordsPaint.getTextBounds(mOriginLineLyrics, 0, mOriginLineLyrics.length, mMeasureRect)
     }
 }

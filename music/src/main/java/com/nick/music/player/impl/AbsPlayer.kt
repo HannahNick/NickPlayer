@@ -64,7 +64,7 @@ abstract class AbsPlayer: PlayerControl {
 
 
     protected fun init(){
-        mTimer.schedule(mTask,0,10)
+        mTimer.schedule(mTask,0,35)
     }
 
 

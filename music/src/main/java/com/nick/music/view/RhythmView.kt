@@ -580,19 +580,19 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         var wordIndex:Int,
 
         /**
-         * 原版字的内容
+         * 原音歌词，一个字
          */
         var originalWord: String,
 
         /**
-         * 翻译字的内容
+         * 翻译歌词，一个字
          */
         var translateWord: String = "",
 
         /**
-         * 注音字的内容
+         * 音译歌词，一个字
          */
-        var phoneticWord: String = "",
+        var transliterationWord: String = "",
 
         /**
          * 所在的歌词行
