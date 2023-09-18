@@ -4,21 +4,24 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 
+/**
+ * 顶部歌词、居左显示
+ */
 class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0):KrcLineView(context, attributeSet, defStyleAttr) {
 
 
     override fun doDraw(canvas: Canvas) {
-        drawSingLyrics(canvas)
+        drawSingLyrics2(canvas)
     }
 
     override fun drawPreView(canvas: Canvas) {
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mOriginWordsPaint)
-        canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+        drawPreViewSubsidiaryWords(canvas)
     }
 
     override fun drawSingFinish(canvas: Canvas) {
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mWordsSingPaint)
-        canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+        drawSubsidiaryWords(canvas)
     }
 
 
@@ -31,14 +34,74 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
      */
     private fun drawSingLyrics(canvas: Canvas){
         measureHaveSingRect()
-        // 绘制歌词
+        // 绘制原始歌词
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mOriginWordsPaint)
+        // 绘制副歌词
         canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
         canvas.save()
         canvas.clipRect(mWordsSingRect)
+        // 绘制已唱歌词
         canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mWordsSingPaint)
         canvas.restore()
     }
+
+    private fun drawSingLyrics2(canvas: Canvas){
+        if (mLineLyricsList.isEmpty()){
+            return
+        }
+        // 绘制原音歌词
+        canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mOriginWordsPaint)
+        measureHaveSingRect()
+        // 逐个绘制注音
+        drawSubsidiaryWords(canvas)
+        canvas.save()
+        canvas.clipRect(mWordsSingRect)
+        // 绘制已唱歌词
+        canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mWordsSingPaint)
+        canvas.restore()
+    }
+
+    private fun drawSubsidiaryWords(canvas: Canvas){
+        var currentX = mPaintStartPosition
+        val krcLineWord = mLineLyricsList[mCurrentLineIndex]
+        krcLineWord.originArray.forEachIndexed { index, originChar ->
+            val transliteration = krcLineWord.transliterationArray[index]
+            // 计算注音的宽度
+            val transliterationWidth = mSubsidiaryWordsPaint.measureText(transliteration)
+            // 绘制拼音，居中显示在汉字的正上方
+            canvas.drawText(
+                transliteration,
+                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
+                mSubsidiaryStartPositionY,
+                mSubsidiaryWordsPaint
+            )
+            // 移动 X 坐标，为下一个汉字和拼音腾出空间
+            currentX += mOriginWordsPaint.measureText(originChar)
+        }
+    }
+
+    private fun drawPreViewSubsidiaryWords(canvas: Canvas){
+        if (mLineLyricsList.size<=mCurrentLineIndex+1){
+            return
+        }
+        var currentX = mPaintStartPosition
+        val krcLineWord = mLineLyricsList[mCurrentLineIndex+1]
+        krcLineWord.originArray.forEachIndexed { index, originChar ->
+            val transliteration = krcLineWord.transliterationArray[index]
+            // 计算注音的宽度
+            val transliterationWidth = mSubsidiaryWordsPaint.measureText(transliteration)
+            // 绘制拼音，居中显示在汉字的正上方
+            canvas.drawText(
+                transliteration,
+                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
+                mSubsidiaryStartPositionY,
+                mSubsidiaryWordsPaint
+            )
+            // 移动 X 坐标，为下一个汉字和拼音腾出空间
+            currentX += mOriginWordsPaint.measureText(originChar)
+        }
+    }
+
 
     private fun measureHaveSingRect(){
         if (mOriginLineLyrics.isEmpty()){

@@ -52,6 +52,11 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     protected val mLineLyricsList = ArrayList<KrcLineWord>()
 
     /**
+     * 当前唱的这行歌词在mLineLyricsList的下标
+     */
+    protected var mCurrentLineIndex: Int = 0
+
+    /**
      * 当前唱的字在rhythmList的下标
      */
     protected var mCurrentPlayDataIndex: Int = 0
@@ -139,8 +144,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             textSize = (bottom-top)/4.toFloat()
             color = context.resources.getColor(R.color.white,null)
         }
-        mSubsidiaryStartPositionY = (bottom-top).toFloat()-7
-        mOriginStartPositionY = (bottom-top)*3/4.toFloat()-12
+        mSubsidiaryStartPositionY = (bottom-top)/4.toFloat()
+        mOriginStartPositionY = (bottom-top).toFloat() - 7f
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -235,6 +240,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
                     mCurrentOriginalWord = ""
                     mOriginLineLyrics = ""
                     mSubsidiaryLineLyrics = ""
+//                    mLineLyricsList.clear()
                     invalidate()
                 },2000)
             }
@@ -272,6 +278,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             if (currentTime >= data.startTime && currentTime < data.startTime + data.duration) {
                 // 当前时间在这个歌词的时间范围内
                 mCurrentPlayDataIndex = mid
+                mCurrentLineIndex = data.lineLyricsDataIndex
                 return data
             } else if (currentTime < data.startTime) {
                 // 当前时间在这个歌词之前
@@ -332,7 +339,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         }
 
         release()
-        var outDataIndex = 0
+        var tempIndex = 0
         map.forEach {
             val duration = it.value.wordsDisInterval
             val startTime = it.value.wordsStartTime
@@ -340,14 +347,14 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             val wordsList = it.value.lyricsWords
             val lineLyrics = it.value.lineLyrics
             val wordColor = it.value.wordColors
-            val krcLineWord = KrcLineWord(origin = it.value.lineLyrics,)
+            val krcLineWord = KrcLineWord(origin = it.value.lineLyrics)
             krcLineWord.translate = if (translateLrcLineInfo.isNotEmpty()){
-                translateLrcLineInfo[outDataIndex].lineLyrics
+                translateLrcLineInfo[tempIndex].lineLyrics
             }else{
                 ""
             }
             krcLineWord.transliteration = if (transliterationLrcLineInfo.isNotEmpty()){
-                transliterationLrcLineInfo[outDataIndex].lineLyrics
+                transliterationLrcLineInfo[tempIndex].lineLyrics
             }else{
                 ""
             }
@@ -366,12 +373,16 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
                         lineLyricsDataIndex = mLineLyricsList.size-1,
                         wordsColor = wordColor[index]
                 )
+                krcLineWord.originArray.add(wordsList[index])
                 if (transliterationLrcLineInfo.isNotEmpty()){
-                    rhythm.transliterationWord = transliterationLrcLineInfo[outDataIndex].lyricsWords[index]
+                    val transliterationWord = transliterationLrcLineInfo[tempIndex].lyricsWords[index]
+                    rhythm.transliterationWord = transliterationWord
+                    krcLineWord.transliterationArray.add(transliterationWord)
                 }
                 mRhythmList.add(rhythm)
             }
-            outDataIndex++
+
+            tempIndex++
 
         }
     }
