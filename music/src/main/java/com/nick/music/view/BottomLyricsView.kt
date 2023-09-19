@@ -2,6 +2,7 @@ package com.nick.music.view
 
 import android.content.Context
 import android.graphics.Canvas
+import android.text.TextUtils
 import android.util.AttributeSet
 
 class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0):KrcLineView(context, attributeSet, defStyleAttr) {
@@ -14,13 +15,13 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
     }
 
     override fun doDraw(canvas: Canvas) {
-        drawSingLyrics(canvas)
+        drawSingLyrics2(canvas)
     }
 
     override fun drawPreView(canvas: Canvas) {
         measurePreViewLyrics()
         canvas.drawText(mOriginLineLyrics, mViewWith - mMeasureRect.right,mOriginStartPositionY, mOriginWordsPaint)
-        canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+        drawPreViewSubsidiaryWords(canvas)
     }
 
     override fun drawSingFinish(canvas: Canvas) {
@@ -42,6 +43,69 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         canvas.clipRect(mWordsSingRect)
         canvas.drawText(mOriginLineLyrics,mViewWith - mMeasureRect.right,mOriginStartPositionY,mWordsSingPaint)
         canvas.restore()
+    }
+
+    private fun drawSingLyrics2(canvas: Canvas){
+        measureLyrics()
+        // 绘制歌词
+        canvas.drawText(mOriginLineLyrics, mViewWith - mMeasureRect.right, mOriginStartPositionY, mOriginWordsPaint)
+        drawSubsidiaryLyrics(canvas)
+        canvas.save()
+        canvas.clipRect(mWordsSingRect)
+        canvas.drawText(mOriginLineLyrics,mViewWith - mMeasureRect.right,mOriginStartPositionY,mWordsSingPaint)
+        canvas.restore()
+    }
+
+    private fun drawSubsidiaryLyrics(canvas: Canvas){
+        if (mLineLyricsList.isEmpty()){
+            return
+        }
+        if (TextUtils.isEmpty(mOriginLineLyrics)){
+            return
+        }
+
+        var currentX = mViewWith - mMeasureRect.right
+        val krcLineWord = mLineLyricsList[mCurrentLineIndex]
+        krcLineWord.originArray.forEachIndexed { index, originChar ->
+            val transliteration = krcLineWord.transliterationArray[index]
+            // 计算注音的宽度
+            val transliterationWidth = mSubsidiaryWordsPaint.measureText(transliteration)
+            // 绘制拼音，居中显示在汉字的正上方
+            canvas.drawText(
+                transliteration,
+                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
+                mSubsidiaryStartPositionY,
+                mSubsidiaryWordsPaint
+            )
+            // 移动 X 坐标，为下一个汉字和拼音腾出空间
+            currentX += mOriginWordsPaint.measureText(originChar)
+        }
+    }
+
+    private fun drawPreViewSubsidiaryWords(canvas: Canvas){
+        if (mLineLyricsList.size<=mPreViewLineIndex){
+            return
+        }
+        if (TextUtils.isEmpty(mOriginLineLyrics)){
+            return
+        }
+        var currentX = mViewWith - mMeasureRect.right
+        val krcLineWord = mLineLyricsList[mPreViewLineIndex]
+//        LogUtils.i("顶部画预览歌词>>>${krcLineWord.origin}")
+        krcLineWord.originArray.forEachIndexed { index, originChar ->
+            val transliteration = krcLineWord.transliterationArray[index]
+            // 计算注音的宽度
+            val transliterationWidth = mSubsidiaryWordsPaint.measureText(transliteration)
+            // 绘制拼音，居中显示在汉字的正上方
+            canvas.drawText(
+                transliteration,
+                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
+                mSubsidiaryStartPositionY,
+                mSubsidiaryWordsPaint
+            )
+            // 移动 X 坐标，为下一个汉字和拼音腾出空间
+            currentX += mOriginWordsPaint.measureText(originChar)
+        }
     }
 
     /**

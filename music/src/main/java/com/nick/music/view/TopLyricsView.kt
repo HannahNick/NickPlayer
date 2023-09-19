@@ -2,7 +2,9 @@ package com.nick.music.view
 
 import android.content.Context
 import android.graphics.Canvas
+import android.text.TextUtils
 import android.util.AttributeSet
+import com.blankj.utilcode.util.LogUtils
 
 /**
  * 顶部歌词、居左显示
@@ -21,7 +23,7 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
 
     override fun drawSingFinish(canvas: Canvas) {
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mWordsSingPaint)
-        drawSubsidiaryWords(canvas)
+        drawSubsidiaryLyrics(canvas)
     }
 
 
@@ -46,14 +48,11 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     }
 
     private fun drawSingLyrics2(canvas: Canvas){
-        if (mLineLyricsList.isEmpty()){
-            return
-        }
+        measureHaveSingRect()
         // 绘制原音歌词
         canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mOriginWordsPaint)
-        measureHaveSingRect()
         // 逐个绘制注音
-        drawSubsidiaryWords(canvas)
+        drawSubsidiaryLyrics(canvas)
         canvas.save()
         canvas.clipRect(mWordsSingRect)
         // 绘制已唱歌词
@@ -61,7 +60,17 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         canvas.restore()
     }
 
-    private fun drawSubsidiaryWords(canvas: Canvas){
+    /**
+     * 画副歌词
+     */
+    private fun drawSubsidiaryLyrics(canvas: Canvas){
+        if (mLineLyricsList.isEmpty()){
+            return
+        }
+        if (TextUtils.isEmpty(mOriginLineLyrics)){
+            return
+        }
+
         var currentX = mPaintStartPosition
         val krcLineWord = mLineLyricsList[mCurrentLineIndex]
         krcLineWord.originArray.forEachIndexed { index, originChar ->
@@ -81,11 +90,15 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     }
 
     private fun drawPreViewSubsidiaryWords(canvas: Canvas){
-        if (mLineLyricsList.size<=mCurrentLineIndex+1){
+        if (mLineLyricsList.size<=mPreViewLineIndex){
+            return
+        }
+        if (TextUtils.isEmpty(mOriginLineLyrics)){
             return
         }
         var currentX = mPaintStartPosition
-        val krcLineWord = mLineLyricsList[mCurrentLineIndex+1]
+        val krcLineWord = mLineLyricsList[mPreViewLineIndex]
+//        LogUtils.i("顶部画预览歌词>>>${krcLineWord.origin}")
         krcLineWord.originArray.forEachIndexed { index, originChar ->
             val transliteration = krcLineWord.transliterationArray[index]
             // 计算注音的宽度
@@ -103,6 +116,9 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     }
 
 
+    /**
+     * 测量已唱的框框
+     */
     private fun measureHaveSingRect(){
         if (mOriginLineLyrics.isEmpty()){
             return

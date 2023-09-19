@@ -57,6 +57,11 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     protected var mCurrentLineIndex: Int = 0
 
     /**
+     * 预览歌词mLineLyricsList的下标
+     */
+    protected var mPreViewLineIndex: Int = 0
+
+    /**
      * 当前唱的字在rhythmList的下标
      */
     protected var mCurrentPlayDataIndex: Int = 0
@@ -240,7 +245,6 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
                     mCurrentOriginalWord = ""
                     mOriginLineLyrics = ""
                     mSubsidiaryLineLyrics = ""
-//                    mLineLyricsList.clear()
                     invalidate()
                 },2000)
             }
@@ -263,7 +267,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         isDrawPreview = false
         mCurrentLineIsStart = true
         isDrawSingFinish = false
-//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mLineLyrics},rhythm:$rhythm")
+        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mOriginLineLyrics},lineLyricsDataIndex:${rhythm.lineLyricsDataIndex}")
         positionInitFinishListener?.showPreView(rhythm.lineLyricsDataIndex,!isTopLyrics())
         invalidate()
     }
@@ -415,7 +419,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             }else{
                 krcLineWord.translate
             }
-//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}收到: 下标:$index, 当前需要预展示的歌词:$mLineLyrics")
+            mPreViewLineIndex = index
+//            LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}收到: 下标:$index, 当前需要预展示的歌词:$mOriginLineLyrics 副歌词:$mSubsidiaryLineLyrics")
         }
         isDrawPreview = true
         mCurrentLineIsStart = false

@@ -610,7 +610,7 @@ class RhythmView @JvmOverloads constructor(context: Context, attributeSet: Attri
         var wordInLineIndex: Int,
 
         /**
-         * 歌词在所有数据的下标,目前只有基础歌词会需要这个字段
+         * 一行歌词在所有数据的下标,目前只有基础歌词会需要这个字段
          */
         val lineLyricsDataIndex: Int,
 
