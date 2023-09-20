@@ -11,7 +11,7 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        mViewWith = right.toFloat()
+        mViewWith = right.toFloat() - 10f
     }
 
     override fun doDraw(canvas: Canvas) {
@@ -27,7 +27,7 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
     override fun drawSingFinish(canvas: Canvas) {
         measurePreViewLyrics()
         canvas.drawText(mOriginLineLyrics,mViewWith - mMeasureRect.right,mOriginStartPositionY,mWordsSingPaint)
-        canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+        drawPreViewSubsidiaryWords(canvas)
     }
 
     override fun isTopLyrics(): Boolean {
