@@ -138,19 +138,19 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         mOriginWordsPaint.apply {
-            textSize = (bottom-top)*3/4.toFloat()-7
+            textSize = (bottom-top)*3/4.toFloat()-15
             color = context.resources.getColor(R.color.white,null)
         }
         mWordsSingPaint.apply {
-            textSize = (bottom-top)*3/4.toFloat()-7
+            textSize = (bottom-top)*3/4.toFloat()-15
             color = context.resources.getColor(R.color.male_voice,null)
         }
         mSubsidiaryWordsPaint.apply {
-            textSize = (bottom-top)/4.toFloat()
+            textSize = (bottom-top)/5.toFloat()
             color = context.resources.getColor(R.color.white,null)
         }
         mSubsidiaryStartPositionY = (bottom-top)/4.toFloat()
-        mOriginStartPositionY = (bottom-top).toFloat() - 7f
+        mOriginStartPositionY = (bottom-top).toFloat() - 25f
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -267,7 +267,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         isDrawPreview = false
         mCurrentLineIsStart = true
         isDrawSingFinish = false
-        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mOriginLineLyrics},lineLyricsDataIndex:${rhythm.lineLyricsDataIndex}")
+//        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mOriginLineLyrics},lineLyricsDataIndex:${rhythm.lineLyricsDataIndex}")
         positionInitFinishListener?.showPreView(rhythm.lineLyricsDataIndex,!isTopLyrics())
         invalidate()
     }
@@ -341,6 +341,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             LogUtils.e("lyricsInfo is empty")
             return
         }
+        val hasTransLate = translateLrcLineInfo.isNotEmpty()
+        val hasTransliteration = transliterationLrcLineInfo.isNotEmpty()
 
         release()
         var tempIndex = 0
@@ -351,7 +353,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             val wordsList = it.value.lyricsWords
             val lineLyrics = it.value.lineLyrics
             val wordColor = it.value.wordColors
-            val krcLineWord = KrcLineWord(origin = it.value.lineLyrics)
+            val krcLineWord = KrcLineWord(origin = it.value.lineLyrics,hasTransLate = hasTransLate,hasTransliteration = hasTransliteration)
             krcLineWord.translate = if (translateLrcLineInfo.isNotEmpty()){
                 translateLrcLineInfo[tempIndex].lineLyrics
             }else{

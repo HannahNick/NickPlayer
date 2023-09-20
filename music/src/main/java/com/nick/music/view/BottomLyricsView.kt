@@ -15,26 +15,40 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
     }
 
     override fun doDraw(canvas: Canvas) {
-        drawSingLyrics2(canvas)
+        if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
+            drawOriginAndTransliteration(canvas)
+        }else{
+            drawOriginAndTranslate(canvas)
+        }
     }
 
     override fun drawPreView(canvas: Canvas) {
         measurePreViewLyrics()
         canvas.drawText(mOriginLineLyrics, mViewWith - mMeasureRect.right,mOriginStartPositionY, mOriginWordsPaint)
-        drawPreViewSubsidiaryWords(canvas)
+        if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
+            drawPreViewSubsidiaryWords(canvas)
+        }else{
+            canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+        }
+
+
     }
 
     override fun drawSingFinish(canvas: Canvas) {
         measurePreViewLyrics()
         canvas.drawText(mOriginLineLyrics,mViewWith - mMeasureRect.right,mOriginStartPositionY,mWordsSingPaint)
-        drawPreViewSubsidiaryWords(canvas)
+        if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
+            drawPreViewSubsidiaryWords(canvas)
+        }else{
+            canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+        }
     }
 
     override fun isTopLyrics(): Boolean {
         return false
     }
 
-    private fun drawSingLyrics(canvas: Canvas){
+    private fun drawOriginAndTranslate(canvas: Canvas){
         measureLyrics()
         // 绘制歌词
         canvas.drawText(mOriginLineLyrics, mViewWith - mMeasureRect.right, mOriginStartPositionY, mOriginWordsPaint)
@@ -45,7 +59,7 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         canvas.restore()
     }
 
-    private fun drawSingLyrics2(canvas: Canvas){
+    private fun drawOriginAndTransliteration(canvas: Canvas){
         measureLyrics()
         // 绘制歌词
         canvas.drawText(mOriginLineLyrics, mViewWith - mMeasureRect.right, mOriginStartPositionY, mOriginWordsPaint)
@@ -57,7 +71,7 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
     }
 
     private fun drawSubsidiaryLyrics(canvas: Canvas){
-        if (mLineLyricsList.isEmpty()){
+        if (!mLineLyricsList[0].hasTransliteration){
             return
         }
         if (TextUtils.isEmpty(mOriginLineLyrics)){

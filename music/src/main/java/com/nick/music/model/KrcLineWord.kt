@@ -8,6 +8,17 @@ data class KrcLineWord (
      * 原音歌词一行
      */
     var origin: String,
+
+    /**
+     * 是否有翻译歌词
+     */
+    var hasTransLate: Boolean = false,
+
+    /**
+     * 是否有音译歌词
+     */
+    var hasTransliteration: Boolean = false,
+
     /**
      * 翻译歌词一行
      */

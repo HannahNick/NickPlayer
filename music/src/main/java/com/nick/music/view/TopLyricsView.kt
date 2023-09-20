@@ -13,17 +13,31 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
 
 
     override fun doDraw(canvas: Canvas) {
-        drawSingLyrics2(canvas)
+        if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
+            drawSingLyrics2(canvas)
+        }else{
+            drawSingLyrics(canvas)
+        }
     }
 
     override fun drawPreView(canvas: Canvas) {
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mOriginWordsPaint)
-        drawPreViewSubsidiaryWords(canvas)
+        if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
+            drawPreViewSubsidiaryWords(canvas)
+        }else{
+            canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+        }
+
     }
 
     override fun drawSingFinish(canvas: Canvas) {
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mWordsSingPaint)
-        drawSubsidiaryLyrics(canvas)
+        if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
+            drawSubsidiaryLyrics(canvas)
+        }else{
+            canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
+        }
+
     }
 
 
@@ -32,7 +46,7 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     }
 
     /**
-     * 画当前歌词和已唱
+     * 画主歌词和翻译歌词
      */
     private fun drawSingLyrics(canvas: Canvas){
         measureHaveSingRect()
@@ -47,11 +61,14 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         canvas.restore()
     }
 
+    /**
+     * 画主歌词和音译歌词
+     */
     private fun drawSingLyrics2(canvas: Canvas){
         measureHaveSingRect()
         // 绘制原音歌词
         canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mOriginWordsPaint)
-        // 逐个绘制注音
+        // 逐个绘制副歌词或翻译
         drawSubsidiaryLyrics(canvas)
         canvas.save()
         canvas.clipRect(mWordsSingRect)
@@ -64,9 +81,6 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
      * 画副歌词
      */
     private fun drawSubsidiaryLyrics(canvas: Canvas){
-        if (mLineLyricsList.isEmpty()){
-            return
-        }
         if (TextUtils.isEmpty(mOriginLineLyrics)){
             return
         }
