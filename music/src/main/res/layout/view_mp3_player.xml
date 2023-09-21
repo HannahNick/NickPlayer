@@ -14,7 +14,7 @@
     <com.nick.music.view.KTVLyricsView
         android:id="@+id/ktv_lyric"
         android:layout_width="match_parent"
-        android:layout_height="320px"
+        android:layout_height="380px"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

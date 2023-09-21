@@ -30,8 +30,6 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         }else{
             canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
         }
-
-
     }
 
     override fun drawSingFinish(canvas: Canvas) {
@@ -39,6 +37,7 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         canvas.drawText(mOriginLineLyrics,mViewWith - mMeasureRect.right,mOriginStartPositionY,mWordsSingPaint)
         if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
             drawPreViewSubsidiaryWords(canvas)
+            drawHaveSingSubsidiaryLyrics(canvas)
         }else{
             canvas.drawText(mSubsidiaryLineLyrics, mViewWith - mMeasureRect.right, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
         }
@@ -48,6 +47,9 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         return false
     }
 
+    /**
+     * 画原音和翻译歌词
+     */
     private fun drawOriginAndTranslate(canvas: Canvas){
         measureLyrics()
         // 绘制歌词
@@ -59,6 +61,9 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         canvas.restore()
     }
 
+    /**
+     * 画原音和音译歌词
+     */
     private fun drawOriginAndTransliteration(canvas: Canvas){
         measureLyrics()
         // 绘制歌词
@@ -67,13 +72,14 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         canvas.save()
         canvas.clipRect(mWordsSingRect)
         canvas.drawText(mOriginLineLyrics,mViewWith - mMeasureRect.right,mOriginStartPositionY,mWordsSingPaint)
+        drawHaveSingSubsidiaryLyrics(canvas)
         canvas.restore()
     }
 
+    /**
+     * 画音译歌词
+     */
     private fun drawSubsidiaryLyrics(canvas: Canvas){
-        if (!mLineLyricsList[0].hasTransliteration){
-            return
-        }
         if (TextUtils.isEmpty(mOriginLineLyrics)){
             return
         }
@@ -84,7 +90,7 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
             val transliteration = krcLineWord.transliterationArray[index]
             // 计算注音的宽度
             val transliterationWidth = mSubsidiaryWordsPaint.measureText(transliteration)
-            // 绘制拼音，居中显示在汉字的正上方
+            // 绘制音译歌词，居中显示在原音的正上方
             canvas.drawText(
                 transliteration,
                 currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
@@ -96,10 +102,30 @@ class BottomLyricsView @JvmOverloads constructor(context: Context, attributeSet:
         }
     }
 
-    private fun drawPreViewSubsidiaryWords(canvas: Canvas){
-        if (mLineLyricsList.size<=mPreViewLineIndex){
+    private fun drawHaveSingSubsidiaryLyrics(canvas: Canvas){
+        if (TextUtils.isEmpty(mOriginLineLyrics)){
             return
         }
+
+        var currentX = mViewWith - mMeasureRect.right
+        val krcLineWord = mLineLyricsList[mCurrentLineIndex]
+        krcLineWord.originArray.forEachIndexed { index, originChar ->
+            val transliteration = krcLineWord.transliterationArray[index]
+            // 计算注音的宽度
+            val transliterationWidth = mHaveSingSubsidiaryWordsPaint.measureText(transliteration)
+            // 绘制拼音，居中显示在汉字的正上方
+            canvas.drawText(
+                transliteration,
+                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
+                mSubsidiaryStartPositionY,
+                mHaveSingSubsidiaryWordsPaint
+            )
+            // 移动 X 坐标，为下一个汉字和拼音腾出空间
+            currentX += mOriginWordsPaint.measureText(originChar)
+        }
+    }
+
+    private fun drawPreViewSubsidiaryWords(canvas: Canvas){
         if (TextUtils.isEmpty(mOriginLineLyrics)){
             return
         }

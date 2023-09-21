@@ -22,14 +22,19 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     protected val mOriginWordsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
+     * 已唱歌词画笔
+     */
+    protected val mWordsSingPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
      * 辅助歌词画笔(注音或翻译)
      */
     protected val mSubsidiaryWordsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
-     * 已唱歌词画笔
+     * 已唱辅助歌词画笔
      */
-    protected val mWordsSingPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    protected val mHaveSingSubsidiaryWordsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
      * 歌词长度测量框框
@@ -149,6 +154,10 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             textSize = (bottom-top)/5.toFloat()
             color = context.resources.getColor(R.color.white,null)
         }
+        mHaveSingSubsidiaryWordsPaint.apply {
+            textSize = (bottom-top)/5.toFloat()
+            color = context.resources.getColor(R.color.male_voice,null)
+        }
         mSubsidiaryStartPositionY = (bottom-top)/4.toFloat()
         mOriginStartPositionY = (bottom-top).toFloat() - 25f
     }
@@ -232,7 +241,6 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         return wordsLength
     }
 
-
     open fun setCurrentPosition(position: Long){
         if (mRhythmList.isEmpty()){
             return
@@ -249,7 +257,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
                 },2000)
             }
             //这行已经唱完了,补全绘制
-            if (mCurrentLineIsStart){
+            if (mCurrentLineIsStart&&isInLastThreeFourths(mCurrentOriginalWord,mOriginLineLyrics)){
                 isDrawSingFinish = true
                 invalidate()
             }
@@ -257,6 +265,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         }
         mHandler.removeCallbacksAndMessages(null)
         mWordsSingPaint.color = context.resources.getColor(rhythm.wordsColor,null)
+        mHaveSingSubsidiaryWordsPaint.color = context.resources.getColor(rhythm.wordsColor,null)
         mCurrentOriginalWord = rhythm.originalWord
 
         mOriginLineLyrics = rhythm.lineLyrics
@@ -270,6 +279,19 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
 //        LogUtils.i("${if(isTopLyrics()) "顶部" else "底部"}已找到需要展示的歌词:${mOriginLineLyrics},lineLyricsDataIndex:${rhythm.lineLyricsDataIndex}")
         positionInitFinishListener?.showPreView(rhythm.lineLyricsDataIndex,!isTopLyrics())
         invalidate()
+    }
+
+    /**
+     * 计算当前唱的字是否在当前行的后四分之三位置
+     */
+    private fun isInLastThreeFourths(char: String, sentence: String): Boolean {
+        if (TextUtils.isEmpty(char)||TextUtils.isEmpty(sentence)){
+            return false
+        }
+        // 计算句子长度的四分之三位置
+        val threeFourthsPosition = (sentence.length * 3) / 4
+        // 如果字在句子的后四分之三位置范围内，则返回true，否则返回false
+        return char in sentence.substring(threeFourthsPosition)
     }
 
     private fun findCurrentLyrics(currentTime: Long): RhythmView.Rhythm? {

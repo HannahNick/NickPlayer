@@ -1,6 +1,7 @@
 package com.nick.music.krc;
 
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.Base64;
 
 
@@ -101,7 +102,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 continue;
             }
             checkLineIsStartSex(tempList, lyricsLineInfo);
-            if (tempList.size() == 1) {
+            if (tempList.size() == 1) {//有男女对唱的单独行跳过此轮循环将在下一轮循环中拼接
                 continue;
             }
             LyricsLineInfo appendLyricsLineInfo = mergeLyricsLine(tempList);
@@ -117,7 +118,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         }
         // 设置歌词的标签类
         lyricsInfo.setLyricsTags(lyricsTags);
-        //
+        // 设置每行歌词数据
         lyricsInfo.setLyricsLineInfoTreeMap(lyricsLineInfos);
         return lyricsInfo;
     }
@@ -375,7 +376,9 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                                           JSONArray lyricContentArrayObj) throws Exception {
 
         // 音译歌词集合
-        List<LyricsLineInfo> transliterationLrcLineInfos = new ArrayList<LyricsLineInfo>();
+        List<LyricsLineInfo> transliterationLrcLineInfos = new ArrayList<>();
+
+        List<String> tempTransliterationLrcLineInfo = new ArrayList<>();
         // 获取歌词内容
         for (int j = 0; j < lyricContentArrayObj.length(); j++) {
             JSONArray lrcDataArrayObj = lyricContentArrayObj.getJSONArray(j);
@@ -391,10 +394,18 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 }
                 lineLyrics.append(lyricsWords[k]);
             }
-            transliterationLrcLineInfo.setLineLyrics(lineLyrics.toString());
-            transliterationLrcLineInfo.setLyricsWords(lyricsWords);
+            //检查是否是对唱类型
+            checkTranslateIsSexStart(tempTransliterationLrcLineInfo,lineLyrics.toString());
+            if (tempTransliterationLrcLineInfo.size()==1){
+                continue;
+            }
+            String mergeTemp = mergeTranslateIsSexStart(tempTransliterationLrcLineInfo);
+
+            transliterationLrcLineInfo.setLineLyrics(TextUtils.isEmpty(mergeTemp)?lineLyrics.toString():mergeTemp);
+            transliterationLrcLineInfo.setLyricsWords(TextUtils.isEmpty(mergeTemp)?lyricsWords:mergeTempArray(lyricsWords,tempTransliterationLrcLineInfo.get(0)));
 
             transliterationLrcLineInfos.add(transliterationLrcLineInfo);
+            tempTransliterationLrcLineInfo.clear();
         }
         // 添加音译歌词
         if (transliterationLrcLineInfos.size() > 0) {
@@ -403,33 +414,69 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         }
     }
 
+    private String[] mergeTempArray(String[] lyricsWords,String sexStart){
+        String[] mergeTempArray = new String[lyricsWords.length+1];
+        mergeTempArray[0] = sexStart;
+        for (int i = 0; i < lyricsWords.length; i++) {
+            mergeTempArray[i+1] = lyricsWords[i];
+        }
+        return mergeTempArray;
+    }
+
     /**
      * 解析翻译歌词
      *
-     * @param lyricsIfno
+     * @param lyricsInfo
      * @param lyricContentArrayObj
      */
-    private void parserTranslateLrc(LyricsInfo lyricsIfno,
+    private void parserTranslateLrc(LyricsInfo lyricsInfo,
                                     JSONArray lyricContentArrayObj) throws Exception {
 
         // 翻译歌词集合
-        List<TranslateLrcLineInfo> translateLrcLineInfos = new ArrayList<TranslateLrcLineInfo>();
+        List<TranslateLrcLineInfo> translateLrcLineInfos = new ArrayList<>();
+        List<String> tempLrcLineInfo = new ArrayList<>();
 
         // 获取歌词内容
         for (int j = 0; j < lyricContentArrayObj.length(); j++) {
             JSONArray lrcDataArrayObj = lyricContentArrayObj.getJSONArray(j);
             String lrcComtext = lrcDataArrayObj.getString(0);
+            checkTranslateIsSexStart(tempLrcLineInfo,lrcComtext);
+            if (tempLrcLineInfo.size()==1){
+                continue;
+            }
+            String mergeLrcComtext = mergeTranslateIsSexStart(tempLrcLineInfo);
 
             // 翻译行歌词
             TranslateLrcLineInfo translateLrcLineInfo = new TranslateLrcLineInfo();
-            translateLrcLineInfo.setLineLyrics(lrcComtext);
+            translateLrcLineInfo.setLineLyrics(TextUtils.isEmpty(mergeLrcComtext)?lrcComtext:mergeLrcComtext);
 
             translateLrcLineInfos.add(translateLrcLineInfo);
         }
         // 添加翻译歌词
         if (translateLrcLineInfos.size() > 0) {
-            lyricsIfno.setTranslateLrcLineInfos(translateLrcLineInfos);
+            lyricsInfo.setTranslateLrcLineInfos(translateLrcLineInfos);
         }
+    }
+
+    private void checkTranslateIsSexStart(List<String> temp,String lrcComtext){
+        if (TextUtils.isEmpty(lrcComtext)){
+            return;
+        }
+        if (temp.size()==1){
+            temp.add(lrcComtext);
+            return;
+        }
+        String trimLrc = lrcComtext.trim();
+        if (trimLrc.endsWith(":")||trimLrc.endsWith("：")){
+            temp.add(lrcComtext);
+        }
+    }
+
+    private String mergeTranslateIsSexStart(List<String> temp){
+        if (temp.size()==2){
+            return temp.get(0).concat(temp.get(1));
+        }
+        return "";
     }
 
     /**

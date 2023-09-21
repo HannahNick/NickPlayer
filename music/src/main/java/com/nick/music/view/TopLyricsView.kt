@@ -34,6 +34,7 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mWordsSingPaint)
         if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
             drawSubsidiaryLyrics(canvas)
+            drawHaveSingSubsidiaryLyrics(canvas)
         }else{
             canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
         }
@@ -68,12 +69,14 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         measureHaveSingRect()
         // 绘制原音歌词
         canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mOriginWordsPaint)
-        // 逐个绘制副歌词或翻译
+        // 逐个绘制副歌词
         drawSubsidiaryLyrics(canvas)
         canvas.save()
         canvas.clipRect(mWordsSingRect)
         // 绘制已唱歌词
         canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mWordsSingPaint)
+        //绘制已唱副歌词
+        drawHaveSingSubsidiaryLyrics(canvas)
         canvas.restore()
     }
 
@@ -97,6 +100,32 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
                 currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
                 mSubsidiaryStartPositionY,
                 mSubsidiaryWordsPaint
+            )
+            // 移动 X 坐标，为下一个汉字和拼音腾出空间
+            currentX += mOriginWordsPaint.measureText(originChar)
+        }
+    }
+
+    /**
+     * 画已唱副歌词
+     */
+    private fun drawHaveSingSubsidiaryLyrics(canvas: Canvas){
+        if (TextUtils.isEmpty(mOriginLineLyrics)){
+            return
+        }
+
+        var currentX = mPaintStartPosition
+        val krcLineWord = mLineLyricsList[mCurrentLineIndex]
+        krcLineWord.originArray.forEachIndexed { index, originChar ->
+            val transliteration = krcLineWord.transliterationArray[index]
+            // 计算注音的宽度
+            val transliterationWidth = mHaveSingSubsidiaryWordsPaint.measureText(transliteration)
+            // 绘制拼音，居中显示在汉字的正上方
+            canvas.drawText(
+                transliteration,
+                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
+                mSubsidiaryStartPositionY,
+                mHaveSingSubsidiaryWordsPaint
             )
             // 移动 X 坐标，为下一个汉字和拼音腾出空间
             currentX += mOriginWordsPaint.measureText(originChar)
