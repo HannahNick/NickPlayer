@@ -132,9 +132,9 @@ class TwoPlayerFragment2: Fragment(), ServiceConnection, PlayInfoCallBack, Surfa
         mBinding.apply {
             if (UrlUtil.isAudioUrl(playInfo.url)){
                 val loopPath = "${context?.filesDir?.absolutePath}/vod/adc.mp4"
+                ktvLyricParent.setKrc(File(path))
                 ktvLyricParent.setLoopFile(File(loopPath))
                 ktvLyricParent.play()
-                ktvLyricParent.setKrc(File(path))
             }
         }
     }

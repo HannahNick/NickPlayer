@@ -140,6 +140,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
 
     var positionInitFinishListener: PositionInitFinishListener? = null
 
+    var mOriginWordsTextSize = 0f
+
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         mOriginWordsPaint.apply {
@@ -160,6 +162,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         }
         mSubsidiaryStartPositionY = (bottom-top)/4.toFloat()
         mOriginStartPositionY = (bottom-top).toFloat() - 25f
+        mOriginWordsTextSize = mOriginWordsPaint.textSize
     }
 
     override fun onDraw(canvas: Canvas) {

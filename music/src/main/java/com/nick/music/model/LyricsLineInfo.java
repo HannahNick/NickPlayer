@@ -69,6 +69,34 @@ public class LyricsLineInfo {
         this.mLyricsWords = tempArray;
     }
 
+    /**
+     * 使用该方法一定要先setLineLyrics
+     */
+    public void setLyricsWords2(String[] lyricsWords){
+        if (lyricsWords == null) return;
+        StringBuilder sb = new StringBuilder();
+        for (String lyricsWord : lyricsWords) {
+            sb.append(lyricsWord);
+        }
+        if (!mLineLyrics.equals(sb.toString())){
+            String[] array = new String[1];
+            array[0] = mLineLyrics;
+            this.mLyricsWords = array;
+            return;
+        }
+
+        String[] tempArray = new String[lyricsWords.length];
+        for (int i = 0; i < lyricsWords.length; i++) {
+            String temp = lyricsWords[i];
+            if (TextUtils.isEmpty(temp)) {
+                tempArray[i] = "";
+            } else {
+                tempArray[i] = temp.replaceAll("\r|\n", "");
+            }
+        }
+        this.mLyricsWords = tempArray;
+    }
+
     public int[] getWordsIndex() {
         return mWordsIndex;
     }

@@ -18,6 +18,13 @@ public class TranslateLrcLineInfo {
         return mLineLyrics;
     }
 
+    public TranslateLrcLineInfo() {
+    }
+
+    public TranslateLrcLineInfo(String mLineLyrics) {
+        this.mLineLyrics = mLineLyrics;
+    }
+
     public void setLineLyrics(String lineLyrics) {
         if (!TextUtils.isEmpty(lineLyrics))
             this.mLineLyrics = lineLyrics.replaceAll("\r|\n", "");

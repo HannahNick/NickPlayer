@@ -92,4 +92,7 @@ class KTVLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
         }
     }
 
+    fun getOriginTextSize(): Float{
+        return topLyricsView.mOriginWordsTextSize
+    }
 }

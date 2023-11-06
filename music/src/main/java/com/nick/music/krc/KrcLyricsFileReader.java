@@ -1,14 +1,15 @@
 package com.nick.music.krc;
 
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Pair;
 
-
-import androidx.core.util.Pair;
 
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.RegexUtils;
 import com.nick.music.R;
 import com.nick.music.model.LyricsInfo;
 import com.nick.music.model.LyricsLineInfo;
@@ -21,6 +22,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -67,6 +69,12 @@ public class KrcLyricsFileReader extends LyricsFileReader {
     private final static String LEGAL_QQ_PREFIX = "[qq:";
     private final static String LEGAL_TOTAL_PREFIX = "[total:";
     private final static String LEGAL_LANGUAGE_PREFIX = "[language:";
+
+    private final Paint mPaint = new Paint();
+    //屏幕是1920的宽度，但是歌词view有间距，所以就设置1820为最大显示宽度
+    private final static float MAX_Width = 1820f;
+
+    private float mTextSize = 0f;
     /**
      * 解码参数
      */
@@ -74,6 +82,10 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             'Q', '6', '1', '-', 'Î', 'Ò', 'n', 'i'};
 
     public KrcLyricsFileReader() {
+    }
+
+    public void setTextSize(float textSize){
+        mTextSize = textSize;
     }
 
     @Override
@@ -90,11 +102,13 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         LyricsInfo lyricsInfo = new LyricsInfo();
         String lyricsTextStr = FileIOUtils.readFile2String(file);
         String[] lyricsTexts = lyricsTextStr.split("\n");
-        TreeMap<Integer, LyricsLineInfo> lyricsLineInfos = new TreeMap<Integer, LyricsLineInfo>();
-        Map<String, Object> lyricsTags = new HashMap<String, Object>();
+        TreeMap<Integer, LyricsLineInfo> lyricsLineInfos = new TreeMap<>();
+        Map<String, Object> lyricsTags = new HashMap<>();
         int index = 0;
+        int transliterationIndex = 0;
         List<LyricsLineInfo> tempList = new ArrayList<>();
-        for (String lineInfo : lyricsTexts) {
+        for (int i = 0; i < lyricsTexts.length; i++) {
+            String lineInfo = lyricsTexts[i];
             // 行读取，并解析每行歌词的内容
             LyricsLineInfo lyricsLineInfo = parserLineInfos(lyricsTags,
                     lineInfo, lyricsInfo);
@@ -105,16 +119,43 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             if (tempList.size() == 1) {//有男女对唱的单独行跳过此轮循环将在下一轮循环中拼接
                 continue;
             }
+            //拼接歌词
             LyricsLineInfo appendLyricsLineInfo = mergeLyricsLine(tempList);
+            //获取翻译数据
+            List<TranslateLrcLineInfo> translateLrcLineInfos = lyricsInfo.getTranslateLrcLineInfos();
+            //获取注音数据
+            LyricsLineInfo transliterationLrcLineInfos = lyricsInfo.getTransliterationLrcLineInfos()==null?null:lyricsInfo.getTransliterationLrcLineInfos().get(transliterationIndex);
+            transliterationIndex++;
             if (appendLyricsLineInfo != null) {
-                lyricsLineInfos.put(index, appendLyricsLineInfo);
-                index++;
+                Pair<List<LyricsLineInfo>, List<LyricsLineInfo>> pair = wrapLyricsLineInfos(appendLyricsLineInfo, transliterationLrcLineInfos);
+                for (int j = 0; j < pair.first.size(); j++) {
+                    if (j>0){
+                        if (translateLrcLineInfos!=null){
+                            translateLrcLineInfos.add(index,new TranslateLrcLineInfo(""));
+                        }
+                        if (transliterationLrcLineInfos !=null){
+                            lyricsInfo.getTransliterationLrcLineInfos().add(index,pair.second.get(j));
+                        }
+                    }
+                    lyricsLineInfos.put(index, pair.first.get(j));
+                    index++;
+                }
                 tempList.clear();
                 continue;
             }
-
-            lyricsLineInfos.put(index, lyricsLineInfo);
-            index++;
+            Pair<List<LyricsLineInfo>, List<LyricsLineInfo>> pair = wrapLyricsLineInfos(lyricsLineInfo,transliterationLrcLineInfos);
+            for (int k = 0; k < pair.first.size(); k++) {
+                if (k>0){
+                    if (translateLrcLineInfos!=null){
+                        translateLrcLineInfos.add(index,new TranslateLrcLineInfo(""));
+                    }
+                    if (transliterationLrcLineInfos !=null){
+                        lyricsInfo.getTransliterationLrcLineInfos().add(index,pair.second.get(k));
+                    }
+                }
+                lyricsLineInfos.put(index, pair.first.get(k));
+                index++;
+            }
         }
         // 设置歌词的标签类
         lyricsInfo.setLyricsTags(lyricsTags);
@@ -123,7 +164,23 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         return lyricsInfo;
     }
 
-    //检测是否是对唱类型开头
+    /**
+     * 包装翻译歌词
+     * @param lyricsLineInfo 默认标准行歌词数据
+     * @param transliterationLyricsLineInfo 音译歌词
+     * @return
+     */
+    private Pair<List<LyricsLineInfo>, List<LyricsLineInfo>> wrapLyricsLineInfos(LyricsLineInfo lyricsLineInfo, LyricsLineInfo transliterationLyricsLineInfo){
+        String lineLyrics = lyricsLineInfo.getLineLyrics();
+        List<String> strings = splitLyricsLine(lineLyrics);
+        return mapLyricsLineInfoList(strings, lyricsLineInfo,transliterationLyricsLineInfo);
+    }
+
+    /**
+     * 检测是否是对唱类型开头
+     * @param tempList
+     * @param lyricsLineInfo 当前行歌词
+     */
     private void checkLineIsStartSex(List<LyricsLineInfo> tempList,LyricsLineInfo lyricsLineInfo){
         if (tempList.size()==1){
             tempList.add(lyricsLineInfo);
@@ -135,7 +192,11 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         }
     }
 
-    //开始拼接歌词
+    /**
+     * 对唱类型歌词拼接
+     * @param tempList
+     * @return
+     */
     private LyricsLineInfo mergeLyricsLine(List<LyricsLineInfo> tempList){
         if (tempList.size()==2){
 //            LogUtils.i("开始拼接数据:"+tempList);
@@ -188,6 +249,175 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         }
         return null;
     }
+
+    /**
+     * 歌词是否能够一行显示，英文歌词大概率显示不全
+     * @param lineText 一行歌词
+     * @return 是否能显示
+     */
+    private boolean isTextFitInOneLine(String lineText){
+        mPaint.setTextSize(mTextSize);
+        float textWidth = mPaint.measureText(lineText);
+        return textWidth<=MAX_Width;
+    }
+
+    /**
+     * 如果文本中英文数量超过80%，就认为是英文
+     * @param text 文本
+     * @return 是否是英文
+     */
+    public boolean isMostlyEnglishText(String text) {
+        int totalCharacters = text.length();
+        int englishCharacters = 0;
+
+        // 统计文本中的英文字母数量
+        for (char c : text.toCharArray()) {
+            if (Character.isLetter(c) && Character.UnicodeBlock.of(c) == Character.UnicodeBlock.BASIC_LATIN) {
+                englishCharacters++;
+            }
+        }
+        // 计算英文字母比例，如果超过70%则认为是英文
+        double englishPercentage = (double) englishCharacters / totalCharacters * 100;
+        return englishPercentage >= 70;
+    }
+
+    /**
+     * 将超出屏幕的歌词进行分割
+     * @param lineLyrics 行歌词
+     * @return 分割数组
+     */
+    private List<String> splitLyricsLine(String lineLyrics){
+        List<String> result = new ArrayList<>();
+        if (isTextFitInOneLine(lineLyrics)){
+            result.add(lineLyrics);
+            return result;
+        }
+        //英文按照空格进行分割，中文全部分割
+        boolean isMostEnglish = isMostlyEnglishText(lineLyrics);
+        String[] words =isMostEnglish?lineLyrics.split("\\s+"):lineLyrics.split("");
+        float accumulatedWidth = 0f;
+        StringBuilder currentLine = new StringBuilder();
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            //英文的拼接最后不需要拼空格
+            String text = isMostEnglish?word.concat(i== words.length-1?"":" "):word;
+            float wordWidth = mPaint.measureText(text);
+            if (accumulatedWidth + wordWidth<=MAX_Width){
+                currentLine.append(text);
+                accumulatedWidth += wordWidth;
+            }else {
+                result.add(currentLine.toString());
+                currentLine = new StringBuilder(text);
+                accumulatedWidth = wordWidth;
+            }
+        }
+        if (currentLine.length()>0){
+            result.add(currentLine.toString());
+        }
+        return result;
+    }
+
+    /**
+     * 将分割好的文本组装数据
+     * @param splitLyricsLine 分割好的文本
+     * @param lyricsLineInfo 当前行数据
+     * @param transliterationLyricsLineInfo 当前行注音数据
+     * @return 组装好的数据
+     */
+    private Pair<List<LyricsLineInfo>,List<LyricsLineInfo>> mapLyricsLineInfoList(List<String> splitLyricsLine, LyricsLineInfo lyricsLineInfo, LyricsLineInfo transliterationLyricsLineInfo){
+        LogUtils.i(splitLyricsLine);
+        List<LyricsLineInfo> originResult = new ArrayList<>();
+        List<LyricsLineInfo> transliterationResult = new ArrayList<>();
+        //没有进行过分割就直接返回
+        if (splitLyricsLine.size()==1){
+            originResult.add(lyricsLineInfo);
+            if(transliterationLyricsLineInfo!=null){
+                transliterationResult.add(transliterationLyricsLineInfo);
+            }
+            return new Pair<>(originResult,transliterationResult);
+        }
+
+        String[] lyricsWords = lyricsLineInfo.getLyricsWords();
+        int[] wordsIndex = lyricsLineInfo.getWordsIndex();
+        long[] wordsStartTime = lyricsLineInfo.getWordsStartTime();
+        long[] wordsDisInterval = lyricsLineInfo.getWordsDisInterval();
+
+        int baseIndex = 0;
+        String[] tempLyricsWords;
+        int[] tempWordsIndex;
+        long[] tempWordsStartTime;
+        long[] tempWordsDisInterval;
+        long tempStartTime = 0;
+
+
+        for (String s : splitLyricsLine) {
+            LyricsLineInfo tempLyricsLineInfo = new LyricsLineInfo();
+            int endIndex = getEndIndex(lyricsWords, s, baseIndex);
+            if (endIndex==baseIndex){
+                baseIndex = endIndex-1;
+            }
+            tempWordsIndex = Arrays.copyOfRange(wordsIndex,baseIndex,endIndex);
+            tempWordsStartTime = Arrays.copyOfRange(wordsStartTime,baseIndex,endIndex);
+            tempWordsDisInterval = Arrays.copyOfRange(wordsDisInterval,baseIndex,endIndex);
+            tempLyricsWords = Arrays.copyOfRange(lyricsWords,baseIndex,endIndex);
+            long sumEndTime = sumEndTime(tempWordsDisInterval);
+            long sStartTime = tempStartTime;
+            tempLyricsLineInfo.setStartTime(sStartTime);
+            tempLyricsLineInfo.setEndTime(sStartTime+sumEndTime);
+            tempStartTime += sumEndTime;
+            if (transliterationLyricsLineInfo!=null){
+                LyricsLineInfo tempTlLyricsLineInfo = new LyricsLineInfo();
+                tempTlLyricsLineInfo.setLyricsWords(Arrays.copyOfRange(transliterationLyricsLineInfo.getLyricsWords(),baseIndex,endIndex));
+                tempTlLyricsLineInfo.setLineLyrics(sumTransliteration(Arrays.copyOfRange(transliterationLyricsLineInfo.getLyricsWords(),baseIndex,endIndex)));
+                transliterationResult.add(tempTlLyricsLineInfo);
+            }
+
+            tempLyricsLineInfo.setLineLyrics(s);
+            tempLyricsLineInfo.setWordsIndex(tempWordsIndex);
+            tempLyricsLineInfo.setWordsStartTime(tempWordsStartTime);
+            tempLyricsLineInfo.setWordsDisInterval(tempWordsDisInterval);
+            tempLyricsLineInfo.setLyricsWords2(tempLyricsWords);
+
+            originResult.add(tempLyricsLineInfo);
+            baseIndex=endIndex;
+        }
+        return new Pair<>(originResult,transliterationResult);
+    }
+
+    private long sumEndTime(long[] tempEndTime){
+        int sum = 0;
+        for (long num : tempEndTime) {
+            sum += num;
+        }
+        return sum;
+    }
+
+    private String sumTransliteration(String[] transliteration){
+        StringBuilder sb = new StringBuilder();
+        for (String s : transliteration) {
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+
+
+    private int getEndIndex(String[] lyricsWords,String lineLyricsWords,int startIndex){
+        if (TextUtils.isEmpty(lineLyricsWords)||lyricsWords.length==0){
+            return 0;
+        }
+        StringBuilder tempWords = new StringBuilder();
+        for (int i = startIndex; i < lyricsWords.length; i++) {
+            if (tempWords.toString().equals(lineLyricsWords)){
+                return i;
+            }
+            tempWords.append(lyricsWords[i]);
+        }
+        return lyricsWords.length;
+    }
+
+
+
 
 
     /**
@@ -256,8 +486,8 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                         mEndIndex - 1).split(",");
                 //
 
-                long startTime = modifyNumber(Long.parseLong(lineTime[0]));
-                long endTime = modifyNumber(startTime + Long.parseLong(lineTime[1]));
+                long startTime = Long.parseLong(lineTime[0]);
+                long endTime = startTime + Long.parseLong(lineTime[1]);
                 lyricsLineInfo.setEndTime(endTime);
                 lyricsLineInfo.setStartTime(startTime);
                 // 获取歌词信息，将开始的行时间[xxx,xxx]去掉
@@ -306,9 +536,9 @@ public class KrcLyricsFileReader extends LyricsFileReader {
 
                     //
                     //获取字的绝对开始时间
-                    wordsStartTime[index] = modifyNumber(Long.parseLong(wordsDisIntervalTemp[0])+startTime);
+                    wordsStartTime[index] = Long.parseLong(wordsDisIntervalTemp[0])+startTime;
                     //获取每个字的持续时间
-                    wordsDisInterval[index] = modifyNumber(Long.parseLong(wordsDisIntervalTemp[1]));
+                    wordsDisInterval[index] = Long.parseLong(wordsDisIntervalTemp[1]);
                     //设置每个歌词在view中的显示下标
                     wordsIndex[index] = RandomIndexUtil.getInstance().getRandom();
                     index++;

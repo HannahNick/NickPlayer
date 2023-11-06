@@ -36,6 +36,7 @@ class KtvMp3PlayerView @JvmOverloads constructor(context: Context, attributeSet:
             // TODO: 加日志
             return
         }
+        mKrcReader.setTextSize(mKTVLyricsView.getOriginTextSize())
         val krcInfo = mKrcReader.readFile(krcFile)
         if (krcInfo!=null){
             mKTVLyricsView.setData(krcInfo)
