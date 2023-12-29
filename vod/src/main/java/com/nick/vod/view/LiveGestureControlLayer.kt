@@ -64,7 +64,7 @@ class LiveGestureControlLayer @JvmOverloads constructor(context: Context, attrs:
     }
 
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
+    override fun onTouchEvent(event: MotionEvent): Boolean {
         return mGestureDetectorCompat.onTouchEvent(event)
     }
 

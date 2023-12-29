@@ -172,7 +172,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
      */
     private Pair<List<LyricsLineInfo>, List<LyricsLineInfo>> wrapLyricsLineInfos(LyricsLineInfo lyricsLineInfo, LyricsLineInfo transliterationLyricsLineInfo){
         String lineLyrics = lyricsLineInfo.getLineLyrics();
-        List<String> strings = splitLyricsLine(lineLyrics);
+        List<String> strings = splitLyricsLine(lineLyrics,lyricsLineInfo);
         return mapLyricsLineInfoList(strings, lyricsLineInfo,transliterationLyricsLineInfo);
     }
 
@@ -286,22 +286,24 @@ public class KrcLyricsFileReader extends LyricsFileReader {
      * @param lineLyrics 行歌词
      * @return 分割数组
      */
-    private List<String> splitLyricsLine(String lineLyrics){
+    private List<String> splitLyricsLine(String lineLyrics,LyricsLineInfo lyricsLineInfo){
         List<String> result = new ArrayList<>();
         if (isTextFitInOneLine(lineLyrics)){
             result.add(lineLyrics);
             return result;
         }
         //英文按照空格进行分割，中文全部分割
-        boolean isMostEnglish = isMostlyEnglishText(lineLyrics);
-        String[] words =isMostEnglish?lineLyrics.split("\\s+"):lineLyrics.split("");
+//        boolean isMostEnglish = isMostlyEnglishText(lineLyrics);
+//        String[] words =isMostEnglish?lineLyrics.split("\\s+"):lineLyrics.split("");
+        String[] words = lyricsLineInfo.getLyricsWords();
         float accumulatedWidth = 0f;
         StringBuilder currentLine = new StringBuilder();
 
         for (int i = 0; i < words.length; i++) {
-            String word = words[i];
+//            String word = words[i];
             //英文的拼接最后不需要拼空格
-            String text = isMostEnglish?word.concat(i== words.length-1?"":" "):word;
+//            String text = isMostEnglish?word.concat(i== words.length-1?"":" "):word;
+            String text = words[i];
             float wordWidth = mPaint.measureText(text);
             if (accumulatedWidth + wordWidth<=MAX_Width){
                 currentLine.append(text);
@@ -368,11 +370,17 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             tempStartTime += sumEndTime;
             if (transliterationLyricsLineInfo!=null){
                 LyricsLineInfo tempTlLyricsLineInfo = new LyricsLineInfo();
-                tempTlLyricsLineInfo.setLyricsWords(Arrays.copyOfRange(transliterationLyricsLineInfo.getLyricsWords(),baseIndex,endIndex));
-                tempTlLyricsLineInfo.setLineLyrics(sumTransliteration(Arrays.copyOfRange(transliterationLyricsLineInfo.getLyricsWords(),baseIndex,endIndex)));
+                String[] transliterationWords = transliterationLyricsLineInfo.getLyricsWords();
+                //数据不规范是真恶心
+                if (baseIndex>=transliterationWords.length|| endIndex>transliterationWords.length){
+                    tempTlLyricsLineInfo.setLyricsWords(Arrays.copyOfRange(lyricsWords,baseIndex,endIndex));
+                    tempTlLyricsLineInfo.setLineLyrics(sumTransliteration(Arrays.copyOfRange(lyricsWords,baseIndex,endIndex)));
+                }else {
+                    tempTlLyricsLineInfo.setLyricsWords(Arrays.copyOfRange(transliterationLyricsLineInfo.getLyricsWords(),baseIndex,endIndex));
+                    tempTlLyricsLineInfo.setLineLyrics(sumTransliteration(Arrays.copyOfRange(transliterationLyricsLineInfo.getLyricsWords(),baseIndex,endIndex)));
+                }
                 transliterationResult.add(tempTlLyricsLineInfo);
             }
-
             tempLyricsLineInfo.setLineLyrics(s);
             tempLyricsLineInfo.setWordsIndex(tempWordsIndex);
             tempLyricsLineInfo.setWordsStartTime(tempWordsStartTime);
