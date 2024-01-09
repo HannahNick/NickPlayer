@@ -1,15 +1,15 @@
 ext {
     sdk_version = [
-            compileSdkVersion: 33,
+            compileSdkVersion: 34,
             minSdkVersion    : 24,
-            targetSdkVersion : 33,
+            targetSdkVersion : 34,
     ]
 
     dependencies_version = [
-            android_core_ktx     : "1.7.0",
-            android_appcompat    : "1.4.1",
-            android_material     : "1.6.1",
-            constraintlayout     : "2.1.3",
+            android_core_ktx     : "1.9.0",
+            android_appcompat    : "1.6.1",
+            android_material     : "1.10.0",
+            constraintlayout     : "2.1.4",
             lifecycle            : "2.3.0",
             utilcodex            : "1.31.1",
             retrofit               : "2.9.0",
@@ -17,7 +17,7 @@ ext {
             loggingInterceptor     : "3.1.0",
             quickAdapter           : "3.0.10",
             kotlinxCoroutinesRx2    : "1.6.4",
-            rxjava                  : "3.1.5",
+            rxjava                  : "3.1.6",
             rxandroid               : "3.0.2",
             glide               : "4.15.1",
     ]
