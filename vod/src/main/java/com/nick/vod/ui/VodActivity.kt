@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.nick.vod.databinding.ActivityVodBinding
 import com.nick.vod.ui.dialog.GlidePlayerDialog
+import com.nick.vod.ui.dialog.LiveDialog
 import com.nick.vod.ui.dialog.TwoPlayerDialog
 import com.nick.vod.ui.dialog.VodDialog
 import com.nick.vod.view.LiveGestureControlLayer
@@ -17,7 +18,7 @@ import com.nick.vod.wiget.GestureMessageCenter
 class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack {
 
     private val mBinding by lazy { ActivityVodBinding.inflate(layoutInflater) }
-    private val mVodDialog by lazy { VodDialog() }
+    private val mLiveDialog by lazy { LiveDialog() }
     private val mGlidePlayerDialog by lazy { GlidePlayerDialog() }
     private val mTwoPlayerDialog by lazy { TwoPlayerDialog() }
 
@@ -31,7 +32,7 @@ class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack 
     private fun initListener(){
         mBinding.apply {
             btnVodDialog.setOnClickListener {
-                mVodDialog.show(supportFragmentManager,"VodDialog")
+                mLiveDialog.show(supportFragmentManager,"VodDialog")
 //                mTwoPlayerDialog.show(supportFragmentManager,"TwoPlayerDialog")
             }
             btnGifDialog.setOnClickListener {

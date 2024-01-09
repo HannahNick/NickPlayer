@@ -27,4 +27,10 @@ object GestureMessageCenter {
             it.back()
         }
     }
+
+    fun seek(position: Int){
+        callBackList.forEach{
+            it.seek(position)
+        }
+    }
 }

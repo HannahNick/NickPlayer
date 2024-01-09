@@ -34,6 +34,9 @@ android {
 
 dependencies {
 
+    implementation("com.xyz.base:app:$dependencies_version.app_base"){
+        exclude group: "com.android.support"
+    }
     implementation project(path: ':music')
     implementation project(path: ':vod')
     implementation project(path: ':base')

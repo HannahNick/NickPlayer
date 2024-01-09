@@ -1,9 +1,7 @@
 package com.xyz.edu.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.nick.base.ui.BaseActivity
 import com.xyz.edu.contract.IHomeC
 import com.xyz.edu.databinding.ActivityHomeBinding
 import com.xyz.edu.model.HomeModel

@@ -23,15 +23,12 @@ import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.binder.MusicBinder
 import com.nick.vod.databinding.LayoutLiveBinding
-import com.nick.vod.databinding.LayoutVodBinding
 import com.nick.vod.ui.adapter.LiveAdapter
-import com.nick.vod.view.LiveGestureControlLayer
 import java.util.*
 
-class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolder.Callback,
-    LiveGestureControlLayer.GestureCallBack{
+class LiveFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolder.Callback{
 
-    private val mBindingView by lazy { LayoutVodBinding.inflate(layoutInflater) }
+    private val mBindingView by lazy { LayoutLiveBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
     private lateinit var mMusicBinder: MusicBinder
     private val mLiveAdapter = LiveAdapter()
@@ -74,15 +71,15 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
 
             )
             mMusicBinder.setPlayList(data)
-//            mBindingView.rvVod.apply {
-//                layoutManager = LinearLayoutManager(context)
-//                mLiveAdapter.addData(data)
-//                adapter = mLiveAdapter
-//                mLiveAdapter.setOnItemClickListener { adapter, view, position ->
-//                    mMusicBinder.play(position)
-//                    mBindingView.gcLayer.setLiveName(mMusicBinder.getPlayInfo().liveName)
-//                }
-//            }
+            mBindingView.rvLive.apply {
+                layoutManager = LinearLayoutManager(context)
+                mLiveAdapter.addData(data)
+                adapter = mLiveAdapter
+                mLiveAdapter.setOnItemClickListener { adapter, view, position ->
+                    mMusicBinder.play(position)
+                    mBindingView.gcLayer.setLiveName(mMusicBinder.getPlayInfo().liveName)
+                }
+            }
         }
         val registerCallBackTask = Runnable {
             mMusicBinder.registerCallBack(this)
@@ -106,7 +103,7 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
             ivPlay.setOnClickListener {
                 mMusicBinder.play()
             }
-            svVideo.holder.addCallback(this@VodFragment)
+            svVideo.holder.addCallback(this@LiveFragment)
         }
     }
 
@@ -141,10 +138,6 @@ class VodFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolde
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
-    }
-
-    override fun seek(position: Int) {
-        mMusicBinder.seek(position)
     }
 
 }

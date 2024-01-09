@@ -1,4 +1,4 @@
-package com.nick.base.ui
+package com.xyz.edu.ui
 
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
