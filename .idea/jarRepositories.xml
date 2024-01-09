@@ -36,5 +36,10 @@
       <option name="name" value="TarsosDSP repository" />
       <option name="url" value="https://mvn.0110.be/releases" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="http://sz.mtsclound.com:8081/repository/4cloud/" />
+    </remote-repository>
   </component>
 </project>

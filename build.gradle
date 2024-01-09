@@ -8,7 +8,7 @@ buildscript {
         /*
         仓库配置
         */
-        repo_url = 'http://4dcloud.f3322.net:8081/repository/4cloud-release/'
+        repo_url = 'http://sz.mtsclound.com:8081/repository/4cloud/'
         repo_username = 'admin'
         repo_password = 'qwert26990000'
         artifact_group = 'com.xyz.module'
@@ -23,7 +23,7 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            url "http://4dcloud.f3322.net:8081/repository/4cloud/"
+            url "http://sz.mtsclound.com:8081/repository/4cloud/"
             allowInsecureProtocol true
         }
         maven{
@@ -38,7 +38,7 @@ allprojects {
         google()
         mavenCentral()
         maven {
-            url "http://4dcloud.f3322.net:8081/repository/4cloud/"
+            url "http://sz.mtsclound.com:8081/repository/4cloud/"
             allowInsecureProtocol true
         }
         maven{
