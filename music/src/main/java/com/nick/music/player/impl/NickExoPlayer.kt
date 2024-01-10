@@ -2,7 +2,6 @@ package com.nick.music.player.impl
 
 import android.content.Context
 import android.view.SurfaceHolder
-import android.view.SurfaceView
 import androidx.media3.common.*
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -17,35 +16,42 @@ import com.nick.music.server.PlayStatus
 import com.nick.music.server.TrackType
 
 class NickExoPlayer(context: Context): AbsPlayer() {
-    private val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-    private val player = ExoPlayer.Builder(context).build()
+    private val mDataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+    private val mPlayer = ExoPlayer.Builder(context).build()
+    private val mLoadingToken = "LOADING"
     init {
-        player.addListener(object : Player.Listener{
+        mPlayer.addListener(object : Player.Listener{
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
-                if (playbackState == Player.STATE_READY){
-                    LogUtils.i("duration: ${player.duration}")
-                    mDuration = player.duration.toInt()
-                    mPositionCallBackList.forEach { callback->
-                        LogUtils.i("回调准备开始")
-                        callback.prepareStart(getCurrentInfo())
-                    }
-                    if (mPlayNow){
-                        player.play()
-                        LogUtils.i("播放器已播放")
-                        mPositionCallBackList.forEach { callback->
-                            callback.startPlay(player.currentPosition)
+                LogUtils.i("playbackState:$playbackState")
+                when(playbackState){
+                    Player.STATE_READY-> {
+                        LogUtils.i("duration: ${mPlayer.duration}")
+                        mDuration = mPlayer.duration.toInt()
+                        mPositionCallBackList.forEach { callback ->
+                            LogUtils.i("回调准备开始")
+                            showLoading(false)
+                            callback.prepareStart(getCurrentInfo())
                         }
-                        LogUtils.i("已回调开始播放")
-                        mPlayStatus = PlayStatus.PLAY
-                        mErrorTimes = 0
+                        if (mPlayNow){
+                            mPlayer.play()
+                            LogUtils.i("播放器已播放")
+                            mPositionCallBackList.forEach { callback->
+                                showLoading(false)
+                                callback.startPlay(mPlayer.currentPosition)
+                            }
+                            LogUtils.i("已回调开始播放")
+                            mPlayStatus = PlayStatus.PLAY
+                            mErrorTimes = 0
+                        }
                     }
-
+                    Player.STATE_ENDED-> {
+                        pause()
+                    }
+                    else->{
+                        showLoading(true)
+                    }
                 }
-                if (playbackState == Player.STATE_ENDED){
-                    next()
-                }
-
             }
 
             override fun onPlayerError(error: PlaybackException) {
@@ -58,7 +64,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                 }
                 mErrorTimes++
                 mPlayerHasPrepare = false
-                player.stop()
+                mPlayer.stop()
                 play(mIndex)
             }
 
@@ -78,100 +84,115 @@ class NickExoPlayer(context: Context): AbsPlayer() {
         super.init()
     }
 
+    private fun showLoading(show: Boolean){
+        mHandler.removeCallbacksAndMessages(mLoadingToken)
+        if (show){
+            mHandler.postDelayed({
+                mPositionCallBackList.forEach { callback->
+                    callback.loading(true)
+                }
+            },mLoadingToken,2000)
+        }else{
+            mPositionCallBackList.forEach { callback->
+                callback.loading(false)
+            }
+        }
+    }
+
     override fun setPlayMode(playMode: PlayMode) {
         super.setPlayMode(playMode)
         when (playMode) {
             PlayMode.SINGLE -> {
-                player.repeatMode = Player.REPEAT_MODE_ONE
+                mPlayer.repeatMode = Player.REPEAT_MODE_ONE
             }
             PlayMode.CYCLE -> {
-                player.repeatMode = Player.REPEAT_MODE_ALL
+                mPlayer.repeatMode = Player.REPEAT_MODE_ALL
             }
             else -> {
-                player.repeatMode = Player.REPEAT_MODE_OFF
+                mPlayer.repeatMode = Player.REPEAT_MODE_OFF
             }
         }
     }
 
     override fun startPlay() {
-        player.play()
+        mPlayer.play()
     }
 
     override fun playUrl(url: String,urlType: UrlType) {
         if (urlType == UrlType.M3U8){
-            val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(url))
-            player.setMediaSource(hlsMediaSource)
+            val hlsMediaSource = HlsMediaSource.Factory(mDataSourceFactory).createMediaSource(MediaItem.fromUri(url))
+            mPlayer.setMediaSource(hlsMediaSource)
         }else{
             LogUtils.i("playUrl: $url")
-            player.setMediaItem(MediaItem.fromUri(url))
+            mPlayer.setMediaItem(MediaItem.fromUri(url))
         }
         if (url.endsWith(".mp3")){
 
         }
-        player.prepare()
+        mPlayer.prepare()
         mPlayerHasPrepare = true
 
     }
 
     override fun prepareUrl(url: String,urlType: UrlType) {
         if (urlType == UrlType.M3U8){
-            val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(url))
-            player.setMediaSource(hlsMediaSource)
+            val hlsMediaSource = HlsMediaSource.Factory(mDataSourceFactory).createMediaSource(MediaItem.fromUri(url))
+            mPlayer.setMediaSource(hlsMediaSource)
         }else{
-            player.setMediaItem(MediaItem.fromUri(url))
+            mPlayer.setMediaItem(MediaItem.fromUri(url))
         }
-        player.prepare()
+        mPlayer.prepare()
     }
 
     override fun playerPause() {
-        player.pause()
+        mPlayer.pause()
     }
 
     override fun getPlayPosition(): Int {
-        return player.currentPosition.toInt()
+        return mPlayer.currentPosition.toInt()
     }
 
     override fun setPlayWhenReady(ready: Boolean) {
-        player.playWhenReady = ready
+        mPlayer.playWhenReady = ready
     }
 
     override fun seek(num: Int) {
         LogUtils.i("seek: ${num.toLong()}")
-        player.seekTo(num.toLong())
+        mPlayer.seekTo(num.toLong())
     }
 
     override fun setKey(key: Float) {
-        player.playbackParameters = PlaybackParameters(1f,key)
+        mPlayer.playbackParameters = PlaybackParameters(1f,key)
     }
 
     override fun replay() {
-        player.seekTo(0)
-        if (!player.isPlaying){
-            player.play()
+        mPlayer.seekTo(0)
+        if (!mPlayer.isPlaying){
+            mPlayer.play()
         }
     }
 
     override fun attachSurfaceHolder(holder: SurfaceHolder) {
-        player.setVideoSurfaceHolder(holder)
+        mPlayer.setVideoSurfaceHolder(holder)
         mHasAttachSurfaceHolder = true
     }
 
     override fun clearSurfaceHolder(holder: SurfaceHolder) {
-        player.clearVideoSurfaceHolder(holder)
+        mPlayer.clearVideoSurfaceHolder(holder)
         mHasAttachSurfaceHolder = false
     }
 
     override fun mute() {
-        player.volume = 0f
+        mPlayer.volume = 0f
     }
 
     override fun changeTrack(trackType: TrackType) {
-        val groups = player.currentTracks.groups
+        val groups = mPlayer.currentTracks.groups
         var tempTrackGroup: TrackGroup = groups.first().mediaTrackGroup
         if (TrackType.ACC == trackType){
             tempTrackGroup = groups.last().mediaTrackGroup
         }
-        player.trackSelectionParameters = player.trackSelectionParameters
+        mPlayer.trackSelectionParameters = mPlayer.trackSelectionParameters
                 .buildUpon()
                 .setOverrideForType(
                     TrackSelectionOverride(tempTrackGroup, 0)
@@ -197,7 +218,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
 
     override fun release() {
         super.release()
-        player.release()
+        mPlayer.release()
     }
 
 }

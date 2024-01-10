@@ -19,6 +19,7 @@ class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack 
 
     private val mBinding by lazy { ActivityVodBinding.inflate(layoutInflater) }
     private val mLiveDialog by lazy { LiveDialog() }
+    private val mVodDialog by lazy { VodDialog() }
     private val mGlidePlayerDialog by lazy { GlidePlayerDialog() }
     private val mTwoPlayerDialog by lazy { TwoPlayerDialog() }
 
@@ -32,7 +33,8 @@ class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack 
     private fun initListener(){
         mBinding.apply {
             btnVodDialog.setOnClickListener {
-                mLiveDialog.show(supportFragmentManager,"VodDialog")
+                mVodDialog.show(supportFragmentManager,"VodDialog")
+//                mLiveDialog.show(supportFragmentManager,"LiveDialog")
 //                mTwoPlayerDialog.show(supportFragmentManager,"TwoPlayerDialog")
             }
             btnGifDialog.setOnClickListener {

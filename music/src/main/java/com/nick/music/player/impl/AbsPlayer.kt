@@ -1,5 +1,7 @@
 package com.nick.music.player.impl
 
+import android.os.Handler
+import android.os.Looper
 import com.blankj.utilcode.util.LogUtils
 import com.nick.base.vo.MusicVo
 import com.nick.base.vo.enum.UrlType
@@ -46,30 +48,37 @@ abstract class AbsPlayer: PlayerControl {
     protected var mHasAttachSurfaceHolder = false
 
 
-    private val mTask = object : TimerTask(){
-        override fun run() {
-            io.reactivex.rxjava3.core.Observable.just("")
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { _ ->
-                    if (mPlayStatus == PlayStatus.PAUSE){
-                        return@subscribe
-                    }
-                    mCurrentPosition = getPlayPosition()
-                    mPositionCallBackList.forEach {
-                        it.playPosition(mCurrentPosition)
-                    }
-                }
-        }
-    }
+    protected val mHandler = Handler(Looper.getMainLooper())
+    protected var tag = false
 
 
     protected fun init(){
-        mTimer.schedule(mTask,0,35)
+        mHandler.post(object : Runnable {
+            override fun run() {
+                if (tag){
+                    return
+                }
+                if (mPlayStatus == PlayStatus.PAUSE){
+                    mHandler.postDelayed(this, 1000)
+                    return
+                }
+
+                mCurrentPosition = getPlayPosition()
+                mPositionCallBackList.forEach {
+                    it.playPosition(mCurrentPosition)
+                }
+                mHandler.postDelayed(this, 35)
+            }
+        })
     }
 
 
     override fun release() {
-        mTimer.cancel()
+        tag = true
+        mHandler.removeCallbacksAndMessages(null)
+        mMusicData.clear()
+        mHasRandomPlayData.reset()
+        mPositionCallBackList.clear()
     }
 
     private fun setDataSource(data: List<MusicVo>){

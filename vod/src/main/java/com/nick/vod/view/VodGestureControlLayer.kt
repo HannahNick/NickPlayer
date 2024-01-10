@@ -67,16 +67,16 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
             GestureMessageCenter.sendBack()
         }
         mSbSeek.setOnSeekBarChangeListener(object :OnSeekBarChangeListener{
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                GestureMessageCenter.seek(progress)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
 
             }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
 
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                GestureMessageCenter.seek(seekBar.progress)
             }
 
         })

@@ -37,6 +37,7 @@ dependencies {
     implementation project(path: ':base')
     implementation project(path: ':music')
 //    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$dependencies_version.lifecycle"
+    implementation "com.wang.avi:library:$dependencies_version.avi"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

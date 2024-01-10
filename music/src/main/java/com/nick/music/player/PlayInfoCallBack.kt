@@ -18,4 +18,9 @@ interface PlayInfoCallBack {
      * 开始播放
      */
     fun startPlay(position: Long)
+
+    /**
+     * 缓冲
+     */
+    fun loading(show: Boolean){}
 }
