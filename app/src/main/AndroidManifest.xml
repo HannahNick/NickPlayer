@@ -29,7 +29,7 @@
 <!--                android:value="" />-->
 <!--        </activity>-->
         <activity
-            android:name="com.nick.vod.ui.VodActivity"
+            android:name="com.xyz.edu.ui.VideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true">
             <intent-filter>

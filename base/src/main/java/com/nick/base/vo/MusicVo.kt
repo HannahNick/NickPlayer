@@ -1,7 +1,6 @@
 package com.nick.base.vo
 
 import com.nick.base.vo.enum.UrlType
-import java.util.Date
 
 data class MusicVo (
     val id: String = "",

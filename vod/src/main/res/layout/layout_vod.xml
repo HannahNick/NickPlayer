@@ -58,6 +58,16 @@
             app:layout_constraintBottom_toBottomOf="@id/iv_back"
             android:gravity="center"
             />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_center_play"
+            android:layout_width="@dimen/dp_100"
+            android:layout_height="@dimen/dp_100"
+            android:src="@drawable/ic_play"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_play"
@@ -77,6 +87,7 @@
             android:layout_marginBottom="@dimen/dp_10"
             android:layout_marginEnd="@dimen/dp_10"
             android:src="@drawable/ic_full_screen"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             />
@@ -111,14 +122,5 @@
 
     </com.nick.vod.view.VodGestureControlLayer>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_vod"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/sv_video"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
