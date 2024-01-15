@@ -31,6 +31,7 @@
         <activity
             android:name="com.xyz.edu.ui.VideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="landscape"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

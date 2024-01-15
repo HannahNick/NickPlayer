@@ -16,17 +16,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ScreenUtils
+import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayStatus
-import com.nick.music.server.binder.MusicBinder
 import com.nick.vod.R
 import com.nick.vod.wiget.GestureMessageCenter
 
 class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     ConstraintLayout(context, attrs, defStyleAttr){
 
-    private lateinit var mMusicBinder: MusicBinder
+    private lateinit var mPlayerControl: PlayerControl
     private val mHandler = Handler(Looper.getMainLooper())
     private val mGestureDetectorCompat = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
 
@@ -94,32 +92,45 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
 
 
     private fun playOrPause(){
-        val playInfo = mMusicBinder.getPlayInfo()
+        val playInfo = mPlayerControl.getPlayInfo()
         if (playInfo.playStatus == PlayStatus.PLAY){
             mIvPlay.setImageResource(R.drawable.ic_play)
             mIvCenterPlay.setImageResource(R.drawable.ic_play)
-            mMusicBinder.pause()
+            mPlayerControl.pause()
         }else{
             mIvPlay.setImageResource(R.drawable.ic_live_pause)
             mIvCenterPlay.setImageResource(R.drawable.ic_live_pause)
-            mMusicBinder.play()
+            mPlayerControl.play()
         }
         onToggleVisibility(true)
+    }
+
+    fun flushPlayStatus(){
+        val playInfo = mPlayerControl.getPlayInfo()
+        if (playInfo.playStatus == PlayStatus.PLAY){
+            mIvPlay.setImageResource(R.drawable.ic_live_pause)
+            mIvCenterPlay.setImageResource(R.drawable.ic_live_pause)
+        }else{
+            mIvPlay.setImageResource(R.drawable.ic_play)
+            mIvCenterPlay.setImageResource(R.drawable.ic_play)
+        }
     }
 
     private fun onToggleVisibility(statusChange: Boolean = false) {
         mHandler.removeCallbacksAndMessages(null)
         children.forEach { v ->
+            if (v.getTag()=="invisible"){
+                return@forEach
+            }
             if (statusChange){
                 mHandler.postDelayed({
                     v.visibility = View.GONE
                 },3000)
                 return@forEach
             }
-
             if (v.isVisible){
                 v.visibility = View.GONE
-            }else{
+            } else{
                 v.visibility = View.VISIBLE
                 mHandler.postDelayed({
                     v.visibility = View.GONE
@@ -128,12 +139,12 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
         }
     }
 
-    fun initMusicBinder(musicBinder: MusicBinder){
-        mMusicBinder = musicBinder
+    fun initMusicBinder(playerControl: PlayerControl){
+        mPlayerControl = playerControl
     }
 
-    fun setLiveName(name: String){
-        mTvName.text = name
+    fun setVodName(name: String){
+//        mTvName.text = name
     }
 
     fun setPlayStart(){

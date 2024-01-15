@@ -67,7 +67,7 @@ interface PlayerControl {
     /**
      * 获取当前播放信息和状态
      */
-    fun getCurrentInfo(): PlayInfo
+    fun getPlayInfo(): PlayInfo
 
     /**
      * 释放资源

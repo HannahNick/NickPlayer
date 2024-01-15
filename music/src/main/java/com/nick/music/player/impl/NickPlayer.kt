@@ -10,7 +10,6 @@ import com.nick.music.kt.play
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.TrackType
-import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class NickPlayer: AbsPlayer(){
@@ -44,7 +43,7 @@ class NickPlayer: AbsPlayer(){
                 }
 
                 mPositionCallBackList.forEach { callback->
-                    callback.prepareStart(getCurrentInfo())
+                    callback.prepareStart(getPlayInfo())
                 }
             }
             setOnBufferingUpdateListener { mp,precent ->

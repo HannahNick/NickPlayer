@@ -88,6 +88,7 @@
             android:layout_marginEnd="@dimen/dp_10"
             android:src="@drawable/ic_full_screen"
             android:visibility="invisible"
+            android:tag="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             />

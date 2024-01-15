@@ -1,0 +1,46 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.xyz.proxy'
+    compileSdkVersion sdk_version.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion sdk_version.minSdkVersion
+        targetSdkVersion sdk_version.targetSdkVersion
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+
+    implementation project(path: ':base')
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation "com.xyz.base:utils:$dependencies_version.utils_base"
+
+    implementation "com.xyz.module:luban-base:$dependencies_version.luban_base"
+    implementation "com.xyz.module:luban-vod:$dependencies_version.luban_vod_proxy"
+    implementation "com.xyz.module:luban-ktv:$dependencies_version.luban_ktv_proxy"
+    implementation "com.xyz.module:luban-play:$dependencies_version.luban_play_proxy"
+    implementation "com.xyz.base:app:$dependencies_version.app_base"
+}

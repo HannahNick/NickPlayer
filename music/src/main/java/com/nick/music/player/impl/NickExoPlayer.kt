@@ -18,6 +18,7 @@ import com.nick.music.server.TrackType
 class NickExoPlayer(context: Context): AbsPlayer() {
     private val mDataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
     private val mPlayer = ExoPlayer.Builder(context).build()
+
     private val mLoadingToken = "LOADING"
     init {
         mPlayer.addListener(object : Player.Listener{
@@ -31,7 +32,7 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                         mPositionCallBackList.forEach { callback ->
                             LogUtils.i("回调准备开始")
                             showLoading(false)
-                            callback.prepareStart(getCurrentInfo())
+                            callback.prepareStart(getPlayInfo())
                         }
                         if (mPlayNow){
                             mPlayer.play()
@@ -46,7 +47,31 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                         }
                     }
                     Player.STATE_ENDED-> {
-                        pause()
+                        LogUtils.i("mPlayMode:${mPlayMode.name}")
+                        mPositionCallBackList.forEach { callback ->
+                            LogUtils.i("回调播放结束")
+                            callback.playEnd(mIndex)
+                        }
+                        when(mPlayMode){
+                            PlayMode.RANDOM ->{
+                                playNextRandom()
+                            }
+                            PlayMode.SINGLE ->{
+                                seek(0)
+                            }
+                            PlayMode.CYCLE ->{
+                                next()
+                            }else->{
+                                if (mIndex == mMusicData.size-1){
+                                    mPlayNow = false
+                                    seek(0)
+                                    pause()
+                                }else{
+                                    next()
+                                }
+                            }
+                        }
+
                     }
                     else->{
                         showLoading(true)
@@ -125,9 +150,6 @@ class NickExoPlayer(context: Context): AbsPlayer() {
         }else{
             LogUtils.i("playUrl: $url")
             mPlayer.setMediaItem(MediaItem.fromUri(url))
-        }
-        if (url.endsWith(".mp3")){
-
         }
         mPlayer.prepare()
         mPlayerHasPrepare = true

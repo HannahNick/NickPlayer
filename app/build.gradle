@@ -1,6 +1,12 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+}
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.getName())
+    }
 }
 
 android {
@@ -42,6 +48,9 @@ dependencies {
     implementation project(path: ':vod')
     implementation project(path: ':base')
     implementation project(path: ':edu')
+    implementation project(path: ':proxy')
+    implementation "com.alibaba:arouter-api:$dependencies_version.arouter_api"
+    kapt "com.alibaba:arouter-compiler:$dependencies_version.arouter_compiler"
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }

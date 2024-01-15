@@ -20,6 +20,11 @@ interface PlayInfoCallBack {
     fun startPlay(position: Long)
 
     /**
+     * 播放结束
+     */
+    fun playEnd(playIndex: Int){}
+
+    /**
      * 缓冲
      */
     fun loading(show: Boolean){}

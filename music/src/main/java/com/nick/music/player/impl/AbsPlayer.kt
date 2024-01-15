@@ -33,7 +33,7 @@ abstract class AbsPlayer: PlayerControl {
     //当前播放时间位置
     protected var mCurrentPosition: Int = -1
     //播放模式
-    protected var mPlayMode = PlayMode.CYCLE
+    protected var mPlayMode = PlayMode.DEFAULT
     //播放状态
     protected var mPlayStatus = PlayStatus.PAUSE
     //播放器是否准备完成(加载好资源)
@@ -108,7 +108,7 @@ abstract class AbsPlayer: PlayerControl {
         }
     }
 
-    override fun getCurrentInfo(): PlayInfo {
+    override fun getPlayInfo(): PlayInfo {
         val musicVo = mMusicData[mIndex]
         return PlayInfo().apply {
             dataIndex = mIndex

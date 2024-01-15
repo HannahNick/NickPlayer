@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">NickPlayer</string>
+
+    <array name="music_base_url">
+        <item>http://206.221.186.114:9076</item>
+    </array>
 </resources>
