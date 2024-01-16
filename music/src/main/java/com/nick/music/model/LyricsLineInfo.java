@@ -2,6 +2,8 @@ package com.nick.music.model;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import com.blankj.utilcode.util.LogUtils;
 import com.nick.music.R;
 
@@ -175,4 +177,10 @@ public class LyricsLineInfo {
 //        dist.setLineLyrics(orig.getLineLyrics());
 //
 //    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return mLineLyrics;
+    }
 }

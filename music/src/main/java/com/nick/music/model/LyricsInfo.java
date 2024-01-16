@@ -199,19 +199,19 @@ public class LyricsInfo {
         return mLyricsType;
     }
 
-    private static final String MAIL = "男：";
+    private static final String MAIL = "：";
     private static final String FEMAIL = "女：";
     private static final String ALL = "合：";
 
     private int changeColorFlag(String word,int currentColor){
-        if (word.contains(MAIL)){
-            return R.color.male_voice;
-        }
         if (word.contains(FEMAIL)){
             return R.color.female_voice;
         }
         if (word.contains(ALL)){
             return R.color.all_voice;
+        }
+        if (word.contains(MAIL)){
+            return R.color.male_voice;
         }
 
         return currentColor;

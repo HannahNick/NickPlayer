@@ -18,6 +18,8 @@ class BootActivity : BaseActivity<IBootC.Presenter>(), IBootC.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_boot)
+        setContentView(mBinding.root)
+
+
     }
 }

@@ -366,8 +366,8 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             LogUtils.e("lyricsInfo is empty")
             return
         }
-        val hasTransLate = translateLrcLineInfo.isNotEmpty()
-        val hasTransliteration = transliterationLrcLineInfo.isNotEmpty()
+        val hasTransLate = translateLrcLineInfo.isNotEmpty() && map.size == translateLrcLineInfo.size
+        val hasTransliteration = transliterationLrcLineInfo.isNotEmpty() && map.size == transliterationLrcLineInfo.size
 
         release()
         var tempIndex = 0
@@ -379,12 +379,12 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             val lineLyrics = it.value.lineLyrics
             val wordColor = it.value.wordColors
             val krcLineWord = KrcLineWord(origin = it.value.lineLyrics,hasTransLate = hasTransLate,hasTransliteration = hasTransliteration)
-            krcLineWord.translate = if (translateLrcLineInfo.isNotEmpty()){
+            krcLineWord.translate = if (hasTransLate){
                 translateLrcLineInfo[tempIndex].lineLyrics
             }else{
                 ""
             }
-            krcLineWord.transliteration = if (transliterationLrcLineInfo.isNotEmpty()){
+            krcLineWord.transliteration = if (hasTransliteration){
                 transliterationLrcLineInfo[tempIndex].lineLyrics
             }else{
                 ""
@@ -405,7 +405,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
                         wordsColor = wordColor[index]
                 )
                 krcLineWord.originArray.add(wordsList[index])
-                if (transliterationLrcLineInfo.isNotEmpty()){
+                if (hasTransliteration){
                     val transliterationWord = transliterationLrcLineInfo[tempIndex].lyricsWords[index]
                     rhythm.transliterationWord = transliterationWord
                     krcLineWord.transliterationArray.add(transliterationWord)

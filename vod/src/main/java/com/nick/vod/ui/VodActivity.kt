@@ -33,9 +33,9 @@ class VodActivity : AppCompatActivity(),LiveGestureControlLayer.GestureCallBack 
     private fun initListener(){
         mBinding.apply {
             btnVodDialog.setOnClickListener {
-                mVodDialog.show(supportFragmentManager,"VodDialog")
+//                mVodDialog.show(supportFragmentManager,"VodDialog")
 //                mLiveDialog.show(supportFragmentManager,"LiveDialog")
-//                mTwoPlayerDialog.show(supportFragmentManager,"TwoPlayerDialog")
+                mTwoPlayerDialog.show(supportFragmentManager,"TwoPlayerDialog")
             }
             btnGifDialog.setOnClickListener {
                 mGlidePlayerDialog.show(supportFragmentManager,"GlidePlayer")

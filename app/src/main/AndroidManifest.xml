@@ -44,7 +44,7 @@
                 android:value="" />
         </activity>
 <!--        <activity-->
-<!--            android:name="com.xyz.edu.ui.HomeActivity"-->
+<!--            android:name="com.nick.vod.ui.VodActivity"-->
 <!--            android:configChanges="keyboardHidden|orientation|screenSize"-->
 <!--            android:exported="true">-->
 <!--            <intent-filter>-->

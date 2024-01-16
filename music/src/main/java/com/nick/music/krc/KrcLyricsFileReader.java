@@ -1,6 +1,5 @@
 package com.nick.music.krc;
 
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -9,8 +8,6 @@ import android.util.Pair;
 
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.LogUtils;
-import com.blankj.utilcode.util.RegexUtils;
-import com.nick.music.R;
 import com.nick.music.model.LyricsInfo;
 import com.nick.music.model.LyricsLineInfo;
 import com.nick.music.model.LyricsTag;
@@ -22,13 +19,11 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,7 +93,23 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         return new LyricsInfo();
     }
 
+    /**
+     * 原始歌词和注音歌词行数是否一致
+     */
+    private boolean mOriginLineSizeEqTransliterSize = false;
+    /**
+     * 原始歌词和翻译歌词行数是否一致
+     */
+    private boolean mOriginLineSizeEqTranslateSize = false;
+    /**
+     * 是否检查过原始歌词和注音歌词行数
+     */
+    private boolean mHasCheckOriginLineSizeEqTransliterSize = false;
+
     public LyricsInfo readFile(File file) throws Exception {
+        mHasCheckOriginLineSizeEqTransliterSize = false;
+        mOriginLineSizeEqTranslateSize = false;
+        mOriginLineSizeEqTransliterSize = false;
         LyricsInfo lyricsInfo = new LyricsInfo();
         String lyricsTextStr = FileIOUtils.readFile2String(file);
         String[] lyricsTexts = lyricsTextStr.split("\n");
@@ -107,7 +118,8 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         int index = 0;
         int transliterationIndex = 0;
         List<LyricsLineInfo> tempList = new ArrayList<>();
-        for (int i = 0; i < lyricsTexts.length; i++) {
+        int lyricsTextLinelength = lyricsTexts.length;
+        for (int i = 0; i < lyricsTextLinelength; i++) {
             String lineInfo = lyricsTexts[i];
             // 行读取，并解析每行歌词的内容
             LyricsLineInfo lyricsLineInfo = parserLineInfos(lyricsTags,
@@ -115,26 +127,40 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             if (lyricsLineInfo == null) {
                 continue;
             }
+            checkOriginLineSizeEqTransliterSize(lyricsTextLinelength-i,
+                    lyricsInfo.getTranslateLrcLineInfos()==null?0:lyricsInfo.getTranslateLrcLineInfos().size(),
+                    lyricsInfo.getTransliterationLrcLineInfos()==null?0:lyricsInfo.getTransliterationLrcLineInfos().size());
             checkLineIsStartSex(tempList, lyricsLineInfo);
             if (tempList.size() == 1) {//有男女对唱的单独行跳过此轮循环将在下一轮循环中拼接
                 continue;
             }
             //拼接歌词
             LyricsLineInfo appendLyricsLineInfo = mergeLyricsLine(tempList);
-            //获取翻译数据
-            List<TranslateLrcLineInfo> translateLrcLineInfos = lyricsInfo.getTranslateLrcLineInfos();
-            //获取注音数据
-            LyricsLineInfo transliterationLrcLineInfos = lyricsInfo.getTransliterationLrcLineInfos()==null?null:lyricsInfo.getTransliterationLrcLineInfos().get(transliterationIndex);
-            transliterationIndex++;
+            //获取文件翻译数据
+            List<TranslateLrcLineInfo> translateLrcLineInfos =null;
+            //原始歌词行数和翻译歌词行数对不上就不用处理翻译数据了
+            if (mOriginLineSizeEqTranslateSize){
+                translateLrcLineInfos = lyricsInfo.getTranslateLrcLineInfos();
+            }
+            //获取文件注音数据
+
+            LyricsLineInfo transliterationLrcLineInfos = null;
+            //原始歌词行数和音译歌词行数对不上就不用处理注音数据了
+            if (mOriginLineSizeEqTransliterSize){
+                transliterationLrcLineInfos = lyricsInfo.getTransliterationLrcLineInfos()==null?null:lyricsInfo.getTransliterationLrcLineInfos().get(transliterationIndex);
+                transliterationIndex++;
+            }
             if (appendLyricsLineInfo != null) {
+                mergeTranslate(translateLrcLineInfos,index+1);
                 Pair<List<LyricsLineInfo>, List<LyricsLineInfo>> pair = wrapLyricsLineInfos(appendLyricsLineInfo, transliterationLrcLineInfos);
                 for (int j = 0; j < pair.first.size(); j++) {
                     if (j>0){
                         if (translateLrcLineInfos!=null){
                             translateLrcLineInfos.add(index,new TranslateLrcLineInfo(""));
                         }
-                        if (transliterationLrcLineInfos !=null){
+                        if (transliterationLrcLineInfos !=null ){
                             lyricsInfo.getTransliterationLrcLineInfos().add(index,pair.second.get(j));
+
                         }
                     }
                     lyricsLineInfos.put(index, pair.first.get(j));
@@ -149,7 +175,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                     if (translateLrcLineInfos!=null){
                         translateLrcLineInfos.add(index,new TranslateLrcLineInfo(""));
                     }
-                    if (transliterationLrcLineInfos !=null){
+                    if (transliterationLrcLineInfos !=null ){
                         lyricsInfo.getTransliterationLrcLineInfos().add(index,pair.second.get(k));
                     }
                 }
@@ -165,7 +191,37 @@ public class KrcLyricsFileReader extends LyricsFileReader {
     }
 
     /**
-     * 包装翻译歌词
+     * 查看原始歌词行数是否和音译歌词行数一致
+     * @param originLineSize 原始歌词行数
+     * @param transliterSize 音译歌词行数
+     */
+    private void checkOriginLineSizeEqTransliterSize(int originLineSize,int translateSize,int transliterSize){
+        if (mHasCheckOriginLineSizeEqTransliterSize){
+            return;
+        }
+        mHasCheckOriginLineSizeEqTransliterSize = true;
+        mOriginLineSizeEqTranslateSize = originLineSize==translateSize;
+        mOriginLineSizeEqTransliterSize = originLineSize==transliterSize;
+        LogUtils.i("mOriginLineSizeEqTransliterSize:"+mOriginLineSizeEqTransliterSize+",originLineSize="+originLineSize+",translateSize="+translateSize+",transliterSize="+transliterSize);
+    }
+
+    /**
+     * 拼接翻译数据
+     * @param translate 翻译list
+     * @param index 需要去除的元素下标
+     */
+    public void mergeTranslate(List<TranslateLrcLineInfo> translate, int index) {
+        if (index <= 0 || index >= translate.size()) {
+            return;
+        }
+        //将index下标的元素删除，并把删除的元素值拼接给index-1的元素
+        TranslateLrcLineInfo lastTranslateLrcLineInfo = translate.get(index - 1);
+        TranslateLrcLineInfo element = translate.remove(index);
+        lastTranslateLrcLineInfo.setLineLyrics(lastTranslateLrcLineInfo.getLineLyrics().concat(element.getLineLyrics()));
+    }
+
+    /**
+     * 超屏幕分割并包装翻译歌词
      * @param lyricsLineInfo 默认标准行歌词数据
      * @param transliterationLyricsLineInfo 音译歌词
      * @return
@@ -184,10 +240,11 @@ public class KrcLyricsFileReader extends LyricsFileReader {
     private void checkLineIsStartSex(List<LyricsLineInfo> tempList,LyricsLineInfo lyricsLineInfo){
         if (tempList.size()==1){
             tempList.add(lyricsLineInfo);
+            return;
         }
         String lineLyrics = lyricsLineInfo.getLineLyrics();
         //如果是 男: 女: 这种类型开头
-        if (lineLyrics.length()==2&&(lineLyrics.contains("：")||lineLyrics.contains(":"))){
+        if (lineLyrics.endsWith("：")||lineLyrics.endsWith(":")){
             tempList.add(lyricsLineInfo);
         }
     }
@@ -328,7 +385,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
      * @return 组装好的数据
      */
     private Pair<List<LyricsLineInfo>,List<LyricsLineInfo>> mapLyricsLineInfoList(List<String> splitLyricsLine, LyricsLineInfo lyricsLineInfo, LyricsLineInfo transliterationLyricsLineInfo){
-        LogUtils.i(splitLyricsLine);
+//        LogUtils.i(splitLyricsLine);
         List<LyricsLineInfo> originResult = new ArrayList<>();
         List<LyricsLineInfo> transliterationResult = new ArrayList<>();
         //没有进行过分割就直接返回
@@ -337,6 +394,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             if(transliterationLyricsLineInfo!=null){
                 transliterationResult.add(transliterationLyricsLineInfo);
             }
+            LogUtils.i("originResult:"+originResult+"\ntransliterationResult:"+transliterationResult);
             return new Pair<>(originResult,transliterationResult);
         }
 
@@ -390,6 +448,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             originResult.add(tempLyricsLineInfo);
             baseIndex=endIndex;
         }
+        LogUtils.i("originResult:"+originResult+"\ntransliterationResult:"+transliterationResult);
         return new Pair<>(originResult,transliterationResult);
     }
 
@@ -647,8 +706,8 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         }
         // 添加音译歌词
         if (transliterationLrcLineInfos.size() > 0) {
-            lyricsIfno
-                    .setTransliterationLrcLineInfos(transliterationLrcLineInfos);
+            LogUtils.i("transliterationLrcLineInfos.size() = "+transliterationLrcLineInfos.size());
+            lyricsIfno.setTransliterationLrcLineInfos(transliterationLrcLineInfos);
         }
     }
 
