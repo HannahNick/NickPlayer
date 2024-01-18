@@ -7,6 +7,7 @@ import com.xyz.base.service.edu.bean.LoginBean
 import com.xyz.base.service.edu.bean.PersonWordListBean
 import com.xyz.base.service.edu.bean.PlanItemBean
 import com.xyz.base.service.edu.bean.RegisterBean
+import com.xyz.base.service.edu.bean.StudyRecordBean
 import com.xyz.base.service.svc.DATA
 import com.xyz.base.service.svc.PAGE
 import com.xyz.base.service.svc.RESULT
@@ -22,36 +23,36 @@ class BootModel(context: Context): BaseModel(context), IBootC.Model {
                password : String,
               age: Int,
               basics : Int,
-              sex : Int,): Flowable<DATA<RESULT<RegisterBean>>>{
+              sex : Int,): Flowable<RESULT<RegisterBean>>{
         return ServiceProvider.getEduService().eduRegister(personName, personAccount, password, age, basics, sex)
     }
 
-    override fun login(personAccount : String,password : String): Flowable<DATA<RESULT<LoginBean>>>{
+    override fun login(personAccount : String,password : String): Flowable<RESULT<LoginBean>>{
         return ServiceProvider.getEduService().eduLogin(personAccount, password)
     }
 
-    fun getPersonPlanItemList(personId: Int,
+    override fun getPersonPlanItemList(personId: Int,
                               personPlanId: Int,
                               pageNum: Int,
                               pageSize: Int,
-    ): Flowable<DATA<RESULT<PAGE<PlanItemBean>>>>{
+    ): Flowable<RESULT<PAGE<PlanItemBean>>>{
         return ServiceProvider.getEduService().getPersonPlanItemList(personId, personPlanId, pageNum, pageSize)
     }
 
     fun getPersonWordList(personId: Int,
-    ): Flowable<DATA<RESULT<PersonWordListBean>>>{
+    ): Flowable<RESULT<PersonWordListBean>>{
         return ServiceProvider.getEduService().getPersonWordList(personId)
     }
 
     fun getPersonStudyRecord(personId: Int,
-    ): Flowable<DATA<RESULT<PlanItemBean>>>{
+    ): Flowable<RESULT<StudyRecordBean>>{
         return ServiceProvider.getEduService().getPersonStudyRecord(personId)
     }
 
     fun reportStudyResult(personPlanId : Int,
                           personPlanItemId : Int,
                           personId : Int,
-    ): Flowable<DATA<RESULT<Any>>>{
+    ): Flowable<RESULT<Any>>{
         return ServiceProvider.getEduService().reportStudyResult(personPlanId, personPlanItemId, personId)
     }
 }

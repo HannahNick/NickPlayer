@@ -16,6 +16,10 @@ import kotlin.properties.Delegates
 class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View {
 
     private val mBinding by lazy { ActivityVideoBinding.inflate(layoutInflater) }
+    companion object{
+        const val VIDEO_URL = "VIDEO_URL"
+    }
+
     private var mProxy: IProxy? by Delegates.observable(null) { property, oldValue, newValue ->
         L.i("newValue $newValue oldValue $oldValue")
         if (newValue != null && oldValue != newValue) {
@@ -36,7 +40,8 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View {
     }
 
     private fun initView(){
-        mProxy = KtvPlayProxyManager.createM4aProxy(this)
+        val videoUrl = intent.getStringExtra(VIDEO_URL)
+        mProxy = KtvPlayProxyManager.createKtvProxy(this)
         mProxy?.start()
         val proxyUrl = mProxy?.buildProxyUrl("/aud/16842758/file/5069_16842758.m4a")?.apply {
             L.i(" buildProxyUrl $this")

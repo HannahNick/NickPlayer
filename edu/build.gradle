@@ -40,6 +40,8 @@ dependencies {
     implementation "com.xyz.luban:proxy-vod:$dependencies_version.proxy_vod"
     implementation "com.xyz.engine:engine:$dependencies_version.engine_ver"
     implementation "com.xyz.auth:api:$dependencies_version.auth_api"
+    implementation "com.xyz.module:download-support:$dependencies_version.download_support"
+    implementation "com.xyz.module:download-udp-external:$dependencies_version.download_udp_external"
     implementation project(path: ':music')
     implementation project(path: ':vod')
     implementation project(path: ':base')

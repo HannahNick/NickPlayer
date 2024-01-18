@@ -15,7 +15,7 @@ ext {
             arouter_compiler     : '1.5.2',
 
             app_base             : '0.2.33',
-            service_base         : '0.4.27.10',
+            service_base         : '0.4.27.12',
             utils_base           : '0.1.32',
             engine_ver           : "0.1.0",
             luban_ktv_proxy      : "1.0.7",
@@ -23,6 +23,9 @@ ext {
             luban_play_proxy   : "0.0.10",
             luban_base         : "1.0.12",
             auth_api             : '1.3.5',
+            //Download
+            download_support     : "0.1.12",
+            download_udp_external: "1.1.1.26",
 
 
             lifecycle            : "2.3.0",
