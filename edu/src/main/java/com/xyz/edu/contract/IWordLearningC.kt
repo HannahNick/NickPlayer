@@ -8,12 +8,15 @@ interface IWordLearningC {
 
     interface Presenter: IBaseContract.IPresenter {
 
-        fun downZip(url: String)
+        fun downZip(url: String,md5: String)
+
     }
     interface View: IBaseContract.IView{
         fun getZipData(dirPath: String,zipDataList: List<ZipDataBean>)
 
         fun getZipFileError(message: String)
+
+        fun downLoadProgress(progress: Float)
     }
 
     interface Model: IBaseContract.IModel{

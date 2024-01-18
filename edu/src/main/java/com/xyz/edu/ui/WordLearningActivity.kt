@@ -9,6 +9,7 @@ import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
 import com.nick.music.player.impl.NickExoPlayer
+import com.xyz.base.utils.L
 import com.xyz.edu.contract.IWordLearningC
 import com.xyz.edu.databinding.ActivityWordLearningBinding
 import com.xyz.edu.model.HomeModel
@@ -25,6 +26,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
 
     companion object{
         const val ZIP_URL = "ZIP_URL"
+        const val ZIP_MD5 = "ZIP_MD5"
     }
 
     override fun createPresenter(): IWordLearningC.Presenter {
@@ -38,11 +40,13 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
         Glide.with(this)
             .load("https://i2.hdslb.com/bfs/archive/6c92eb1dadedd6d1e54767c97ce5c19e53807ff1.jpg")
             .into(mBinding.ivLessonImg)
-        val zipUrl = intent.getStringExtra(ZIP_URL)!!
-        presenter.downZip(zipUrl)
+        val zipUrl = intent.getStringExtra(ZIP_URL)?:""
+        val zipMd5 = intent.getStringExtra(ZIP_MD5)?:""
+        presenter.downZip(zipUrl,zipMd5)
 
         audioPlayer.setPlayList(arrayListOf())
         audioPlayer.setPlayWhenReady(true)
+        audioPlayer.registerCallBack(this)
 
     }
 
@@ -67,15 +71,19 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
         // TODO: 切图，换文本
         val currentIndex = playIndex+1
         if (currentIndex < imgList.size){
+            val imgPath = imgList[currentIndex]
+            val imgText = textList[currentIndex]
+            L.i("imgPath:$imgPath \n imgText:$imgText")
             Glide.with(this)
-                .load(imgList[currentIndex])
+                .load(imgPath)
                 .into(mBinding.ivLessonImg)
-            mBinding.tvWord.text = textList[currentIndex]
+            mBinding.tvWord.text = imgText
         }
 
     }
 
     override fun getZipData(dirPath: String,zipDataList: List<ZipDataBean>) {
+        L.i("dirPath:$dirPath")
         val audioList = zipDataList.map { MusicVo(
             id = it.id,
             albumName = it.title,
@@ -84,14 +92,20 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
             pathType = UrlType.DEFAULT
         ) }
         audioPlayer.setPlayList(audioList)
-        textList = zipDataList.map { it.text }
-        imgList = zipDataList.map { it.img}
-//        textList[]
-
+        textList = zipDataList.map { it.title }
+        imgList = zipDataList.map { "$dirPath/${it.img}"}
+        Glide.with(this)
+            .load(imgList[0])
+            .into(mBinding.ivLessonImg)
+        mBinding.tvWord.text = textList[0]
     }
 
     override fun getZipFileError(message: String) {
         TODO("Not yet implemented")
+    }
+
+    override fun downLoadProgress(progress: Float) {
+        mBinding.tvDownloadProgress.text = progress.toString()
     }
 
 }

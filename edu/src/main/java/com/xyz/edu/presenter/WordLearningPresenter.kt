@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ZipUtils
 import com.google.gson.reflect.TypeToken
 import com.xyz.auth.api.IAuthService
+import com.xyz.base.app.rx.io2Main
 import com.xyz.base.utils.L
 import com.xyz.download.api.DownloadConfig
 import com.xyz.download.api.DownloadListener
@@ -18,13 +19,23 @@ import com.xyz.download.support.manager.DownloadManager
 import com.xyz.edu.contract.IWordLearningC
 import com.xyz.edu.vo.ZipDataBean
 import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.io.File
 
 class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: IWordLearningC.Model): DisposablePresenter<IWordLearningC.View,IWordLearningC.Model>(context,view, model),IWordLearningC.Presenter {
 
     private var mZipDownLoadHolder: DownloadManager.DownloadHolder? = null
 
-    override fun downZip(url: String) {
+    override fun downZip(url: String,md5: String) {
+        //1.判断压缩文件是否存在
+        val zipFile = File("${context.filesDir}/zip/PaperPig.zip")
+//        val zipFile = File("${context.filesDir}/zip/$md5")
+        if (FileUtils.isFileExists(zipFile)){
+            findReadme(zipFile)
+            return
+        }
+        //2.不存在就去下载
         val loginResult = IAuthService.create(context)?.getLoginResult()!!
         val wrapUrl = url.appendUrlSwitchStrategy(Utils.UrlSwitchStrategy.UDP_TCP_CRO).appendDispatchStrategy(
             Utils.DispatchStrategy.VideoDispatch(
@@ -33,7 +44,7 @@ class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: 
             )
         )
         mZipDownLoadHolder?.cancel()
-        mZipDownLoadHolder = DownloadManager.enqueueDownload(context, wrapUrl, getZipDownLoadConfig(wrapUrl))
+        mZipDownLoadHolder = DownloadManager.enqueueDownload(context, wrapUrl, getZipDownLoadConfig(md5))
         mZipDownLoadHolder?.addListener(object : DownloadListener(){
             override fun onCancel(
                 url: String?,
@@ -66,6 +77,7 @@ class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: 
                 speed: Long,
                 bundle: Bundle
             ) {
+                view.downLoadProgress(progress)
             }
 
             override fun onStart(url: String?, file: File?, bundle: Bundle) {
@@ -85,28 +97,44 @@ class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: 
     }
 
     fun findReadme(zipFile: File){
-        val readmeFileExtension = ".txt"
+        L.i("0:${Thread.currentThread().name}")
+        val readmeFileName = "readme"
         Flowable.just(zipFile)
-            .map {
+            .map {//判断是否已解压
+                L.i("1:${Thread.currentThread().name}")
                 FileUtils.isFileExists("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(it)}")
             }
             .flatMap {
-                if (it){
+                L.i("2:${Thread.currentThread().name}")
+                if (it){//已经解压了就直接遍历文件返回
                     Flowable.fromIterable(FileUtils.listFilesInDir("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}"))
-                }else{
-                    Flowable.fromIterable(ZipUtils.unzipFile(zipFile,File("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}")))
+                }else{//没解压过就解压文件并遍历返回
+                    Flowable.fromIterable(ZipUtils.unzipFile(zipFile,File("${context.filesDir.absolutePath}/plan/")))
                 }
             }
             .filter {
+                L.i("3:${Thread.currentThread().name}")
                 L.i(it.absolutePath)
-                it.name.endsWith(readmeFileExtension)
+                //找到readme文件
+                it.name.contains(readmeFileName)
             }
             .firstOrError()
             .map {
+                L.i("4:${Thread.currentThread().name}")
+                //解析txt文件，转化文件信息List
                 val zipFileDescribe = FileIOUtils.readFile2String(it)
-                GsonUtils.fromJson<List<ZipDataBean>>(zipFileDescribe,object :TypeToken<List<ZipDataBean>>(){}.type)
+                L.i(zipFileDescribe)
+                val zipDataList = GsonUtils.fromJson<List<ZipDataBean>>(zipFileDescribe,object :TypeToken<List<ZipDataBean>>(){}.type)
+                //将没有音频的数据过滤
+                zipDataList.filter { zipBataBean->
+                    zipBataBean.audiio.isNotEmpty()
+                }
             }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
+                L.i("5:${Thread.currentThread().name}")
+                //将文件信息传回页面
                 view.getZipData("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}",it)
             },{
                 view.getZipFileError(it.message?:"")
@@ -122,10 +150,12 @@ class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: 
         mZipDownLoadHolder?.cancel()
     }
 
-    private fun getZipDownLoadConfig(url: String): DownloadConfig {
+    private fun getZipDownLoadConfig(md5: String): DownloadConfig {
         val dirPath = "${context.filesDir}/zip"
         return DownloadConfig(
             downloadDir = dirPath,
+            filename = md5,
+            fileMd5 = md5,
             skipIfAlreadyCompleted = false
         )
     }

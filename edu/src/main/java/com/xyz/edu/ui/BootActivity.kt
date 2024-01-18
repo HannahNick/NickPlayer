@@ -37,7 +37,9 @@ class BootActivity : BaseActivity<IBootC.Presenter>(), IBootC.View {
     }
 
     override fun toWordLearning(zipUrl: String) {
+        val intent = Intent(this, WordLearningActivity::class.java)
+        intent.putExtra(WordLearningActivity.ZIP_URL,zipUrl)
 
-        startActivity(Intent(this,WordLearningActivity::class.java))
+        startActivity(intent)
     }
 }
