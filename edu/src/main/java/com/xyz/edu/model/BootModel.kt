@@ -31,12 +31,11 @@ class BootModel(context: Context): BaseModel(context), IBootC.Model {
         return ServiceProvider.getEduService().eduLogin(personAccount, password)
     }
 
-    override fun getPersonPlanItemList(personId: Int,
-                              personPlanId: Int,
+    fun getPersonPlanItemList(personPlanId: Int,
                               pageNum: Int,
                               pageSize: Int,
     ): Flowable<RESULT<PAGE<PlanItemBean>>>{
-        return ServiceProvider.getEduService().getPersonPlanItemList(personId, personPlanId, pageNum, pageSize)
+        return ServiceProvider.getEduService().getPersonPlanItemList(personPlanId, pageNum, pageSize)
     }
 
     fun getPersonWordList(personId: Int,

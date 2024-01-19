@@ -1,8 +1,10 @@
 package com.xyz.edu.contract
 
 import com.xyz.base.app.mvp.IBaseContract
-import com.xyz.edu.vo.ZipDataBean
-import java.io.File
+import com.xyz.base.service.ServiceProvider
+import com.xyz.base.service.svc.RESULT
+import com.xyz.edu.vo.ZipDataVo
+import io.reactivex.Flowable
 
 interface IWordLearningC {
 
@@ -10,9 +12,11 @@ interface IWordLearningC {
 
         fun downZip(url: String,md5: String)
 
+        fun reportStudyResult(personPlanItemId: Int)
+
     }
     interface View: IBaseContract.IView{
-        fun getZipData(dirPath: String,zipDataList: List<ZipDataBean>)
+        fun getZipData(dirPath: String,zipDataList: List<ZipDataVo>)
 
         fun getZipFileError(message: String)
 
@@ -20,6 +24,9 @@ interface IWordLearningC {
     }
 
     interface Model: IBaseContract.IModel{
-
+        fun reportStudyResult(personPlanId : Int,
+                              personPlanItemId : Int,
+                              personId : Int,
+        ): Flowable<RESULT<Any>>
     }
 }

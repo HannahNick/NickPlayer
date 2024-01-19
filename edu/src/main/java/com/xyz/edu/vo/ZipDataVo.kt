@@ -1,6 +1,6 @@
 package com.xyz.edu.vo
 
-data class ZipDataBean(
+data class ZipDataVo(
     val title: String,
     val type: Int,
     val audiio: String,

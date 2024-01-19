@@ -1,7 +1,10 @@
 package com.xyz.edu.ui
 
 import android.os.Bundle
-import com.blankj.utilcode.util.ZipUtils
+import android.view.Gravity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.nick.base.vo.MusicVo
 import com.nick.base.vo.enum.UrlType
@@ -10,27 +13,36 @@ import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
 import com.nick.music.player.impl.NickExoPlayer
 import com.xyz.base.utils.L
+import com.xyz.edu.R
 import com.xyz.edu.contract.IWordLearningC
 import com.xyz.edu.databinding.ActivityWordLearningBinding
-import com.xyz.edu.model.HomeModel
+import com.xyz.edu.model.WordLearningModel
 import com.xyz.edu.presenter.WordLearningPresenter
-import com.xyz.edu.vo.ZipDataBean
-import java.io.File
+import com.xyz.edu.ui.adapter.WordLearningWindowAdapter
+import com.xyz.edu.util.DialogUtil
+import com.xyz.edu.vo.ZipDataVo
 
+/**
+ * 单词学习
+ */
 class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearningC.View, PlayInfoCallBack {
 
     private val mBinding by lazy { ActivityWordLearningBinding.inflate(layoutInflater) }
-    private val audioPlayer: PlayerControl by lazy { NickExoPlayer(this) }
-    private lateinit var imgList:List<String>
-    private lateinit var textList:List<String>
+    private val mDialog by lazy { DialogUtil.getCustomDialog(this, R.layout.layout_word_learning_window,true, Gravity.START) }
+    private lateinit var mWindowAdapter: WordLearningWindowAdapter
+    private val mAudioPlayer: PlayerControl by lazy { NickExoPlayer(this) }
+    private lateinit var mImgList:List<String>
+    private lateinit var mTextList:List<String>
+    private var mPersonPlanItemId: Int = 0
 
     companion object{
         const val ZIP_URL = "ZIP_URL"
         const val ZIP_MD5 = "ZIP_MD5"
+        const val PERSON_PLAN_ITEM_ID = "PERSON_PLAN_ITEM_ID"
     }
 
     override fun createPresenter(): IWordLearningC.Presenter {
-       return WordLearningPresenter(this,this,HomeModel(this))
+       return WordLearningPresenter(this,this,WordLearningModel(this))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,17 +54,30 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
             .into(mBinding.ivLessonImg)
         val zipUrl = intent.getStringExtra(ZIP_URL)?:""
         val zipMd5 = intent.getStringExtra(ZIP_MD5)?:""
+        mPersonPlanItemId = intent.getIntExtra(PERSON_PLAN_ITEM_ID,0)
         presenter.downZip(zipUrl,zipMd5)
 
-        audioPlayer.setPlayList(arrayListOf())
-        audioPlayer.setPlayWhenReady(true)
-        audioPlayer.registerCallBack(this)
+        mAudioPlayer.setPlayList(arrayListOf())
+        mAudioPlayer.setPlayWhenReady(true)
+        mAudioPlayer.registerCallBack(this)
+
+    }
+
+    private fun initWindow(){
+        val holderView = mDialog.holderView
+        val rv_list = holderView.findViewById<RecyclerView>(R.id.rv_word_learning_list)
+        rv_list.layoutManager = LinearLayoutManager(this)
+        mWindowAdapter = WordLearningWindowAdapter()
+        mWindowAdapter.setOnItemClickListener{ adapter,view,position ->
+            L.i("setOnItemClickListener: $position")
+        }
+        rv_list.adapter = mWindowAdapter
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        audioPlayer.release()
+        mAudioPlayer.release()
     }
 
     override fun playPosition(position: Int) {
@@ -68,21 +93,23 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
     }
 
     override fun playEnd(playIndex: Int) {
-        // TODO: 切图，换文本
+        // 切图，换文本
         val currentIndex = playIndex+1
-        if (currentIndex < imgList.size){
-            val imgPath = imgList[currentIndex]
-            val imgText = textList[currentIndex]
+        if (currentIndex < mImgList.size){
+            val imgPath = mImgList[currentIndex]
+            val imgText = mTextList[currentIndex]
             L.i("imgPath:$imgPath \n imgText:$imgText")
             Glide.with(this)
                 .load(imgPath)
                 .into(mBinding.ivLessonImg)
             mBinding.tvWord.text = imgText
+        }else{//已经播完了，就上报学习记录
+            presenter.reportStudyResult(mPersonPlanItemId)
         }
 
     }
 
-    override fun getZipData(dirPath: String,zipDataList: List<ZipDataBean>) {
+    override fun getZipData(dirPath: String,zipDataList: List<ZipDataVo>) {
         L.i("dirPath:$dirPath")
         val audioList = zipDataList.map { MusicVo(
             id = it.id,
@@ -91,17 +118,17 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
             path = "$dirPath/${it.audiio}",
             pathType = UrlType.DEFAULT
         ) }
-        audioPlayer.setPlayList(audioList)
-        textList = zipDataList.map { it.title }
-        imgList = zipDataList.map { "$dirPath/${it.img}"}
+        mAudioPlayer.setPlayList(audioList)
+        mTextList = zipDataList.map { it.title }
+        mImgList = zipDataList.map { "$dirPath/${it.img}"}
         Glide.with(this)
-            .load(imgList[0])
+            .load(mImgList[0])
             .into(mBinding.ivLessonImg)
-        mBinding.tvWord.text = textList[0]
+        mBinding.tvWord.text = mTextList[0]
     }
 
     override fun getZipFileError(message: String) {
-        TODO("Not yet implemented")
+        ToastUtils.showLong("getZipFileError")
     }
 
     override fun downLoadProgress(progress: Float) {

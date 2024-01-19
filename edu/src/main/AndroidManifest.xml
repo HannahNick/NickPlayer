@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
-        <activity android:name=".ui.WordLearningActivity"
+        <activity
+            android:name=".ui.PlanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.WordLearningActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="landscape"/>
-        <activity android:name=".ui.VideoActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".ui.VideoActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>

@@ -17,15 +17,18 @@ import com.xyz.download.service.Utils.appendDispatchStrategy
 import com.xyz.download.service.Utils.appendUrlSwitchStrategy
 import com.xyz.download.support.manager.DownloadManager
 import com.xyz.edu.contract.IWordLearningC
-import com.xyz.edu.vo.ZipDataBean
+import com.xyz.edu.manager.UserManager
+import com.xyz.edu.presenter.base.DisposablePresenter
+import com.xyz.edu.vo.ZipDataVo
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 
-class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: IWordLearningC.Model): DisposablePresenter<IWordLearningC.View,IWordLearningC.Model>(context,view, model),IWordLearningC.Presenter {
+class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: IWordLearningC.Model): DisposablePresenter<IWordLearningC.View, IWordLearningC.Model>(context,view, model),IWordLearningC.Presenter {
 
     private var mZipDownLoadHolder: DownloadManager.DownloadHolder? = null
+
 
     override fun downZip(url: String,md5: String) {
         //1.判断压缩文件是否存在
@@ -96,6 +99,14 @@ class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: 
         })
     }
 
+    override fun reportStudyResult(personPlanItemId: Int) {
+        model.reportStudyResult(UserManager.personPlanId,personPlanItemId,UserManager.personId)
+            .io2Main()
+            .subscribe({},{
+                it.printStackTrace()
+            }).apply { compositeDisposable.add(this) }
+    }
+
     fun findReadme(zipFile: File){
         L.i("0:${Thread.currentThread().name}")
         val readmeFileName = "readme"
@@ -124,7 +135,7 @@ class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: 
                 //解析txt文件，转化文件信息List
                 val zipFileDescribe = FileIOUtils.readFile2String(it)
                 L.i(zipFileDescribe)
-                val zipDataList = GsonUtils.fromJson<List<ZipDataBean>>(zipFileDescribe,object :TypeToken<List<ZipDataBean>>(){}.type)
+                val zipDataList = GsonUtils.fromJson<List<ZipDataVo>>(zipFileDescribe,object :TypeToken<List<ZipDataVo>>(){}.type)
                 //将没有音频的数据过滤
                 zipDataList.filter { zipBataBean->
                     zipBataBean.audiio.isNotEmpty()

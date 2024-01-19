@@ -2,6 +2,8 @@ package com.xyz.edu.ui
 
 import android.os.Bundle
 import com.blankj.utilcode.util.BarUtils
+import com.nick.music.entity.PlayInfo
+import com.nick.music.player.PlayInfoCallBack
 import com.nick.vod.ui.fragment.VodFragment
 import com.xyz.base.utils.L
 import com.xyz.edu.R
@@ -13,11 +15,13 @@ import com.xyz.proxy.IProxy
 import com.xyz.proxy.KtvPlayProxyManager
 import kotlin.properties.Delegates
 
-class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View {
+class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoCallBack {
 
     private val mBinding by lazy { ActivityVideoBinding.inflate(layoutInflater) }
+    private var mPersonPlanItemId: Int = 0
     companion object{
         const val VIDEO_URL = "VIDEO_URL"
+        const val PERSON_PLAN_ITEM_ID = "PERSON_PLAN_ITEM_ID"
     }
 
     private var mProxy: IProxy? by Delegates.observable(null) { property, oldValue, newValue ->
@@ -40,6 +44,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View {
     }
 
     private fun initView(){
+        mPersonPlanItemId = intent.getIntExtra(PERSON_PLAN_ITEM_ID,0)
         val videoUrl = intent.getStringExtra(VIDEO_URL)
         mProxy = KtvPlayProxyManager.createKtvProxy(this)
         mProxy?.start()
@@ -57,5 +62,22 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View {
     override fun onDestroy() {
         super.onDestroy()
         mProxy?.stop()
+    }
+
+    override fun playPosition(position: Int) {
+
+    }
+
+    override fun prepareStart(playInfo: PlayInfo) {
+
+    }
+
+    override fun startPlay(position: Long) {
+
+    }
+
+    override fun playEnd(playIndex: Int) {
+        super.playEnd(playIndex)
+        presenter.reportStudyResult(mPersonPlanItemId)
     }
 }

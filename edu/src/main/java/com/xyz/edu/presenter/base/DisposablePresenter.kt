@@ -1,4 +1,4 @@
-package com.xyz.edu.presenter
+package com.xyz.edu.presenter.base
 
 import android.content.Context
 import androidx.annotation.CallSuper

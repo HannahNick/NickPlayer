@@ -23,14 +23,14 @@ class BootActivity : BaseActivity<IBootC.Presenter>(), IBootC.View {
     }
 
     override fun loginSuccess() {
-
+        startActivity(Intent(this,PlanActivity::class.java))
     }
 
     override fun loginFail() {
         ToastUtils.showLong("login fail")
     }
 
-    override fun toVideo(url: String) {
+    fun toVideo(url: String) {
         val intent = Intent(this,VideoActivity::class.java)
         intent.putExtra(VideoActivity.VIDEO_URL,url)
         startActivity(intent)

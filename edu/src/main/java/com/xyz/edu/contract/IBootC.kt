@@ -14,15 +14,11 @@ interface IBootC {
         fun login()
 
         fun register()
-
-        fun getPersonPlanItemList(pageNum: Int, pageSize: Int)
     }
     interface View: IBaseContract.IView{
         fun loginSuccess()
 
         fun loginFail()
-
-        fun toVideo(url: String)
 
         fun toWordLearning(zipUrl: String)
     }
@@ -36,11 +32,5 @@ interface IBootC {
                    sex : Int,): Flowable<RESULT<RegisterBean>>
 
         fun login(personAccount : String,password : String): Flowable<RESULT<LoginBean>>
-
-        fun getPersonPlanItemList(personId: Int,
-                                  personPlanId: Int,
-                                  pageNum: Int,
-                                  pageSize: Int,
-        ): Flowable<RESULT<PAGE<PlanItemBean>>>
     }
 }

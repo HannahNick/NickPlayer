@@ -48,8 +48,8 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initData()
         initListener()
+        initData()
     }
 
     private fun initData(){
@@ -57,7 +57,6 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
         GestureMessageCenter.registerCallBack(this)
         val urlList = arguments?.getStringArrayList(URL_LIST_PARAM)
 
-        mPlayerControl.registerCallBack(this)
         if (urlList!=null){
             val data = urlList.map {
                 return@map MusicVo(path = it, pathType = UrlType.DEFAULT, liveName = "浙江卫视")
@@ -83,6 +82,12 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
                 mPlayerControl.play()
             }
             svVideo.holder.addCallback(this@VodFragment)
+        }
+        mPlayerControl.registerCallBack(this)
+        if (activity is PlayInfoCallBack){
+            LogUtils.i("activity is PlayInfoCallBack")
+            val activityMusicCallBack = activity as PlayInfoCallBack
+            mPlayerControl.registerCallBack(activityMusicCallBack)
         }
     }
 

@@ -5,6 +5,7 @@ import com.xyz.base.app.mvp.IBaseContract
 interface IVideoC {
     interface Presenter: IBaseContract.IPresenter {
 
+        fun reportStudyResult(personPlanItemId: Int)
     }
     interface View: IBaseContract.IView{
     }
