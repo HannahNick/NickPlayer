@@ -16,7 +16,7 @@ interface IPlanC {
     }
 
     interface Model: IBaseContract.IModel{
-        fun getPersonPlanItemList(personPlanId: Int,
+        fun getPersonPlanItemList(personPlanId: String,
                                   pageNum: Int,
                                   pageSize: Int,
         ): Flowable<RESULT<PAGE<PlanItemBean>>>

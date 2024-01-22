@@ -11,11 +11,11 @@ import io.reactivex.Flowable
 
 class PlanModel(context: Context): BaseModel(context), IPlanC.Model {
     override fun getPersonPlanItemList(
-        personPlanId: Int,
+        personPlanId: String,
         pageNum: Int,
         pageSize: Int
     ): Flowable<RESULT<PAGE<PlanItemBean>>> {
-        return ServiceProvider.getEduService().getPersonPlanItemList(personPlanId, pageNum, pageSize)
+        return ServiceProvider.getEduService("http://38.91.106.109:9393").getPersonPlanItemList(personPlanId, pageNum, pageSize)
     }
 
 

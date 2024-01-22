@@ -3,6 +3,7 @@ package com.xyz.edu.ui
 import android.content.Intent
 import android.os.Bundle
 import com.blankj.utilcode.util.ToastUtils
+import com.xyz.base.utils.L
 import com.xyz.edu.contract.IBootC
 import com.xyz.edu.databinding.ActivityBootBinding
 import com.xyz.edu.model.BootModel
@@ -18,12 +19,14 @@ class BootActivity : BaseActivity<IBootC.Presenter>(), IBootC.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
-        presenter.register()
+        L.i("L.isEnable:${L.isEnable}")
+        presenter.login()
 
     }
 
     override fun loginSuccess() {
         startActivity(Intent(this,PlanActivity::class.java))
+        finish()
     }
 
     override fun loginFail() {

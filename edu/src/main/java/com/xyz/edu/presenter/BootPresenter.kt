@@ -2,6 +2,7 @@ package com.xyz.edu.presenter
 
 import android.content.Context
 import com.xyz.base.app.rx.io2Main
+import com.xyz.base.utils.L
 import com.xyz.edu.contract.IBootC
 import com.xyz.edu.manager.UserManager
 import com.xyz.edu.presenter.base.DisposablePresenter
@@ -9,6 +10,7 @@ import com.xyz.edu.presenter.base.DisposablePresenter
 class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): DisposablePresenter<IBootC.View, IBootC.Model>(context,view, model),
     IBootC.Presenter {
     override fun login() {
+        L.i("login")
         model.login("13714570137","12345678")
             .io2Main()
             .subscribe({
@@ -20,17 +22,23 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
             },{
                 it.printStackTrace()
                 view.loginFail()
+            },{
+                L.i("login finish")
             }).apply { compositeDisposable.add(this) }
     }
 
     override fun register() {
+        L.i("register")
+
         model.register("王大锤","13714570137","12345678",10,1,1)
             .io2Main()
             .subscribe({
-                UserManager.personId = it.result.personId
+//                UserManager.personId = it.result.personId
                 login()
             },{
                 it.printStackTrace()
+            },{
+                L.i("register finish")
             }).apply { compositeDisposable.add(this) }
     }
 

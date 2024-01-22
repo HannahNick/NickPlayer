@@ -99,7 +99,7 @@ class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: 
         })
     }
 
-    override fun reportStudyResult(personPlanItemId: Int) {
+    override fun reportStudyResult(personPlanItemId: String) {
         model.reportStudyResult(UserManager.personPlanId,personPlanItemId,UserManager.personId)
             .io2Main()
             .subscribe({},{

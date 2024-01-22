@@ -12,7 +12,7 @@ class VideoPresenter(context: Context, view: IVideoC.View, model: IVideoC.Model)
 
         private val mWordLearningModel by lazy { WordLearningModel(context) }
 
-    override fun reportStudyResult(personPlanItemId: Int) {
+    override fun reportStudyResult(personPlanItemId: String) {
         mWordLearningModel.reportStudyResult(UserManager.personPlanId,personPlanItemId,UserManager.personId)
     }
 }

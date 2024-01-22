@@ -1,6 +1,9 @@
 package com.xyz.edu.model
 
 import android.content.Context
+import com.ihsanbal.logging.Level
+import com.ihsanbal.logging.LoggingInterceptor
+import com.nick.base.BuildConfig
 import com.xyz.base.app.mvp.BaseModel
 import com.xyz.base.service.ServiceProvider
 import com.xyz.base.service.edu.bean.LoginBean
@@ -13,6 +16,7 @@ import com.xyz.base.service.svc.PAGE
 import com.xyz.base.service.svc.RESULT
 import com.xyz.edu.contract.IBootC
 import io.reactivex.Flowable
+import okhttp3.internal.platform.Platform
 import retrofit2.http.Field
 import retrofit2.http.Query
 
@@ -24,33 +28,36 @@ class BootModel(context: Context): BaseModel(context), IBootC.Model {
               age: Int,
               basics : Int,
               sex : Int,): Flowable<RESULT<RegisterBean>>{
-        return ServiceProvider.getEduService().eduRegister(personName, personAccount, password, age, basics, sex)
+
+
+
+        return ServiceProvider.getEduService("http://38.91.106.109:9393").eduRegister(personName, personAccount, password, age, basics, sex)
     }
 
     override fun login(personAccount : String,password : String): Flowable<RESULT<LoginBean>>{
-        return ServiceProvider.getEduService().eduLogin(personAccount, password)
+        return ServiceProvider.getEduService(baseUrl = "http://38.91.106.109:9393").eduLogin(personAccount, password)
     }
 
-    fun getPersonPlanItemList(personPlanId: Int,
+    fun getPersonPlanItemList(personPlanId: String,
                               pageNum: Int,
                               pageSize: Int,
     ): Flowable<RESULT<PAGE<PlanItemBean>>>{
-        return ServiceProvider.getEduService().getPersonPlanItemList(personPlanId, pageNum, pageSize)
+        return ServiceProvider.getEduService("http://38.91.106.109:9393").getPersonPlanItemList(personPlanId, pageNum, pageSize)
     }
 
-    fun getPersonWordList(personId: Int,
+    fun getPersonWordList(personId: String,
     ): Flowable<RESULT<PersonWordListBean>>{
         return ServiceProvider.getEduService().getPersonWordList(personId)
     }
 
-    fun getPersonStudyRecord(personId: Int,
+    fun getPersonStudyRecord(personId: String,
     ): Flowable<RESULT<StudyRecordBean>>{
         return ServiceProvider.getEduService().getPersonStudyRecord(personId)
     }
 
-    fun reportStudyResult(personPlanId : Int,
-                          personPlanItemId : Int,
-                          personId : Int,
+    fun reportStudyResult(personPlanId : String,
+                          personPlanItemId : String,
+                          personId : String,
     ): Flowable<RESULT<Any>>{
         return ServiceProvider.getEduService().reportStudyResult(personPlanId, personPlanItemId, personId)
     }

@@ -12,7 +12,7 @@ interface IWordLearningC {
 
         fun downZip(url: String,md5: String)
 
-        fun reportStudyResult(personPlanItemId: Int)
+        fun reportStudyResult(personPlanItemId: String)
 
     }
     interface View: IBaseContract.IView{
@@ -24,9 +24,9 @@ interface IWordLearningC {
     }
 
     interface Model: IBaseContract.IModel{
-        fun reportStudyResult(personPlanId : Int,
-                              personPlanItemId : Int,
-                              personId : Int,
+        fun reportStudyResult(personPlanId : String,
+                              personPlanItemId : String,
+                              personId : String,
         ): Flowable<RESULT<Any>>
     }
 }

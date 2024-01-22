@@ -11,22 +11,54 @@ kapt {
 
 android {
     namespace 'com.xyz.nickplayer'
+
     compileSdk sdk_version.compileSdkVersion
+
+    signingConfigs {
+        releaseConfig {
+            storeFile new File(getRootDir(), "sign/platform.jks")
+            storePassword '123456'
+            keyAlias 'android'
+            keyPassword '123456'
+        }
+        debug {
+            storeFile new File(getRootDir(), "sign/platform.jks")
+            storePassword '123456'
+            keyAlias 'android'
+            keyPassword '123456'
+        }
+        newSign {
+            storeFile new File(getRootDir(), "sign/xyz_android.jks")
+            storePassword 'qwert123$'
+            keyAlias 'app'
+            keyPassword '26990000'
+        }
+    }
 
     defaultConfig {
         applicationId "com.xyz.nickplayer"
+//        applicationId "com.xyz.vlive"
         minSdk sdk_version.minSdkVersion
         targetSdk sdk_version.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        flavorDimensions "dev", "app"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        release {
-            minifyEnabled false
+        debug {
+            multiDexKeepFile file('multidex-config.txt')
+            signingConfig signingConfigs.newSign
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled false
+        }
+        release {
+            multiDexKeepFile file('multidex-config.txt')
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.newSign
         }
     }
     compileOptions {
@@ -38,6 +70,19 @@ android {
     }
     buildFeatures {
         viewBinding = true
+    }
+    productFlavors { flavor ->
+        edu {
+            signingConfig signingConfigs.newSign
+            applicationIdSuffix '.edu'
+            dimension "dev"
+        }
+        music {
+            signingConfig signingConfigs.newSign
+            applicationIdSuffix '.music'
+            dimension "app"
+        }
+
     }
 }
 

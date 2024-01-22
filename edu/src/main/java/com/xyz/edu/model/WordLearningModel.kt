@@ -9,11 +9,11 @@ import io.reactivex.Flowable
 
 class WordLearningModel(context: Context): BaseModel(context),IWordLearningC.Model {
     override fun reportStudyResult(
-        personPlanId: Int,
-        personPlanItemId: Int,
-        personId: Int
+        personPlanId: String,
+        personPlanItemId: String,
+        personId: String
     ): Flowable<RESULT<Any>> {
-        return ServiceProvider.getEduService().reportStudyResult(personPlanId, personPlanItemId, personId)
+        return ServiceProvider.getEduService("http://38.91.106.109:9393").reportStudyResult(personPlanId, personPlanItemId, personId)
     }
 
 }

@@ -33,7 +33,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
     private val mAudioPlayer: PlayerControl by lazy { NickExoPlayer(this) }
     private lateinit var mImgList:List<String>
     private lateinit var mTextList:List<String>
-    private var mPersonPlanItemId: Int = 0
+    private var mPersonPlanItemId: String = ""
 
     companion object{
         const val ZIP_URL = "ZIP_URL"
@@ -54,7 +54,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
             .into(mBinding.ivLessonImg)
         val zipUrl = intent.getStringExtra(ZIP_URL)?:""
         val zipMd5 = intent.getStringExtra(ZIP_MD5)?:""
-        mPersonPlanItemId = intent.getIntExtra(PERSON_PLAN_ITEM_ID,0)
+        mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
         presenter.downZip(zipUrl,zipMd5)
 
         mAudioPlayer.setPlayList(arrayListOf())

@@ -6,11 +6,14 @@
     <application>
         <activity
             android:name=".ui.PlanActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="landscape"
             android:exported="false" />
         <activity
             android:name=".ui.WordLearningActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:exported="false"/>
         <activity
             android:name=".ui.VideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

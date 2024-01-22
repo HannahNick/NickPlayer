@@ -18,7 +18,7 @@ import kotlin.properties.Delegates
 class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoCallBack {
 
     private val mBinding by lazy { ActivityVideoBinding.inflate(layoutInflater) }
-    private var mPersonPlanItemId: Int = 0
+    private var mPersonPlanItemId: String = ""
     companion object{
         const val VIDEO_URL = "VIDEO_URL"
         const val PERSON_PLAN_ITEM_ID = "PERSON_PLAN_ITEM_ID"
@@ -44,7 +44,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
     }
 
     private fun initView(){
-        mPersonPlanItemId = intent.getIntExtra(PERSON_PLAN_ITEM_ID,0)
+        mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
         val videoUrl = intent.getStringExtra(VIDEO_URL)
         mProxy = KtvPlayProxyManager.createKtvProxy(this)
         mProxy?.start()
