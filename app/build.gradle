@@ -72,17 +72,26 @@ android {
         viewBinding = true
     }
     productFlavors { flavor ->
+        xiaoyun {
+            signingConfig signingConfigs.newSign
+            applicationIdSuffix '.xiaoyun'
+            dimension "dev"
+        }
         edu {
             signingConfig signingConfigs.newSign
             applicationIdSuffix '.edu'
-            dimension "dev"
+            dimension "app"
         }
         music {
             signingConfig signingConfigs.newSign
             applicationIdSuffix '.music'
             dimension "app"
         }
-
+        svc {
+            signingConfig signingConfigs.newSign
+            applicationIdSuffix '.svc'
+            dimension "app"
+        }
     }
 }
 
