@@ -5,6 +5,8 @@ import com.blankj.utilcode.util.BarUtils
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.vod.ui.fragment.VodFragment
+import com.nick.vod.view.LiveGestureControlLayer
+import com.nick.vod.wiget.GestureMessageCenter
 import com.xyz.base.utils.L
 import com.xyz.edu.R
 import com.xyz.edu.contract.IVideoC
@@ -15,12 +17,14 @@ import com.xyz.proxy.IProxy
 import com.xyz.proxy.KtvPlayProxyManager
 import kotlin.properties.Delegates
 
-class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoCallBack {
+class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoCallBack,
+    LiveGestureControlLayer.GestureCallBack{
 
     private val mBinding by lazy { ActivityVideoBinding.inflate(layoutInflater) }
     private var mPersonPlanItemId: String = ""
     companion object{
         const val VIDEO_URL = "VIDEO_URL"
+        const val VIDEO_NAME = "VIDEO_NAME"
         const val PERSON_PLAN_ITEM_ID = "PERSON_PLAN_ITEM_ID"
     }
 
@@ -44,16 +48,16 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
     }
 
     private fun initView(){
+        GestureMessageCenter.registerCallBack(this)
         mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
-        val videoUrl = intent.getStringExtra(VIDEO_URL)
+        val videoUrl = intent.getStringExtra(VIDEO_URL)?:""
+        val videoName = intent.getStringExtra(VIDEO_NAME)?:""
         mProxy = KtvPlayProxyManager.createKtvProxy(this)
         mProxy?.start()
-        val proxyUrl = mProxy?.buildProxyUrl("/aud/16842758/file/5069_16842758.m4a")?.apply {
+        val proxyUrl = mProxy?.buildProxyUrl(videoUrl)?.apply {
             L.i(" buildProxyUrl $this")
         }?:""
-
-//        val vodFragment = VodFragment.newInstance(arrayListOf("${filesDir.absolutePath}/vod/abc.mp4"))
-        val vodFragment = VodFragment.newInstance(arrayListOf(proxyUrl))
+        val vodFragment = VodFragment.newInstance(arrayListOf(proxyUrl), arrayListOf(videoName))
         val transaction = supportFragmentManager.beginTransaction()
         transaction.add(R.id.fl_contain, vodFragment)
         transaction.commit()
@@ -80,4 +84,10 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         super.playEnd(playIndex)
         presenter.reportStudyResult(mPersonPlanItemId)
     }
+
+    override fun back() {
+        super.back()
+        finish()
+    }
+
 }

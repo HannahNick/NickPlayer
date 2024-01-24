@@ -1,5 +1,6 @@
 package com.xyz.edu.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.GridLayoutManager
@@ -42,7 +43,21 @@ class PlanActivity :  BaseActivity<IPlanC.Presenter>(), IPlanC.View {
             rvPlanList.layoutManager = GridLayoutManager(this@PlanActivity,3)
             rvPlanList.adapter = mPlanAdapter
             mPlanAdapter.setOnItemClickListener{ adapter,view,position->
-                ToastUtils.showLong("$position")
+                val data = mPlanAdapter.data[position]
+                when(data.contentType){
+                    1->{
+                        val videoIntent = Intent(this@PlanActivity,VideoActivity::class.java)
+                        videoIntent.putExtra(VideoActivity.VIDEO_URL,data.contentUrl)
+                        videoIntent.putExtra(VideoActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
+                        videoIntent.putExtra(VideoActivity.VIDEO_NAME,data.contentTitle)
+                        startActivity(videoIntent)
+                    }
+                    else ->{
+                        ToastUtils.showLong("$position")
+                    }
+                }
+
+
             }
             mPlanAdapter.setOnLoadMoreListener({
                planPresenter.loadMore()

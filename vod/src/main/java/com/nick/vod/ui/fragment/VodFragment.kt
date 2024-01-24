@@ -1,6 +1,5 @@
 package com.nick.vod.ui.fragment
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.SurfaceHolder
@@ -28,10 +27,12 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
 
     companion object{
         val URL_LIST_PARAM = "URL_LIST_PARAM"
-        fun newInstance(urlList: ArrayList<String>): VodFragment {
+        val VIDEO_LIST_NAME = "VIDEO_LIST_NAME"
+        fun newInstance(urlList: ArrayList<String>,nameList: ArrayList<String>): VodFragment {
             val fragment = VodFragment()
             val args = Bundle()
             args.putStringArrayList(URL_LIST_PARAM, urlList)
+            args.putStringArrayList(VIDEO_LIST_NAME, nameList)
             fragment.setArguments(args)
             return fragment
         }
@@ -56,11 +57,13 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
 //        LogUtils.i("电影本地路径:${PathUtils.getExternalMoviesPath()}/bear.mp4  isExists: ${File(PathUtils.getExternalMoviesPath()+"/bear.mp4").exists()}")
         GestureMessageCenter.registerCallBack(this)
         val urlList = arguments?.getStringArrayList(URL_LIST_PARAM)
+        val nameList = arguments?.getStringArrayList(VIDEO_LIST_NAME)
 
         if (urlList!=null){
-            val data = urlList.map {
-                return@map MusicVo(path = it, pathType = UrlType.DEFAULT, liveName = "浙江卫视")
+            val data = urlList.mapIndexed { index, s ->
+                return@mapIndexed MusicVo(path = s, pathType = UrlType.DEFAULT, liveName = nameList?.get(index)?:"")
             }
+            LogUtils.i("dataList: $data")
             mPlayerControl.setPlayList(data)
         }else{
             LogUtils.w("data is empty")

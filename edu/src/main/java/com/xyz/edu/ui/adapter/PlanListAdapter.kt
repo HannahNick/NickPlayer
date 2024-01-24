@@ -7,6 +7,17 @@ import com.xyz.edu.R
 
 class PlanListAdapter: BaseQuickAdapter<PlanItemBean,BaseViewHolder>(R.layout.layout_plan_item) {
     override fun convert(helper: BaseViewHolder, item: PlanItemBean) {
-        helper.setText(R.id.tv_plan_name,item.contentTitle)
+        when(item.contentType){
+            1 ->{
+                helper.setText(R.id.tv_plan_name,"视频")
+            }
+            2 ->{
+                helper.setText(R.id.tv_plan_name,"音频")
+            }
+            else ->{
+                helper.setText(R.id.tv_plan_name,item.contentTitle)
+            }
+        }
+
     }
 }
