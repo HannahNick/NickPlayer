@@ -314,6 +314,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
      */
     private boolean isTextFitInOneLine(String lineText){
         mPaint.setTextSize(mTextSize);
+        mPaint.setLetterSpacing(0.1f);
         float textWidth = mPaint.measureText(lineText);
         return textWidth<=MAX_Width;
     }

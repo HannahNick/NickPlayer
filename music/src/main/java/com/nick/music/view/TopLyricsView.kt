@@ -21,21 +21,25 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     }
 
     override fun drawPreView(canvas: Canvas) {
+        canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mOriginWordsStrokePaint)
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mOriginWordsPaint)
         if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
             drawPreViewSubsidiaryWords(canvas)
         }else{
+            canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsStrokePaint)
             canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
         }
 
     }
 
     override fun drawSingFinish(canvas: Canvas) {
+        canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mWordsSingStrokePaint)
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mWordsSingPaint)
         if (mLineLyricsList.isNotEmpty()&&mLineLyricsList[0].hasTransliteration){
             drawSubsidiaryLyrics(canvas)
             drawHaveSingSubsidiaryLyrics(canvas)
         }else{
+            canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsStrokePaint)
             canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
         }
 
@@ -52,12 +56,15 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     private fun drawSingLyrics(canvas: Canvas){
         measureHaveSingRect()
         // 绘制原始歌词
+        canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mOriginWordsStrokePaint)
         canvas.drawText(mOriginLineLyrics, mPaintStartPosition, mOriginStartPositionY, mOriginWordsPaint)
         // 绘制副歌词
+        canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsStrokePaint)
         canvas.drawText(mSubsidiaryLineLyrics, mPaintStartPosition, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
         canvas.save()
         canvas.clipRect(mWordsSingRect)
         // 绘制已唱歌词
+        canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mWordsSingStrokePaint)
         canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mWordsSingPaint)
         canvas.restore()
     }
@@ -68,12 +75,14 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
     private fun drawSingLyrics2(canvas: Canvas){
         measureHaveSingRect()
         // 绘制原音歌词
+        canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mOriginWordsStrokePaint)
         canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mOriginWordsPaint)
         // 逐个绘制副歌词
         drawSubsidiaryLyrics(canvas)
         canvas.save()
         canvas.clipRect(mWordsSingRect)
         // 绘制已唱歌词
+        canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mWordsSingStrokePaint)
         canvas.drawText(mOriginLineLyrics,mPaintStartPosition,mOriginStartPositionY,mWordsSingPaint)
         //绘制已唱副歌词
         drawHaveSingSubsidiaryLyrics(canvas)
@@ -95,12 +104,8 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
             // 计算注音的宽度
             val transliterationWidth = mSubsidiaryWordsPaint.measureText(transliteration)
             // 绘制拼音，居中显示在汉字的正上方
-            canvas.drawText(
-                transliteration,
-                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
-                mSubsidiaryStartPositionY,
-                mSubsidiaryWordsPaint
-            )
+            canvas.drawText(transliteration, currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2, mSubsidiaryStartPositionY, mSubsidiaryWordsStrokePaint)
+            canvas.drawText(transliteration, currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
             // 移动 X 坐标，为下一个汉字和拼音腾出空间
             currentX += mOriginWordsPaint.measureText(originChar)
         }
@@ -121,12 +126,8 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
             // 计算注音的宽度
             val transliterationWidth = mHaveSingSubsidiaryWordsPaint.measureText(transliteration)
             // 绘制拼音，居中显示在汉字的正上方
-            canvas.drawText(
-                transliteration,
-                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
-                mSubsidiaryStartPositionY,
-                mHaveSingSubsidiaryWordsPaint
-            )
+            canvas.drawText(transliteration, currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2, mSubsidiaryStartPositionY, mHaveSingSubsidiaryWordsStrokePaint)
+            canvas.drawText(transliteration, currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2, mSubsidiaryStartPositionY, mHaveSingSubsidiaryWordsPaint)
             // 移动 X 坐标，为下一个汉字和拼音腾出空间
             currentX += mOriginWordsPaint.measureText(originChar)
         }
@@ -147,12 +148,8 @@ class TopLyricsView @JvmOverloads constructor(context: Context, attributeSet: At
             // 计算注音的宽度
             val transliterationWidth = mSubsidiaryWordsPaint.measureText(transliteration)
             // 绘制拼音，居中显示在汉字的正上方
-            canvas.drawText(
-                transliteration,
-                currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2,
-                mSubsidiaryStartPositionY,
-                mSubsidiaryWordsPaint
-            )
+            canvas.drawText(transliteration, currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2, mSubsidiaryStartPositionY, mSubsidiaryWordsStrokePaint)
+            canvas.drawText(transliteration, currentX + (mOriginWordsPaint.measureText(originChar) - transliterationWidth) / 2, mSubsidiaryStartPositionY, mSubsidiaryWordsPaint)
             // 移动 X 坐标，为下一个汉字和拼音腾出空间
             currentX += mOriginWordsPaint.measureText(originChar)
         }

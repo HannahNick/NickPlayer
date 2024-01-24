@@ -27,14 +27,34 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     protected val mWordsSingPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
+     * 原音歌词描边笔
+     */
+    protected val mOriginWordsStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
+     * 已唱歌词描边笔
+     */
+    protected val mWordsSingStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
      * 辅助歌词画笔(注音或翻译)
      */
     protected val mSubsidiaryWordsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
+     * 辅助歌词描边笔
+     */
+    protected val mSubsidiaryWordsStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
      * 已唱辅助歌词画笔
      */
     protected val mHaveSingSubsidiaryWordsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    /**
+     * 已唱辅助歌词描边画笔
+     */
+    protected val mHaveSingSubsidiaryWordsStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
      * 歌词长度测量框框
@@ -145,20 +165,60 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         mOriginWordsPaint.apply {
+            typeface = Typeface.DEFAULT_BOLD
             textSize = (bottom-top)*3/4.toFloat()-15
             color = context.resources.getColor(R.color.white,null)
+            letterSpacing = 0.1f//设置文本间距
+        }
+        mOriginWordsStrokePaint.apply {
+            typeface = Typeface.DEFAULT_BOLD
+            textSize = (bottom-top)*3/4.toFloat()-15
+            color = context.resources.getColor(R.color.black,null)
+            style = Paint.Style.STROKE
+            letterSpacing = 0.1f
+            strokeWidth = 7f
         }
         mWordsSingPaint.apply {
+            typeface = Typeface.DEFAULT_BOLD
             textSize = (bottom-top)*3/4.toFloat()-15
             color = context.resources.getColor(R.color.male_voice,null)
+            letterSpacing = 0.1f
+        }
+        mWordsSingStrokePaint.apply {
+            typeface = Typeface.DEFAULT_BOLD
+            textSize = (bottom-top)*3/4.toFloat()-15
+            color = context.resources.getColor(R.color.white,null)
+            style = Paint.Style.STROKE
+            letterSpacing = 0.1f
+            strokeWidth = 7f
         }
         mSubsidiaryWordsPaint.apply {
+            typeface = Typeface.DEFAULT_BOLD
             textSize = (bottom-top)/5.toFloat()
             color = context.resources.getColor(R.color.white,null)
+            letterSpacing = 0.2f
+        }
+        mSubsidiaryWordsStrokePaint.apply {
+            typeface = Typeface.DEFAULT_BOLD
+            textSize = (bottom-top)/5.toFloat()
+            color = context.resources.getColor(R.color.black,null)
+            style = Paint.Style.STROKE
+            letterSpacing = 0.2f
+            strokeWidth = 7f
         }
         mHaveSingSubsidiaryWordsPaint.apply {
+            typeface = Typeface.DEFAULT_BOLD
             textSize = (bottom-top)/5.toFloat()
             color = context.resources.getColor(R.color.male_voice,null)
+            letterSpacing = 0.2f
+        }
+        mHaveSingSubsidiaryWordsStrokePaint.apply {
+            typeface = Typeface.DEFAULT_BOLD
+            textSize = (bottom-top)/5.toFloat()
+            color = context.resources.getColor(R.color.white,null)
+            style = Paint.Style.STROKE
+            letterSpacing = 0.2f
+            strokeWidth = 7f
         }
         mSubsidiaryStartPositionY = (bottom-top)/4.toFloat()
         mOriginStartPositionY = (bottom-top).toFloat() - 25f
