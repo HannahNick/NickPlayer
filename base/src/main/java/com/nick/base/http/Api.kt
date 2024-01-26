@@ -1,12 +1,14 @@
 package com.nick.base.http
 
-import com.nick.base.vo.MusicVo
-import com.nick.base.vo.base.BaseVo
-import retrofit2.http.*
+import io.reactivex.Flowable
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.http.GET
+import retrofit2.http.Url
+
 
 interface Api {
-
-    @GET("musicPlayer/music/getAllMusic")
-    suspend fun getAllMusic(): BaseVo<List<MusicVo>>
+    @GET
+    fun downloadFile(@Url fileUrl: String): Flowable<ResponseBody>
 
 }

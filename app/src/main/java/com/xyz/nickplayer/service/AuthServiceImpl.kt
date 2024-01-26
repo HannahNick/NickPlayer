@@ -10,7 +10,9 @@ import com.xyz.base.service.ServiceProvider
 import com.xyz.base.service.auth.api.LoginRequestBodyV3
 import com.xyz.base.service.auth.bean.LoginResultBean
 import com.xyz.base.service.svc.RESULT
+import com.xyz.base.utils.L
 import com.xyz.base.utils.kt.localeValue
+import com.xyz.edu.manager.UserManager
 import kotlin.random.Random
 import kotlin.random.nextLong
 
@@ -24,11 +26,13 @@ class AuthServiceImpl : BaseAuthService() {
             .signInV3(
                 context = context,
                 action = LoginRequestBodyV3.Action.Login(),
-                productCode = "edu2eng",
+                productCode = UserManager.productCode,
                 fg = LoginRequestBodyV3.Fg.FOREGROUND,
                 timeSeq = emptySequence()
             )
             .blockingFirst()
+        UserManager.token = result.result.token
+        L.i("AuthServiceImpl loginResult: $result ,token: ${UserManager.token}")
         return ILoginResultImpl(result)
     }
 

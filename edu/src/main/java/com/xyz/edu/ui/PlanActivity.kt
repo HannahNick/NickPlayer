@@ -48,9 +48,16 @@ class PlanActivity :  BaseActivity<IPlanC.Presenter>(), IPlanC.View {
                     1->{
                         val videoIntent = Intent(this@PlanActivity,VideoActivity::class.java)
                         videoIntent.putExtra(VideoActivity.VIDEO_URL,data.contentUrl)
-                        videoIntent.putExtra(VideoActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
                         videoIntent.putExtra(VideoActivity.VIDEO_NAME,data.contentTitle)
+                        videoIntent.putExtra(VideoActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
                         startActivity(videoIntent)
+                    }
+                    3->{
+                        val wordLearningIntent = Intent(this@PlanActivity,WordLearningActivity::class.java)
+                        wordLearningIntent.putExtra(WordLearningActivity.ZIP_URL,data.zip.url)
+                        wordLearningIntent.putExtra(WordLearningActivity.ZIP_MD5,data.zip.md5)
+                        wordLearningIntent.putExtra(WordLearningActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
+                        startActivity(wordLearningIntent)
                     }
                     else ->{
                         ToastUtils.showLong("$position")

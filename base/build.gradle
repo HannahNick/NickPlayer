@@ -46,6 +46,7 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$dependencies_version.kotlinxCoroutinesRx2"
     api "io.reactivex.rxjava3:rxjava:$dependencies_version.rxjava"
     api "io.reactivex.rxjava3:rxandroid:$dependencies_version.rxandroid"
+    api "com.squareup.retrofit2:adapter-rxjava2:$dependencies_version.retrofit"
     api("com.github.ihsanbal:LoggingInterceptor:$dependencies_version.loggingInterceptor") {
         exclude group: 'org.json', module: 'json'
     }

@@ -14,6 +14,9 @@ class PlanListAdapter: BaseQuickAdapter<PlanItemBean,BaseViewHolder>(R.layout.la
             2 ->{
                 helper.setText(R.id.tv_plan_name,"音频")
             }
+            3 ->{
+                helper.setText(R.id.tv_plan_name,"题目")
+            }
             else ->{
                 helper.setText(R.id.tv_plan_name,item.contentTitle)
             }

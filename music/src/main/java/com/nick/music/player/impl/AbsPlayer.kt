@@ -82,6 +82,7 @@ abstract class AbsPlayer: PlayerControl {
     }
 
     private fun setDataSource(data: List<MusicVo>){
+        LogUtils.i("setDataSource: $data")
         mMusicData.clear()
         mMusicData.addAll(data)
         mIndex = 0

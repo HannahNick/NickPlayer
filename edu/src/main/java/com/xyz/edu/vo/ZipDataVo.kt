@@ -2,9 +2,9 @@ package com.xyz.edu.vo
 
 data class ZipDataVo(
     val title: String,
-    val type: Int,
-    val audiio: String,
+    val type: String,
+    val audio: String,
     val img: String,
     val id: String,
-    val text: String,
+    val txt: String,
 )

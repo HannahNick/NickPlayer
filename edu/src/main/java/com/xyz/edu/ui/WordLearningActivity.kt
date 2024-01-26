@@ -55,11 +55,9 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
         val zipUrl = intent.getStringExtra(ZIP_URL)?:""
         val zipMd5 = intent.getStringExtra(ZIP_MD5)?:""
         mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
-        presenter.downZip(zipUrl,zipMd5)
-
-        mAudioPlayer.setPlayList(arrayListOf())
-        mAudioPlayer.setPlayWhenReady(true)
+        L.i("zipUrl:$zipUrl zipMd5:$zipMd5 personPlanItemId:$mPersonPlanItemId")
         mAudioPlayer.registerCallBack(this)
+        presenter.downZip(zipUrl,zipMd5)
 
     }
 
@@ -78,6 +76,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
     override fun onDestroy() {
         super.onDestroy()
         mAudioPlayer.release()
+        presenter.release()
     }
 
     override fun playPosition(position: Int) {
@@ -110,15 +109,17 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
     }
 
     override fun getZipData(dirPath: String,zipDataList: List<ZipDataVo>) {
-        L.i("dirPath:$dirPath")
+        L.i("dirPath:$dirPath ,zipDataList:$zipDataList")
         val audioList = zipDataList.map { MusicVo(
             id = it.id,
             albumName = it.title,
             mainActors = "",
-            path = "$dirPath/${it.audiio}",
+            path = "$dirPath/${it.audio}",
             pathType = UrlType.DEFAULT
         ) }
+
         mAudioPlayer.setPlayList(audioList)
+        mAudioPlayer.setPlayWhenReady(true)
         mTextList = zipDataList.map { it.title }
         mImgList = zipDataList.map { "$dirPath/${it.img}"}
         Glide.with(this)
