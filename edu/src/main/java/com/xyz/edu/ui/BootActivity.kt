@@ -3,9 +3,11 @@ package com.xyz.edu.ui
 import android.content.Intent
 import android.os.Bundle
 import com.blankj.utilcode.util.ToastUtils
+import com.xyz.auth.api.IAuthService
 import com.xyz.base.utils.L
 import com.xyz.edu.contract.IBootC
 import com.xyz.edu.databinding.ActivityBootBinding
+import com.xyz.edu.manager.UserManager
 import com.xyz.edu.model.BootModel
 import com.xyz.edu.presenter.BootPresenter
 

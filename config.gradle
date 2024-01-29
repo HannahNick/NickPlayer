@@ -15,7 +15,7 @@ ext {
             arouter_compiler     : '1.5.2',
 
             app_base             : '0.2.33',
-            service_base         : '0.4.27.17',
+            service_base         : '0.4.30.1',
             utils_base           : '0.1.32',
             engine_ver           : "0.1.0",
             luban_ktv_proxy      : "1.0.7",
@@ -40,6 +40,7 @@ ext {
             avi                  : "2.1.3",
             dialogplus           : "1.11",
             quickAdapter           : "2.9.45",
+            gson                : "2.8.5"
     ]
 
     getProjectName = { Project project ->

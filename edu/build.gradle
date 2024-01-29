@@ -46,6 +46,7 @@ dependencies {
     implementation project(path: ':vod')
     implementation project(path: ':base')
     implementation project(path: ':proxy')
+    implementation project(path: ':game')
     implementation "com.orhanobut:dialogplus:$dependencies_version.dialogplus"
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$dependencies_version.quickAdapter"
     implementation 'androidx.appcompat:appcompat:1.6.1'

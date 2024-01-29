@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <application>
+    <application
+        android:icon="@mipmap/edu_icon"
+        android:roundIcon="@mipmap/edu_icon"
+        >
         <activity
             android:name="com.xyz.edu.ui.BootActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

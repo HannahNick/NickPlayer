@@ -9,8 +9,16 @@ import io.reactivex.Flowable
 interface IPlanC {
     interface Presenter: IBaseContract.IPresenter {
 
+        fun login()
+
+        fun register()
+
     }
     interface View: IBaseContract.IView{
+
+        fun loginSuccess()
+
+        fun loginFail()
 
         fun getPlanItemList(dataList: List<PlanItemBean>)
     }

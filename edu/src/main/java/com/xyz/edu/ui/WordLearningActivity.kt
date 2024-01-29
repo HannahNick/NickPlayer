@@ -1,5 +1,7 @@
 package com.xyz.edu.ui
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +18,7 @@ import com.xyz.base.utils.L
 import com.xyz.edu.R
 import com.xyz.edu.contract.IWordLearningC
 import com.xyz.edu.databinding.ActivityWordLearningBinding
+import com.xyz.edu.manager.PlanManager
 import com.xyz.edu.model.WordLearningModel
 import com.xyz.edu.presenter.WordLearningPresenter
 import com.xyz.edu.ui.adapter.WordLearningWindowAdapter
@@ -34,11 +37,22 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
     private lateinit var mImgList:List<String>
     private lateinit var mTextList:List<String>
     private var mPersonPlanItemId: String = ""
+    private var mItemIndex: Int = 0
 
     companion object{
         const val ZIP_URL = "ZIP_URL"
         const val ZIP_MD5 = "ZIP_MD5"
         const val PERSON_PLAN_ITEM_ID = "PERSON_PLAN_ITEM_ID"
+        const val ITEM_INDEX = "ITEM_INDEX"
+
+        fun start(context: Context, url: String, md5: String, personPlanItemId: String, itemIndex: Int){
+            val wordLearningIntent = Intent(context, WordLearningActivity::class.java)
+            wordLearningIntent.putExtra(ZIP_URL,url)
+            wordLearningIntent.putExtra(ZIP_MD5,md5)
+            wordLearningIntent.putExtra(PERSON_PLAN_ITEM_ID,personPlanItemId)
+            wordLearningIntent.putExtra(ITEM_INDEX,itemIndex)
+            context.startActivity(wordLearningIntent)
+        }
     }
 
     override fun createPresenter(): IWordLearningC.Presenter {
@@ -49,12 +63,10 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
 
-        Glide.with(this)
-            .load("https://i2.hdslb.com/bfs/archive/6c92eb1dadedd6d1e54767c97ce5c19e53807ff1.jpg")
-            .into(mBinding.ivLessonImg)
         val zipUrl = intent.getStringExtra(ZIP_URL)?:""
         val zipMd5 = intent.getStringExtra(ZIP_MD5)?:""
         mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
+        mItemIndex = intent.getIntExtra(ITEM_INDEX,0)
         L.i("zipUrl:$zipUrl zipMd5:$zipMd5 personPlanItemId:$mPersonPlanItemId")
         mAudioPlayer.registerCallBack(this)
         presenter.downZip(zipUrl,zipMd5)
@@ -103,6 +115,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
                 .into(mBinding.ivLessonImg)
             mBinding.tvWord.text = imgText
         }else{//已经播完了，就上报学习记录
+            PlanManager.toNextPlanItem(this,mItemIndex+1)
             presenter.reportStudyResult(mPersonPlanItemId)
         }
 

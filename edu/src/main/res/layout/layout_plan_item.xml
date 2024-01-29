@@ -17,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:cardCornerRadius="@dimen/dp_16"
-        app:cardElevation="@dimen/dp_16"
         app:cardBackgroundColor="@color/deepRed"
         app:layout_constraintDimensionRatio="1:1">
         <androidx.appcompat.widget.AppCompatTextView
