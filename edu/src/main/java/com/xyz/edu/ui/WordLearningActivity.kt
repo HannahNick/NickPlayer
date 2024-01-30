@@ -6,8 +6,11 @@ import android.os.Bundle
 import android.view.Gravity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
+import com.nick.base.router.BaseRouter
+import com.nick.base.router.PlanManager
 import com.nick.base.vo.MusicVo
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
@@ -18,7 +21,6 @@ import com.xyz.base.utils.L
 import com.xyz.edu.R
 import com.xyz.edu.contract.IWordLearningC
 import com.xyz.edu.databinding.ActivityWordLearningBinding
-import com.xyz.edu.manager.PlanManager
 import com.xyz.edu.model.WordLearningModel
 import com.xyz.edu.presenter.WordLearningPresenter
 import com.xyz.edu.ui.adapter.WordLearningWindowAdapter
@@ -28,6 +30,7 @@ import com.xyz.edu.vo.ZipDataVo
 /**
  * 单词学习
  */
+@Route(path = BaseRouter.AROUTER_WORDLEARNINGACTIVITY)
 class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearningC.View, PlayInfoCallBack {
 
     private val mBinding by lazy { ActivityWordLearningBinding.inflate(layoutInflater) }
@@ -40,10 +43,10 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
     private var mItemIndex: Int = 0
 
     companion object{
-        const val ZIP_URL = "ZIP_URL"
-        const val ZIP_MD5 = "ZIP_MD5"
-        const val PERSON_PLAN_ITEM_ID = "PERSON_PLAN_ITEM_ID"
-        const val ITEM_INDEX = "ITEM_INDEX"
+        const val ZIP_URL = "url"
+        const val ZIP_MD5 = "md5"
+        const val PERSON_PLAN_ITEM_ID = "personPlanItemId"
+        const val ITEM_INDEX = "itemIndex"
 
         fun start(context: Context, url: String, md5: String, personPlanItemId: String, itemIndex: Int){
             val wordLearningIntent = Intent(context, WordLearningActivity::class.java)
@@ -115,7 +118,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
                 .into(mBinding.ivLessonImg)
             mBinding.tvWord.text = imgText
         }else{//已经播完了，就上报学习记录
-            PlanManager.toNextPlanItem(this,mItemIndex+1)
+            PlanManager.toNextPlanItem(this,mItemIndex)
             presenter.reportStudyResult(mPersonPlanItemId)
         }
 

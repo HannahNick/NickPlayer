@@ -1,6 +1,7 @@
-package com.xyz.edu.manager
+package com.nick.base.router
 
 import android.content.Context
+import com.alibaba.android.arouter.launcher.ARouter
 import com.blankj.utilcode.util.FileIOUtils
 import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -8,12 +9,9 @@ import com.blankj.utilcode.util.ZipUtils
 import com.nick.base.http.HttpManager
 import com.xyz.base.service.edu.bean.PlanItemBean
 import com.xyz.base.utils.L
-import com.xyz.edu.ui.VideoActivity
-import com.xyz.edu.ui.WordLearningActivity
-import com.xyz.game.GameStart
-import io.reactivex.Flowable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.File
 
 object PlanManager {
@@ -23,7 +21,7 @@ object PlanManager {
     /**
      * 自动
      */
-    val mAutoFlag = false
+    val mAutoFlag = true
     fun initData(data: List<PlanItemBean>){
         mDataList.addAll(data)
     }
@@ -32,17 +30,18 @@ object PlanManager {
         if (!mAutoFlag){
             return
         }
+        val nextIndex = index+1
 
-        if (index >= (mDataList.size)){
-            L.w("dataList is last index:$index")
+        if (nextIndex >= (mDataList.size)){
+            L.w("dataList is last index:$nextIndex")
             ToastUtils.showLong("当前课程已学完")
             return
         }
-        val data = mDataList[index]
+        val data = mDataList[nextIndex]
         L.i("nextPlanData: $data")
         when(data.contentType){
             1,2->{
-                VideoActivity.start(context,data.contentUrl,data.contentTitle,data.personPlanItemId,index)
+                toVideo(context,data.contentUrl,data.contentTitle,data.personPlanItemId,nextIndex)
             }
             3->{
 //                val wordLearningIntent = Intent(context, WordLearningActivity::class.java)
@@ -50,10 +49,10 @@ object PlanManager {
 //                wordLearningIntent.putExtra(WordLearningActivity.ZIP_MD5,data.zip.md5)
 //                wordLearningIntent.putExtra(WordLearningActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
 //                context.startActivity(wordLearningIntent)
-                downZip(context,data.zip.url,data.zip.md5,data.contentUrl)
+                downZip(context,data.zip.url,data.zip.md5,data.contentUrl,nextIndex)
             }
             5->{
-                WordLearningActivity.start(context,data.zip.url,data.zip.md5,data.personPlanItemId,index)
+                toWordLearning(context,data.zip.url,data.zip.md5,data.personPlanItemId,nextIndex)
             }
             else ->{
                 ToastUtils.showLong("else finish")
@@ -62,14 +61,14 @@ object PlanManager {
 
     }
 
-    fun downZip(context: Context,url: String,md5: String,gameJson: String) {
+    fun downZip(context: Context,url: String,md5: String,gameJson: String,index: Int) {
         //1.判断压缩文件是否存在
         val zipFile = File("${context.filesDir}/zip/$md5")
         L.i("zipFilePath: $zipFile")
 //        val zipFile = File("${context.filesDir}/zip/$md5")
         if (FileUtils.isFileExists(zipFile)){
             L.i("FileExists")
-            findGameJson(context,zipFile,gameJson)
+            findGameJson(context,zipFile,gameJson,index)
             return
         }
         //2.不存在就去下载
@@ -80,12 +79,12 @@ object PlanManager {
 //            )
 //        )
         val dispose = HttpManager.api.downloadFile(url)
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(io.reactivex.schedulers.Schedulers.io())
             .subscribe({
                 val writeFileFlag = FileIOUtils.writeFileFromBytesByStream("${context.filesDir}/zip/$md5", it.bytes())
                 if (writeFileFlag){
                     L.i("writeFileFlag: success")
-                    findGameJson(context,File("${context.filesDir}/zip/$md5"),gameJson)
+                    findGameJson(context,File("${context.filesDir}/zip/$md5"),gameJson,index)
                 }else{
                     FileUtils.delete("${context.filesDir}/zip/$md5")
                     L.e("writeFileFlag is fail!")
@@ -95,7 +94,7 @@ object PlanManager {
             })
     }
 
-    fun findGameJson(context: Context, zipFile: File, gameJson: String){
+    fun findGameJson(context: Context, zipFile: File, gameJson: String,index: Int){
         val dispose = Flowable.just(zipFile)
             .map {//判断是否已解压
                 FileUtils.isFileExists("${context.filesDir.absolutePath}/plan/${zipFile.name}")
@@ -114,10 +113,37 @@ object PlanManager {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 //将文件信息传回页面
-                GameStart(context,"${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}",gameJson)
+                toGame("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}",gameJson,index)
             },{
                 it.printStackTrace()
             })
+    }
+
+
+    fun toVideo(context: Context, url: String, titleName: String, personPlanItemId: String, itemIndex: Int){
+        ARouter.getInstance().build(BaseRouter.AROUTER_VIDEOACTIVITY)
+            .withString("url", url)
+            .withString("titleName", titleName)
+            .withString("personPlanItemId", personPlanItemId)
+            .withInt("itemIndex", itemIndex)
+            .navigation()
+    }
+
+    fun toWordLearning(context: Context, url: String, md5: String, personPlanItemId: String, itemIndex: Int){
+        ARouter.getInstance().build(BaseRouter.AROUTER_WORDLEARNINGACTIVITY)
+            .withString("url", url)
+            .withString("md5", md5)
+            .withString("personPlanItemId", personPlanItemId)
+            .withInt("itemIndex", itemIndex)
+            .navigation()
+    }
+
+    fun toGame(path:String,json:String,itemIndex: Int){
+        ARouter.getInstance().build(BaseRouter.AROUTER_GAME)
+            .withString("path", path)
+            .withString("json", json)
+            .withInt("itemIndex", itemIndex)
+            .navigation()
     }
 
 }

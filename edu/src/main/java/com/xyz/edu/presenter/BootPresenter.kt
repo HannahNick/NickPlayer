@@ -1,11 +1,11 @@
 package com.xyz.edu.presenter
 
 import android.content.Context
+import com.nick.base.router.PlanManager
 import com.xyz.auth.api.IAuthService
 import com.xyz.base.app.rx.io2Main
 import com.xyz.base.utils.L
 import com.xyz.edu.contract.IBootC
-import com.xyz.edu.manager.PlanManager
 import com.xyz.edu.manager.UserManager
 import com.xyz.edu.model.PlanModel
 import com.xyz.edu.presenter.base.DisposablePresenter
@@ -53,7 +53,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
             .io2Main()
             .subscribe({
                 PlanManager.initData(it.result.pageContent)
-                PlanManager.toNextPlanItem(context,0)
+                PlanManager.toNextPlanItem(context,-1)
             },{
                 it.printStackTrace()
             }).apply { compositeDisposable.add(this) }

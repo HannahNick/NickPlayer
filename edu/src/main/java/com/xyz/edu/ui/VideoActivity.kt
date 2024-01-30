@@ -3,7 +3,10 @@ package com.xyz.edu.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.BarUtils
+import com.nick.base.router.BaseRouter
+import com.nick.base.router.PlanManager
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.vod.ui.fragment.VodFragment
@@ -13,7 +16,6 @@ import com.xyz.base.utils.L
 import com.xyz.edu.R
 import com.xyz.edu.contract.IVideoC
 import com.xyz.edu.databinding.ActivityVideoBinding
-import com.xyz.edu.manager.PlanManager
 import com.xyz.edu.model.VideoModel
 import com.xyz.edu.presenter.PlanPresenter
 import com.xyz.edu.presenter.VideoPresenter
@@ -21,6 +23,7 @@ import com.xyz.proxy.IProxy
 import com.xyz.proxy.KtvPlayProxyManager
 import kotlin.properties.Delegates
 
+@Route(path = BaseRouter.AROUTER_VIDEOACTIVITY)
 class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoCallBack,
     LiveGestureControlLayer.GestureCallBack{
 
@@ -28,10 +31,10 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
     private var mPersonPlanItemId: String = ""
     private var mItemIndex: Int = 0
     companion object{
-        const val VIDEO_URL = "VIDEO_URL"
-        const val VIDEO_NAME = "VIDEO_NAME"
-        const val PERSON_PLAN_ITEM_ID = "PERSON_PLAN_ITEM_ID"
-        const val ITEM_INDEX = "ITEM_INDEX"
+        const val VIDEO_URL = "url"
+        const val VIDEO_NAME = "titleName"
+        const val PERSON_PLAN_ITEM_ID = "personPlanItemId"
+        const val ITEM_INDEX = "itemIndex"
 
         fun start(context: Context, url: String, titleName: String, personPlanItemId: String, itemIndex: Int){
             val videoIntent = Intent(context,VideoActivity::class.java)
@@ -106,7 +109,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         super.playEnd(playIndex)
         L.i("播放结束，上报学习结果")
         presenter.reportStudyResult(mPersonPlanItemId)
-        PlanManager.toNextPlanItem(this,mItemIndex+1)
+        PlanManager.toNextPlanItem(this,mItemIndex)
     }
 
     override fun back() {
