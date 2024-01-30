@@ -54,6 +54,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
             .subscribe({
                 PlanManager.initData(it.result.pageContent)
                 PlanManager.toNextPlanItem(context,-1)
+
             },{
                 it.printStackTrace()
             }).apply { compositeDisposable.add(this) }

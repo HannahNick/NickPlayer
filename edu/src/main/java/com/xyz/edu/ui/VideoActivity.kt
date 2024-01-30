@@ -25,7 +25,7 @@ import kotlin.properties.Delegates
 
 @Route(path = BaseRouter.AROUTER_VIDEOACTIVITY)
 class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoCallBack,
-    LiveGestureControlLayer.GestureCallBack{
+    LiveGestureControlLayer.GestureCallBack,PlanManager.PreInitDataCallBack{
 
     private val mBinding by lazy { ActivityVideoBinding.inflate(layoutInflater) }
     private var mPersonPlanItemId: String = ""
@@ -62,6 +62,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
         BarUtils.setStatusBarVisibility(this,false)
+        PlanManager.registerDataCallBack(this)
         initView()
     }
 
@@ -114,6 +115,11 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
 
     override fun back() {
         super.back()
+        finish()
+    }
+
+    override fun preInitDataFinish() {
+        L.i("preInitDataFinish")
         finish()
     }
 

@@ -21,6 +21,8 @@ interface IBootC {
         fun loginFail()
 
         fun toWordLearning(zipUrl: String)
+
+        fun dataInitFinish()
     }
 
     interface Model: IBaseContract.IModel{

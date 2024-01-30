@@ -17,6 +17,7 @@ import java.io.File
 object PlanManager {
 
     var mDataList: ArrayList<PlanItemBean> = ArrayList()
+    var mPreInitDataCallBack: PreInitDataCallBack? = null
 
     /**
      * 自动
@@ -24,6 +25,10 @@ object PlanManager {
     val mAutoFlag = true
     fun initData(data: List<PlanItemBean>){
         mDataList.addAll(data)
+    }
+
+    fun registerDataCallBack(preInitDataCallBack: PreInitDataCallBack){
+        mPreInitDataCallBack = preInitDataCallBack
     }
 
     fun toNextPlanItem(context: Context, index: Int){
@@ -42,6 +47,7 @@ object PlanManager {
         when(data.contentType){
             1,2->{
                 toVideo(context,data.contentUrl,data.contentTitle,data.personPlanItemId,nextIndex)
+                mPreInitDataCallBack?.preInitDataFinish()
             }
             3->{
 //                val wordLearningIntent = Intent(context, WordLearningActivity::class.java)
@@ -53,12 +59,12 @@ object PlanManager {
             }
             5->{
                 toWordLearning(context,data.zip.url,data.zip.md5,data.personPlanItemId,nextIndex)
+                mPreInitDataCallBack?.preInitDataFinish()
             }
             else ->{
                 ToastUtils.showLong("else finish")
             }
         }
-
     }
 
     fun downZip(context: Context,url: String,md5: String,gameJson: String,index: Int) {
@@ -114,6 +120,7 @@ object PlanManager {
             .subscribe({
                 //将文件信息传回页面
                 toGame("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}",gameJson,index)
+                mPreInitDataCallBack?.preInitDataFinish()
             },{
                 it.printStackTrace()
             })
@@ -146,4 +153,13 @@ object PlanManager {
             .navigation()
     }
 
+    /**
+     * 这个回调是为了在当前页面提前加载下一个页面需要的数据做个缓冲，
+     */
+    interface PreInitDataCallBack{
+        /**
+         * 数据预初始化完成后通知调用端关闭页面完成跳转
+         */
+        fun preInitDataFinish()
+    }
 }

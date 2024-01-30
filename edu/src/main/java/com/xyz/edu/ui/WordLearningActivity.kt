@@ -31,7 +31,8 @@ import com.xyz.edu.vo.ZipDataVo
  * 单词学习
  */
 @Route(path = BaseRouter.AROUTER_WORDLEARNINGACTIVITY)
-class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearningC.View, PlayInfoCallBack {
+class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearningC.View, PlayInfoCallBack
+,PlanManager.PreInitDataCallBack{
 
     private val mBinding by lazy { ActivityWordLearningBinding.inflate(layoutInflater) }
     private val mDialog by lazy { DialogUtil.getCustomDialog(this, R.layout.layout_word_learning_window,true, Gravity.START) }
@@ -65,7 +66,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
-
+        PlanManager.registerDataCallBack(this)
         val zipUrl = intent.getStringExtra(ZIP_URL)?:""
         val zipMd5 = intent.getStringExtra(ZIP_MD5)?:""
         mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
@@ -118,8 +119,8 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
                 .into(mBinding.ivLessonImg)
             mBinding.tvWord.text = imgText
         }else{//已经播完了，就上报学习记录
-            PlanManager.toNextPlanItem(this,mItemIndex)
             presenter.reportStudyResult(mPersonPlanItemId)
+            PlanManager.toNextPlanItem(this,mItemIndex)
         }
 
     }
@@ -150,6 +151,10 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
 
     override fun downLoadProgress(progress: Float) {
         mBinding.tvDownloadProgress.text = progress.toString()
+    }
+
+    override fun preInitDataFinish() {
+        finish()
     }
 
 }
