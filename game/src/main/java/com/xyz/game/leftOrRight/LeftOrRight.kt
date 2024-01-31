@@ -2,6 +2,7 @@ package com.xyz.game.leftOrRight
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,12 +11,15 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.View
+import android.widget.Button
 
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 
 import com.xyz.game.Exam
+import com.xyz.game.Item
 import com.xyz.game.Opt
 import com.xyz.game.R
 
@@ -27,7 +31,7 @@ import java.io.ObjectInputStream
 class LeftOrRight : AppCompatActivity() {
 
     //按钮
-    private val btnSel = ArrayList<ImageButton>()
+    private val btnSel = ArrayList<Button>()
 
     //媒体播放器
     private val talkPlayer = MediaPlayer()
@@ -54,16 +58,16 @@ class LeftOrRight : AppCompatActivity() {
                     gameState = Opt.Start
                     //开始
                     loadData()
-                    talking(exam!!.getanswerId()!!)
+                    setBtn(true)
+                    talking(exam!!.getquestionId().toString())
                 }
 
                 Opt.Update -> {
                     gameState = Opt.Update
-                    talking(exam!!.getanswerId()!!)
                     loadData()
                     //更新
                     waiting.visibility = View.GONE
-                    setbtn(true)
+                    setBtn(true)
                 }
 
                 Opt.STOP -> {
@@ -114,7 +118,7 @@ class LeftOrRight : AppCompatActivity() {
         btnSel.add(findViewById(R.id.right1))
         waiting = findViewById(R.id.waiting)
         topic.setOnClickListener {
-            talking(exam!!.getanswerId()!!)
+            talking(exam!!.getquestionId().toString())
         }
         btnSel[0].setOnClickListener {
             //按下会发声并且判断对错
@@ -133,14 +137,21 @@ class LeftOrRight : AppCompatActivity() {
 
     //根据数据更新当前页面
     fun loadData() {
+        for(btntemp in btnSel)
+        {
+            btntemp.text = ""
+        }
         exam!!.radomitem()
         btnId = ArrayList()
         topicText.text = exam!!.gettitle()
+        settopic()
         val size = exam!!.number
         if (size <= 4) {
             for (i in 0 until size) {
                 val id = exam!!.getitems()[i].id
-                btnSel[i].setImageBitmap(getBitmap(id))
+//                btnSel[i].setImageBitmap(getBitmap(id))
+//                btnSel[i].background = getdraw(id)
+                putbtndraw(btnSel[i],id)
                 btnId.add(id)
                 if (id == exam!!.getanswerId())
                     answerIndex = i
@@ -150,7 +161,9 @@ class LeftOrRight : AppCompatActivity() {
             var flag = false
             for (i in 0 until 4) {
                 val id = exam!!.getitems()[i].id
-                btnSel[i].setImageBitmap(getBitmap(id))
+//                btnSel[i].setImageBitmap(getBitmap(id))
+//                btnSel[i].background = getdraw(id)
+                putbtndraw(btnSel[i],id)
                 if (id == exam!!.getanswerId()) {
                     answerIndex = i
                     btnId.add(exam!!.getanswerId()!!)
@@ -162,7 +175,9 @@ class LeftOrRight : AppCompatActivity() {
             if (!flag) {
                 answerIndex = (0 until 3).random()
                 try {
-                    btnSel[answerIndex].setImageBitmap(getBitmap(exam!!.getanswerId()!!))
+//                    btnSel[answerIndex].setImageBitmap(getBitmap(exam!!.getanswerId()!!))
+//                    btnSel[answerIndex].background = getdraw(exam!!.getanswerId()!!)
+                    putbtndraw(btnSel[answerIndex],exam!!.getanswerId()!!)
                 } catch (e: Exception) {
                     Log.e("error", "No_RESOURCE:$e")
                 }
@@ -173,16 +188,44 @@ class LeftOrRight : AppCompatActivity() {
 
     }
 
-    private fun getBitmap(picture: String): Bitmap {
+    private fun getBitmap(picture: String): Bitmap? {
         return BitmapFactory.decodeFile("$path/$picture.png")
     }
 
+    private fun getdraw(picture: String): BitmapDrawable? {
+        val bitmap = getBitmap(picture)
+        if(bitmap ==null)
+            return null
+        else{
+            val drawble = BitmapDrawable(resources,bitmap)
+            return drawble
+        }
+    }
+    private fun putbtndraw(btn:Button,picture: String){
+        val pictureResouce = getdraw(picture)
+        //如果图片不存在
+        if(pictureResouce == null){
+            btn.background = ContextCompat.getDrawable(this,R.drawable.whitebackground)
+            val items:ArrayList<Item> = exam!!.getitems()
+            for(item in items)
+            {
+                if(item.id == picture)
+                {
+                    btn.text = item.title
+                    Log.d("tmq","right ===>${item.title}")
+                }
+                Log.d("tmq","putbtndraw: ${item.id}")
+            }
+        }
+        else
+            btn.background = pictureResouce
+    }
     private fun getTalking(music: String): String {
         return "$path/$music.mp3"
     }
 
     private fun putdownbtn(index: Int) {
-        setbtn(false)
+        setBtn(false)
         talking(btnId[index])
         if (btnId[index] != exam!!.getanswerId()) {
             waiting.setImageResource(R.drawable.wrong)
@@ -211,16 +254,32 @@ class LeftOrRight : AppCompatActivity() {
 
     }
 
-    fun setbtn(flag: Boolean) {
-        for (i in btnSel) {
-            i.isEnabled = flag
+    fun setBtn(flag: Boolean) {
+        if(flag){
+            for (i in 0 until exam!!.number) {
+                btnSel[i].visibility = View.VISIBLE
+            }
+        }
+        else{
+            for (i in 0 until exam!!.number) {
+                btnSel[i].visibility = View.GONE
+            }
         }
         topic.isEnabled = flag
     }
-
+    private fun settopic()
+    {
+        val layoutParams =  topic.layoutParams
+        layoutParams.width = topicText.width*2
+        if(layoutParams.width >titleLayout.width )
+        {
+            layoutParams.width = titleLayout.width
+        }
+        topic.layoutParams = layoutParams
+    }
     override fun onStart() {
         super.onStart()
-        handler.sendEmptyMessageDelayed(Opt.Start, 1000)
+        handler.sendEmptyMessageDelayed(Opt.Start, 100)
     }
 
     override fun onStop() {

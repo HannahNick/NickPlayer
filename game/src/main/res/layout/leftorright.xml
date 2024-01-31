@@ -22,20 +22,19 @@
 
         <ImageButton
             android:id="@+id/topic"
-            android:layout_width="400dp"
+            android:layout_width="200dp"
             android:layout_height="80dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
             android:background="@drawable/topic" />
-
         <TextView
             android:id="@+id/listen_topic"
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="35dp"
             android:gravity="center"
-            android:text="点击这里听读音"
+            android:text="Click to Listen"
             android:textColor="@color/black"
             android:textSize="20sp" />
 
@@ -46,36 +45,43 @@
             android:layout_below="@+id/topic"
             android:layout_marginTop="30dp">
 
-            <ImageButton
+            <Button
                 android:id="@+id/left1"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="30dp"
                 android:background="@drawable/picture"
-                android:scaleType="fitXY"/>
-
-            <ImageButton
+                android:visibility="gone"
+                android:textColor="@color/black"
+                android:scaleType="fitXY"
+                />
+            <Button
                 android:id="@+id/left2"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="30dp"
                 android:background="@drawable/picture"
+                android:textColor="@color/black"
+                android:visibility="gone"
                 android:scaleType="fitXY"/>
 
-            <ImageButton
+            <Button
                 android:id="@+id/right1"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="30dp"
                 android:background="@drawable/picture"
+                android:textColor="@color/black"
+                android:visibility="gone"
                 android:scaleType="fitXY"/>
-
-            <ImageButton
+            <Button
                 android:id="@+id/right2"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="30dp"
                 android:background="@drawable/picture"
+                android:visibility="gone"
+                android:textColor="@color/black"
                 android:scaleType="fitXY"/>
         </LinearLayout>
 

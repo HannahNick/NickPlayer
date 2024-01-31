@@ -105,14 +105,11 @@ object PlanManager {
             .map {//判断是否已解压
                 FileUtils.isFileExists("${context.filesDir.absolutePath}/plan/${zipFile.name}")
             }
-            .flatMap {
+            .map {
                 if (it){//已经解压了就直接遍历文件返回
-                    Flowable.fromIterable(FileUtils.listFilesInDir("${context.filesDir}/plan/${FileUtils.getFileNameNoExtension(zipFile)}"))
+                    FileUtils.listFilesInDir("${context.filesDir}/plan/${FileUtils.getFileNameNoExtension(zipFile)}")
                 }else{//没解压过就解压文件并遍历返回
-                    Flowable.fromIterable(
-                        ZipUtils.unzipFile(zipFile,
-                            File("${context.filesDir}/plan/${zipFile.name}")
-                        ))
+                    ZipUtils.unzipFile(zipFile, File("${context.filesDir}/plan/${zipFile.name}"))
                 }
             }
             .subscribeOn(Schedulers.io())
@@ -146,6 +143,7 @@ object PlanManager {
     }
 
     fun toGame(path:String,json:String,itemIndex: Int){
+        L.i("toGame path:$path,json:$json,index:$itemIndex")
         ARouter.getInstance().build(BaseRouter.AROUTER_GAME)
             .withString("path", path)
             .withString("json", json)

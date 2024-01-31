@@ -61,10 +61,13 @@ android {
             minifyEnabled false
         }
         release {
-            multiDexKeepFile file('multidex-config.txt')
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            multiDexKeepFile file('multidex-config.txt')
+
+            debuggable true
+            jniDebuggable true
             signingConfig signingConfigs.newSign
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
         }
     }
     compileOptions {

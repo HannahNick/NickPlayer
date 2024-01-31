@@ -15,6 +15,7 @@ import android.widget.TextView
 import com.xyz.game.Exam
 import com.xyz.game.Opt
 import com.xyz.game.R
+import com.xyz.game.TitleLayout
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
@@ -32,6 +33,7 @@ class WhackMole : AppCompatActivity() {
     private lateinit var topicText: TextView
     private lateinit var topic: ImageButton
     private lateinit var waiting: ImageView
+    private lateinit var titleLayout:TitleLayout
 
     //游戏状态
     var gameState = Opt.Start
@@ -49,12 +51,11 @@ class WhackMole : AppCompatActivity() {
                     gameState = Opt.Start
                     //开始
                     loadData()
-                    talking(exam!!.getanswerId()!!)
+                    talking(exam!!.getquestionId().toString())
                     setbtn(true)
                 }
                 Opt.Update ->{
                     gameState = Opt.Update
-                    talking(exam!!.getanswerId()!!)
                     loadData()
                     setbtn(true)
                     //更新
@@ -101,6 +102,7 @@ class WhackMole : AppCompatActivity() {
         topic = findViewById(R.id.Listen)
         topicText = findViewById(R.id.gametitle)
         waiting = findViewById(R.id.finished_img)
+        titleLayout = findViewById(R.id.TitleLayout)
         btnSel.add(findViewById(R.id.mouse1))
         btnSel.add(findViewById(R.id.mouse2))
         btnSel.add(findViewById(R.id.mouse3))
@@ -118,7 +120,7 @@ class WhackMole : AppCompatActivity() {
             }
         }
         topic.setOnClickListener {
-            talking(exam!!.getanswerId()!!)
+            talking(exam!!.getquestionId().toString())
         }
         btnSelSize = if (exam!!.number<=5) exam!!.number else 5
         soil.add(findViewById(R.id.soil1))
@@ -135,6 +137,7 @@ class WhackMole : AppCompatActivity() {
         exam!!.radomitem()
         btnId = ArrayList()
         topicText.text = exam!!.gettitle()
+        settopic()
         val size = exam!!.number
         if(size <= 5)
         {
@@ -229,10 +232,19 @@ class WhackMole : AppCompatActivity() {
         }
 
     }
-
+    fun settopic()
+    {
+        val layoutParams =  topic.layoutParams
+        layoutParams.width = topicText.width*2
+        if(layoutParams.width >titleLayout.width )
+        {
+            layoutParams.width = titleLayout.width
+        }
+        topic.layoutParams = layoutParams
+    }
     override fun onStart() {
         super.onStart()
-        handler.sendEmptyMessageDelayed(Opt.Start,1000)
+        handler.sendEmptyMessageDelayed(Opt.Start,100)
     }
     override fun onStop() {
         super.onStop()

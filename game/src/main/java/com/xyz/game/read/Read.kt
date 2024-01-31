@@ -8,8 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
-import android.view.View
-import android.widget.ImageButton
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.xyz.game.Exam
@@ -20,47 +19,53 @@ import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
 class Read : AppCompatActivity() {
+    val NUM = 4
+    //图片
+    private lateinit var picture:ImageView
     //按钮
-    private lateinit var readBtn:ImageButton
+    private lateinit var readBtn:Button
     //媒体播放器
     private val talkPlayer = MediaPlayer()
     //标题控件
     private lateinit var titleLayout: TitleLayout
     private lateinit var topicText: TextView
-    private lateinit var topic: ImageButton
-    private lateinit var waiting: ImageView
+    private lateinit var topic: ImageView
     //游戏状态
     var gameState = Opt.Start
     //数据
     lateinit var exam: Exam
     private lateinit var path:String
     var count = 0
+    var btnflag = false
     private val handler = object : Handler(Looper.getMainLooper()){
         override fun handleMessage(msg: Message) {
             when(msg.what){
                 Opt.Start ->{
                     gameState = Opt.Start
                     loadData()
-                    talking(exam.getanswerId().toString())
+                    talking(exam.getquestionId().toString())
                 }
                 Opt.Update ->{
                     gameState = Opt.Update
-                    waiting.visibility = View.VISIBLE
-                    loadData()
+                    talking(exam.getanswerId().toString())
                 }
                 Opt.STOP ->{
                     gameState = Opt.STOP
-                    talking(exam.getanswerId().toString())
-                    while (true){
-                        if(!talkPlayer.isPlaying)
-                            break
+                    try {
+                        while (true){
+                            if(!talkPlayer.isPlaying)
+                                break
+
+                        }
+                    }catch (e:Exception){
+                        Log.e("tmq","too many click")
                     }
-                    waiting.visibility = View.GONE
-                    setBtn(true)
-                    if(count==3)
+                    count++
+                    if(count>=NUM)
                     {
                         finish()
                     }
+                    setBtn(true)
                 }
                 Opt.End -> {
                     gameState = Opt.End
@@ -78,8 +83,9 @@ class Read : AppCompatActivity() {
     private fun loadData(){
         //设置标题
         topicText.text = exam.gettitle()
+        settopic()
         //设置按钮图片
-        readBtn.setImageBitmap(BitmapFactory.decodeFile("$path${exam.getpicture().toString()}"))
+        picture.setImageBitmap(BitmapFactory.decodeFile("$path${exam.getpicture().toString()}"))
 
     }
     private fun getData() {
@@ -100,47 +106,63 @@ class Read : AppCompatActivity() {
     private fun initBinder(){
         titleLayout = findViewById(R.id.TitleLayout)
         topic = findViewById(R.id.topic)
+        readBtn = findViewById(R.id.read)
         topicText = findViewById(R.id.listen_topic)
-        readBtn = findViewById(R.id.readBtn)
-        waiting = findViewById(R.id.waiting)
+        picture = findViewById(R.id.readBtn)
         readBtn.setOnClickListener {
-            setBtn(false)
-            //朗读程序
-
-            //如果读了三次以后，就退出
-
+            if(btnflag)
+            {
+                setBtn(false)
+                //朗读程序
+                //如果读了三次以后，就退出
                 handler.sendEmptyMessage(Opt.Update)
-                handler.sendEmptyMessageDelayed(Opt.STOP,200)
-            count++
-
-
+                handler.sendEmptyMessageDelayed(Opt.STOP,1000)
+            }
+        }
+        topic.setOnClickListener {
+            talking(exam.getquestionId().toString())
         }
     }
     private fun setBtn(flag:Boolean){
-        readBtn.isEnabled = flag
+        picture.isEnabled = flag
         topic.isEnabled = flag
+        btnflag = flag
     }
     private fun talking(id:String)
     {
-        try {
-            val name = exam.getvoice()
-            name?.let {
-                talkPlayer.apply {
-                    reset()
-                    setDataSource("$path/$id.mp3")
-                    prepare()
-                    start()
+        if(count < NUM)
+        {
+            try {
+                val name = exam.getvoice()
+                name?.let {
+                    talkPlayer.apply {
+                        reset()
+                        setDataSource("$path/$id.mp3")
+                        prepare()
+                        start()
+                    }
                 }
+            }catch (e:Exception){
+                Log.e("tmq","talkingWrong")
             }
-        }catch (e:Exception){
-            Log.e("tmq","talkingWrong")
         }
     }
-
+    fun settopic()
+    {
+        val layoutParams =  topic.layoutParams
+        layoutParams.width = topicText.width*2
+        if(layoutParams.width >titleLayout.width )
+        {
+            layoutParams.width = titleLayout.width
+        }
+        topic.layoutParams = layoutParams
+    }
     override fun onStart() {
         super.onStart()
-        handler.sendEmptyMessageDelayed(Opt.Update, 1000)
-        handler.sendEmptyMessageDelayed(Opt.STOP,2000)
+        setBtn(false)
+        handler.sendEmptyMessageDelayed(Opt.Start, 100)
+//        handler.sendEmptyMessageDelayed(Opt.Update, 100)
+        handler.sendEmptyMessageDelayed(Opt.STOP,120)
     }
 
     override fun onStop() {

@@ -1,6 +1,13 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+}
+
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.getName())
+    }
 }
 
 android {
@@ -38,6 +45,9 @@ dependencies {
     implementation "com.google.android.material:material:$dependencies_version.android_material"
     implementation "androidx.constraintlayout:constraintlayout:$dependencies_version.constraintlayout"
     implementation "com.google.code.gson:gson:$dependencies_version.gson"
+    implementation project(path: ':base')
+    implementation "com.alibaba:arouter-api:$dependencies_version.arouter_api"
+    kapt "com.alibaba:arouter-compiler:$dependencies_version.arouter_compiler"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

@@ -6,6 +6,7 @@ class Exam(ques:Map<String,String?>,private val items:ArrayList<Item>): Serializ
     private val title:String? = ques["title"]        //这是题目
     private val voice:String? = ques["voice"]        //这是答案的读法
     private val picture:String? = ques["picture"]    //这是答案相关的的图片
+    private val questionId:String? = ques["questionId"]
     private val answerId:String? = ques["answer"]     //这是答案相关的图片
     private var itemradom = items
     private lateinit var answer:String
@@ -21,6 +22,7 @@ class Exam(ques:Map<String,String?>,private val items:ArrayList<Item>): Serializ
     fun getpicture()=picture
     fun getanswerId()=answerId
     fun getanswer()=answer
+    fun getquestionId()=questionId
     fun getitems():ArrayList<Item>{
         return itemradom
     }

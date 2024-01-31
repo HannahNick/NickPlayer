@@ -16,7 +16,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
     val planModel = PlanModel(context)
     override fun login() {
         model.login("13714570138","12345678")
-            .io2Main()
+//            .io2Main()
             .subscribe({
                 L.i("IAuthService login start")
                 IAuthService.create(context)?.login("eduLogin")
@@ -25,8 +25,8 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
                 UserManager.personId = result.personId
                 UserManager.personPlanItemId = result.personPlanItemId
                 UserManager.personPlanId = result.personPlanId
-                view.loginSuccess()
-//                requestListData()
+//                view.loginSuccess()
+                requestListData()
             },{
                 it.printStackTrace()
                 view.loginFail()
@@ -54,7 +54,6 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
             .subscribe({
                 PlanManager.initData(it.result.pageContent)
                 PlanManager.toNextPlanItem(context,-1)
-
             },{
                 it.printStackTrace()
             }).apply { compositeDisposable.add(this) }
