@@ -81,9 +81,9 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
             ivPlay.setOnClickListener {
                 mPlayerControl.play()
             }
-            ivCenterPlay.setOnClickListener {
-                mPlayerControl.play()
-            }
+//            ivCenterPlay.setOnClickListener {
+//                mPlayerControl.play()
+//            }
             svVideo.holder.addCallback(this@VodFragment)
         }
         mPlayerControl.registerCallBack(this)

@@ -24,6 +24,7 @@ object PlanManager {
      */
     val mAutoFlag = true
     fun initData(data: List<PlanItemBean>){
+        mDataList.clear()
         mDataList.addAll(data)
     }
 

@@ -3,8 +3,10 @@ package com.xyz.edu.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.BarUtils
+import com.enick.base.util.TimeUtil
 import com.nick.base.router.BaseRouter
 import com.nick.base.router.PlanManager
 import com.nick.music.entity.PlayInfo
@@ -64,6 +66,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         BarUtils.setStatusBarVisibility(this,false)
         PlanManager.registerDataCallBack(this)
         initView()
+        initBackListener()
     }
 
     private fun initView(){
@@ -115,7 +118,15 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
 
     override fun back() {
         super.back()
-        finish()
+        TimeUtil.confirmClick { finish() }
+    }
+
+    private fun initBackListener(){
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                TimeUtil.confirmClick { finish() }
+            }
+        })
     }
 
     override fun preInitDataFinish() {

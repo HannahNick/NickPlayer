@@ -15,7 +15,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
     IBootC.Presenter {
     val planModel = PlanModel(context)
     override fun login() {
-        model.login("13714570138","12345678")
+        model.login("13714570139","12345678")
 //            .io2Main()
             .subscribe({
                 L.i("IAuthService login start")
@@ -27,6 +27,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
                 UserManager.personPlanId = result.personPlanId
 //                view.loginSuccess()
                 requestListData()
+//                getPersonPlanList()
             },{
                 it.printStackTrace()
                 view.loginFail()
@@ -38,7 +39,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
     override fun register() {
         L.i("register")
 
-        model.register("王尼美","13714570138","12345678",10,1,1)
+        model.register("王尼美","13714570139","12345678",10,1,1)
             .io2Main()
             .subscribe({
 //                UserManager.personId = it.result.personId
@@ -54,6 +55,16 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
             .subscribe({
                 PlanManager.initData(it.result.pageContent)
                 PlanManager.toNextPlanItem(context,-1)
+            },{
+                it.printStackTrace()
+            }).apply { compositeDisposable.add(this) }
+    }
+
+    private fun getPersonPlanList(){
+        planModel.getPersonPlanList(UserManager.personPlanId,1,ListAdapterUtil.PAGE_SIZE)
+            .io2Main()
+            .subscribe({
+               L.i(it)
             },{
                 it.printStackTrace()
             }).apply { compositeDisposable.add(this) }

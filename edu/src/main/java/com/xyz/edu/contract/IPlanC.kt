@@ -1,10 +1,12 @@
 package com.xyz.edu.contract
 
 import com.xyz.base.app.mvp.IBaseContract
+import com.xyz.base.service.edu.bean.PersonPlanListBean
 import com.xyz.base.service.edu.bean.PlanItemBean
 import com.xyz.base.service.svc.PAGE
 import com.xyz.base.service.svc.RESULT
 import io.reactivex.Flowable
+import retrofit2.http.Query
 
 interface IPlanC {
     interface Presenter: IBaseContract.IPresenter {
@@ -28,5 +30,10 @@ interface IPlanC {
                                   pageNum: Int,
                                   pageSize: Int,
         ): Flowable<RESULT<PAGE<PlanItemBean>>>
+
+        fun getPersonPlanList(personPlanId: String,
+                              pageNum: Int,
+                              pageSize: Int,
+        ): Flowable<RESULT<PAGE<PersonPlanListBean>>>
     }
 }

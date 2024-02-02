@@ -39,7 +39,7 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
      * ui
      */
     private lateinit var mIvPlay : AppCompatImageView
-    private lateinit var mIvCenterPlay : AppCompatImageView
+//    private lateinit var mIvCenterPlay : AppCompatImageView
     private lateinit var mIvFullScreen: AppCompatImageView
     private lateinit var mIvBack: AppCompatImageView
     private lateinit var mTvName: AppCompatTextView
@@ -50,7 +50,7 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
         children.forEach {
             when (it.id){
                 R.id.iv_play -> mIvPlay = it as AppCompatImageView
-                R.id.iv_center_play -> mIvCenterPlay = it as AppCompatImageView
+//                R.id.iv_center_play -> mIvCenterPlay = it as AppCompatImageView
                 R.id.iv_full_screen -> mIvFullScreen = it as AppCompatImageView
                 R.id.iv_back -> mIvBack = it as AppCompatImageView
                 R.id.tv_live_name -> mTvName = it as AppCompatTextView
@@ -60,9 +60,9 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
         mIvPlay.setOnClickListener {
             playOrPause()
         }
-        mIvCenterPlay.setOnClickListener {
-            playOrPause()
-        }
+//        mIvCenterPlay.setOnClickListener {
+//            playOrPause()
+//        }
         mIvFullScreen.setOnClickListener {
 //            GestureMessageCenter.sendFullScreen()
         }
@@ -95,11 +95,11 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
         val playInfo = mPlayerControl.getPlayInfo()
         if (playInfo.playStatus == PlayStatus.PLAY){
             mIvPlay.setImageResource(R.drawable.ic_play)
-            mIvCenterPlay.setImageResource(R.drawable.ic_play)
+//            mIvCenterPlay.setImageResource(R.drawable.ic_play)
             mPlayerControl.pause()
         }else{
             mIvPlay.setImageResource(R.drawable.ic_live_pause)
-            mIvCenterPlay.setImageResource(R.drawable.ic_live_pause)
+//            mIvCenterPlay.setImageResource(R.drawable.ic_live_pause)
             mPlayerControl.play()
         }
         onToggleVisibility(true)
@@ -109,10 +109,10 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
         val playInfo = mPlayerControl.getPlayInfo()
         if (playInfo.playStatus == PlayStatus.PLAY){
             mIvPlay.setImageResource(R.drawable.ic_live_pause)
-            mIvCenterPlay.setImageResource(R.drawable.ic_live_pause)
+//            mIvCenterPlay.setImageResource(R.drawable.ic_live_pause)
         }else{
             mIvPlay.setImageResource(R.drawable.ic_play)
-            mIvCenterPlay.setImageResource(R.drawable.ic_play)
+//            mIvCenterPlay.setImageResource(R.drawable.ic_play)
         }
     }
 

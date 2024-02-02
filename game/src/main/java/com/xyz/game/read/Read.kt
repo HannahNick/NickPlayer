@@ -1,6 +1,7 @@
 package com.xyz.game.read
 
 import android.graphics.BitmapFactory
+
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,26 +9,27 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.xyz.game.AppActivity
 import com.xyz.game.Exam
 import com.xyz.game.Opt
 import com.xyz.game.R
-import com.xyz.game.TitleLayout
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
-class Read : AppCompatActivity() {
+class Read : AppActivity() {
     val NUM = 4
     //图片
     private lateinit var picture:ImageView
-    //按钮
-    private lateinit var readBtn:Button
+    private lateinit var word: TextView
+    private lateinit var pword:TextView
     //媒体播放器
     private val talkPlayer = MediaPlayer()
     //标题控件
-    private lateinit var titleLayout: TitleLayout
     private lateinit var topicText: TextView
     private lateinit var topic: ImageView
     //游戏状态
@@ -83,6 +85,9 @@ class Read : AppCompatActivity() {
     private fun loadData(){
         //设置标题
         topicText.text = exam.gettitle()
+        word.text = exam.getanswer()
+        pword.text = exam.getanswer()
+        setBtn(true)
         settopic()
         //设置按钮图片
         picture.setImageBitmap(BitmapFactory.decodeFile("$path${exam.getpicture().toString()}"))
@@ -100,16 +105,19 @@ class Read : AppCompatActivity() {
         }catch (e:Exception)
         {
             Log.e("read","PathOrDataWrong")
-            finish()
+            handler.sendEmptyMessage(Opt.End)
         }
     }
     private fun initBinder(){
-        titleLayout = findViewById(R.id.TitleLayout)
         topic = findViewById(R.id.topic)
-        readBtn = findViewById(R.id.read)
+        word = findViewById(R.id.word)
+        pword = findViewById(R.id.pword)
         topicText = findViewById(R.id.listen_topic)
         picture = findViewById(R.id.readBtn)
-        readBtn.setOnClickListener {
+        findViewById<Button>(R.id.back).setOnClickListener {
+            finish()
+        }
+        picture.setOnClickListener {
             if(btnflag)
             {
                 setBtn(false)
@@ -127,6 +135,15 @@ class Read : AppCompatActivity() {
         picture.isEnabled = flag
         topic.isEnabled = flag
         btnflag = flag
+        if(flag){
+            word.visibility = View.VISIBLE
+            pword.visibility = View.INVISIBLE
+        }
+        else{
+            word.visibility = View.INVISIBLE
+            pword.visibility = View.VISIBLE
+        }
+
     }
     private fun talking(id:String)
     {
@@ -149,13 +166,18 @@ class Read : AppCompatActivity() {
     }
     fun settopic()
     {
-        val layoutParams =  topic.layoutParams
-        layoutParams.width = topicText.width*2
-        if(layoutParams.width >titleLayout.width )
-        {
-            layoutParams.width = titleLayout.width
-        }
-        topic.layoutParams = layoutParams
+        val topicObserver = topic.viewTreeObserver
+        topicObserver.addOnGlobalLayoutListener(object :ViewTreeObserver.OnGlobalLayoutListener{
+            override fun onGlobalLayout() {
+
+                val layoutParams =  topic.layoutParams
+                layoutParams.width = topicText.width+200
+                Log.d("tmq","View"+layoutParams.width.toString())
+                Log.d("tmq","Text"+topicText.width)
+                topic.layoutParams = layoutParams
+                topic.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+            })
     }
     override fun onStart() {
         super.onStart()

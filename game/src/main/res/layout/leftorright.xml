@@ -3,17 +3,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.xyz.game.TitleLayout
-        android:id="@+id/TitleLayout"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginBottom="5dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
+        <Button
+            android:id="@+id/back"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/select_back"
+            />
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -25,14 +25,15 @@
             android:layout_width="200dp"
             android:layout_height="80dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
+            android:layout_below="@+id/back"
             android:background="@drawable/topic" />
         <TextView
             android:id="@+id/listen_topic"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
+            android:layout_below="@+id/back"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="15dp"
             android:gravity="center"
             android:text="Click to Listen"
             android:textColor="@color/black"

@@ -8,18 +8,20 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import com.xyz.game.AppActivity
 
 import com.xyz.game.Exam
 import com.xyz.game.Opt
 import com.xyz.game.R
-import com.xyz.game.TitleLayout
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
-class WhackMole : AppCompatActivity() {
+class WhackMole : AppActivity() {
     //按钮
     private val btnSel =ArrayList<ImageButton>()
     private var btnSelSize = 0
@@ -33,7 +35,6 @@ class WhackMole : AppCompatActivity() {
     private lateinit var topicText: TextView
     private lateinit var topic: ImageButton
     private lateinit var waiting: ImageView
-    private lateinit var titleLayout:TitleLayout
 
     //游戏状态
     var gameState = Opt.Start
@@ -102,7 +103,6 @@ class WhackMole : AppCompatActivity() {
         topic = findViewById(R.id.Listen)
         topicText = findViewById(R.id.gametitle)
         waiting = findViewById(R.id.finished_img)
-        titleLayout = findViewById(R.id.TitleLayout)
         btnSel.add(findViewById(R.id.mouse1))
         btnSel.add(findViewById(R.id.mouse2))
         btnSel.add(findViewById(R.id.mouse3))
@@ -113,6 +113,9 @@ class WhackMole : AppCompatActivity() {
         soiltext.add(findViewById(R.id.soil_text3))
         soiltext.add(findViewById(R.id.soil_text4))
         soiltext.add(findViewById(R.id.soil_text5))
+        findViewById<Button>(R.id.back).setOnClickListener {
+            handler.sendEmptyMessage(Opt.End)
+        }
         for(i in 0..4)
         {
             btnSel[i].setOnClickListener {
@@ -234,13 +237,18 @@ class WhackMole : AppCompatActivity() {
     }
     fun settopic()
     {
-        val layoutParams =  topic.layoutParams
-        layoutParams.width = topicText.width*2
-        if(layoutParams.width >titleLayout.width )
-        {
-            layoutParams.width = titleLayout.width
-        }
-        topic.layoutParams = layoutParams
+        val topicObserver = topic.viewTreeObserver
+        topicObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener{
+            override fun onGlobalLayout() {
+
+                val layoutParams =  topic.layoutParams
+                layoutParams.width = topicText.width+200
+                Log.d("tmq","View"+layoutParams.width.toString())
+                Log.d("tmq","Text"+topicText.width)
+                topic.layoutParams = layoutParams
+                topic.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
     }
     override fun onStart() {
         super.onStart()

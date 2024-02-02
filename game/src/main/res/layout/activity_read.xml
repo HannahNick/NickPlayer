@@ -3,58 +3,67 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical">
-    <com.xyz.game.TitleLayout
-        android:id="@+id/TitleLayout"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginBottom="5dp" />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <Button
+            android:id="@+id/back"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/select_back"
+            />
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
+
             android:src="@drawable/picture" />
         <ImageView
             android:id="@+id/topic"
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="80dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
+            android:layout_below="@+id/back"
             android:background="@drawable/topic" />
-        <Button
-            android:id="@+id/read"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_toRightOf="@+id/topic"
-            android:layout_marginStart="20dp"
-            android:textColor="@color/black"
-            android:layout_centerVertical="true"
-            android:text="click"
-            android:background="@drawable/bg_read"
-            />
         <TextView
             android:id="@+id/listen_topic"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="15dp"
             android:gravity="center"
+            android:layout_below="@+id/back"
             android:text="Click to follow"
             android:textColor="@color/black"
             android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/readBtn"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/topic"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/picture"
             android:scaleType="fitXY"/>
-
+        <TextView
+            android:id="@+id/word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/readBtn"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:visibility="invisible" />
+        <TextView
+            android:id="@+id/pword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/readBtn"
+            android:textColor="@color/black"
+            android:textSize="40sp"
+            android:visibility="invisible" />
     </RelativeLayout>
 
 

@@ -11,24 +11,25 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Button
 
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.xyz.game.AppActivity
 
 import com.xyz.game.Exam
 import com.xyz.game.Item
 import com.xyz.game.Opt
 import com.xyz.game.R
 
-import com.xyz.game.TitleLayout
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
 
-class LeftOrRight : AppCompatActivity() {
+class LeftOrRight : AppActivity() {
 
     //按钮
     private val btnSel = ArrayList<Button>()
@@ -37,7 +38,6 @@ class LeftOrRight : AppCompatActivity() {
     private val talkPlayer = MediaPlayer()
 
     //标题控件
-    private lateinit var titleLayout: TitleLayout
     private lateinit var topicText: TextView
     private lateinit var topic: ImageButton
     private lateinit var waiting: ImageView
@@ -50,7 +50,8 @@ class LeftOrRight : AppCompatActivity() {
     private var answerIndex = 0
     private lateinit var btnId: ArrayList<String>
     private var path: String? = null
-
+    //获取大小多少
+    var btncount = 0
     private val handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
@@ -109,7 +110,9 @@ class LeftOrRight : AppCompatActivity() {
     }
 
     private fun initBinder() {
-        titleLayout = findViewById(R.id.TitleLayout)
+        findViewById<Button>(R.id.back).setOnClickListener {
+            handler.sendEmptyMessage(Opt.End)
+        }
         topic = findViewById(R.id.topic)
         topicText = findViewById(R.id.listen_topic)
         btnSel.add(findViewById(R.id.left1))
@@ -147,6 +150,7 @@ class LeftOrRight : AppCompatActivity() {
         settopic()
         val size = exam!!.number
         if (size <= 4) {
+            btncount = exam!!.number
             for (i in 0 until size) {
                 val id = exam!!.getitems()[i].id
 //                btnSel[i].setImageBitmap(getBitmap(id))
@@ -157,6 +161,7 @@ class LeftOrRight : AppCompatActivity() {
                     answerIndex = i
             }
         } else {
+            btncount = 4
             //如果size>4，就先依次赋值
             var flag = false
             for (i in 0 until 4) {
@@ -256,26 +261,29 @@ class LeftOrRight : AppCompatActivity() {
 
     fun setBtn(flag: Boolean) {
         if(flag){
-            for (i in 0 until exam!!.number) {
+            for (i in 0 until btncount) {
                 btnSel[i].visibility = View.VISIBLE
             }
         }
         else{
-            for (i in 0 until exam!!.number) {
+            for (i in 0 until btncount) {
                 btnSel[i].visibility = View.GONE
             }
         }
         topic.isEnabled = flag
     }
-    private fun settopic()
+    fun settopic()
     {
-        val layoutParams =  topic.layoutParams
-        layoutParams.width = topicText.width*2
-        if(layoutParams.width >titleLayout.width )
-        {
-            layoutParams.width = titleLayout.width
-        }
-        topic.layoutParams = layoutParams
+        val topicObserver = topic.viewTreeObserver
+        topicObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener{
+            override fun onGlobalLayout() {
+
+                val layoutParams =  topic.layoutParams
+                layoutParams.width = topicText.width+200
+                topic.layoutParams = layoutParams
+                topic.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
     }
     override fun onStart() {
         super.onStart()
