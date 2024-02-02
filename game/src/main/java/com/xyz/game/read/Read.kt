@@ -53,7 +53,7 @@ class Read : AppActivity() {
             when (msg.what) {
                 Opt.Start -> {
                     gameState = Opt.Start
-                    loadData()
+
                     talking(exam.getquestionId().toString())
                 }
 
@@ -93,6 +93,7 @@ class Read : AppActivity() {
         setContentView(R.layout.activity_read)
         initBinder()
         getData()
+        loadData()
     }
 
     private fun loadData() {

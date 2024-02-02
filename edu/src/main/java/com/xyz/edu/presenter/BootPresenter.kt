@@ -26,9 +26,9 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
                 UserManager.personPlanItemId = result.personPlanItemId
                 UserManager.personPlanId = result.personPlanId
 //                view.loginSuccess()
-//                requestListData()
+                requestListData()
 //                getPersonPlanList()
-                PlanManager.toVideo(context,"","","",1)
+//                PlanManager.toVideo(context,"","","",1)
             },{
                 it.printStackTrace()
                 view.loginFail()
@@ -62,7 +62,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
     }
 
     private fun getPersonPlanList(){
-        planModel.getPersonPlanList(UserManager.personPlanId,1,ListAdapterUtil.PAGE_SIZE)
+        planModel.getPersonPlanList(UserManager.personId,1,ListAdapterUtil.PAGE_SIZE)
             .io2Main()
             .subscribe({
                L.i(it)

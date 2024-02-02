@@ -58,7 +58,7 @@ class LeftOrRight : AppActivity() {
                 Opt.Start -> {
                     gameState = Opt.Start
                     //开始
-                    loadData()
+
                     setBtn(true)
                     talking(exam!!.getquestionId().toString())
                 }
@@ -95,6 +95,7 @@ class LeftOrRight : AppActivity() {
         setContentView(R.layout.leftorright)
         initBinder()
         getData()
+        loadData()
     }
 
     private fun getData() {

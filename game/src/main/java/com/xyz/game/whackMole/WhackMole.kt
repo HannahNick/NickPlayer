@@ -84,6 +84,7 @@ class WhackMole : AppActivity() {
         setContentView(R.layout.whackmole)
         getData()
         initBinder()
+        loadData()
     }
     private fun getData() {
         path = intent.getStringExtra("path")
