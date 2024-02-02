@@ -73,7 +73,7 @@ class WhackMole : AppActivity() {
                 Opt.End ->{
                     gameState = Opt.End
                     //结束
-                    finish()
+                    finish(false)
                 }
             }
 
@@ -114,7 +114,7 @@ class WhackMole : AppActivity() {
         soiltext.add(findViewById(R.id.soil_text4))
         soiltext.add(findViewById(R.id.soil_text5))
         findViewById<Button>(R.id.back).setOnClickListener {
-            handler.sendEmptyMessage(Opt.End)
+            finish()
         }
         for(i in 0..4)
         {

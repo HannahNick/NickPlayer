@@ -83,7 +83,7 @@ class LeftOrRight : AppActivity() {
                 Opt.End -> {
                     gameState = Opt.End
                     //结束
-                    finish()
+                    finish(false)
                 }
             }
 
@@ -111,7 +111,7 @@ class LeftOrRight : AppActivity() {
 
     private fun initBinder() {
         findViewById<Button>(R.id.back).setOnClickListener {
-            handler.sendEmptyMessage(Opt.End)
+            finish()
         }
         topic = findViewById(R.id.topic)
         topicText = findViewById(R.id.listen_topic)

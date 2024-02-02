@@ -26,8 +26,9 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
                 UserManager.personPlanItemId = result.personPlanItemId
                 UserManager.personPlanId = result.personPlanId
 //                view.loginSuccess()
-                requestListData()
+//                requestListData()
 //                getPersonPlanList()
+                PlanManager.toVideo(context,"","","",1)
             },{
                 it.printStackTrace()
                 view.loginFail()

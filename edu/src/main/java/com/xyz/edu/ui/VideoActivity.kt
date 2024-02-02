@@ -73,14 +73,14 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         GestureMessageCenter.registerCallBack(this)
         mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
         mItemIndex = intent.getIntExtra(ITEM_INDEX,0)
-        val videoUrl = intent.getStringExtra(VIDEO_URL)?:""
-//        val videoUrl = "http://video.f666666.xyz/aud/17175392/file/313_17175392.m4a"
+//        val videoUrl = intent.getStringExtra(VIDEO_URL)?:""
+        val videoUrl = "http://video.f666666.xyz/mp4/17190049/file/313_17190049"
         val videoName = intent.getStringExtra(VIDEO_NAME)?:""
 
-        mProxy = if (videoUrl.endsWith("m4a")){
-            KtvPlayProxyManager.createM4aProxy(this)
-        }else{
+        mProxy = if (videoUrl.endsWith("m3u8")){
             KtvPlayProxyManager.createKtvProxy(this)
+        }else{
+            KtvPlayProxyManager.createM4aProxy(this)
         }
         mProxy?.start()
         val proxyUrl = mProxy?.buildProxyUrl(videoUrl)?.apply {
