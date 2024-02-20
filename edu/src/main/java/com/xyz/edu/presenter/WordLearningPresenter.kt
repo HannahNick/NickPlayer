@@ -12,7 +12,7 @@ import com.xyz.base.utils.L
 import com.xyz.download.api.DownloadConfig
 import com.xyz.download.support.manager.DownloadManager
 import com.xyz.edu.contract.IWordLearningC
-import com.xyz.edu.manager.UserManager
+import com.nick.base.manager.UserManager
 import com.xyz.edu.presenter.base.DisposablePresenter
 import com.xyz.edu.vo.ZipDataVo
 import io.reactivex.Flowable
@@ -61,7 +61,7 @@ class WordLearningPresenter(context: Context, view: IWordLearningC.View, model: 
     }
 
     override fun reportStudyResult(personPlanItemId: String) {
-        model.reportStudyResult(UserManager.personPlanId,personPlanItemId,UserManager.personId)
+        model.reportStudyResult(UserManager.personPlanId,personPlanItemId, UserManager.personId)
             .io2Main()
             .subscribe({},{
                 it.printStackTrace()

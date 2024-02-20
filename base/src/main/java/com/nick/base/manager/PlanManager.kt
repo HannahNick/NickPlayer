@@ -1,4 +1,4 @@
-package com.nick.base.router
+package com.nick.base.manager
 
 import android.content.Context
 import com.alibaba.android.arouter.launcher.ARouter
@@ -7,6 +7,9 @@ import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.ZipUtils
 import com.nick.base.http.HttpManager
+import com.nick.base.model.WordLearningModel
+import com.nick.base.router.BaseRouter
+import com.xyz.base.app.rx.io2Main
 import com.xyz.base.service.edu.bean.PlanItemBean
 import com.xyz.base.utils.L
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -32,22 +35,27 @@ object PlanManager {
         mPreInitDataCallBack = preInitDataCallBack
     }
 
+
     fun toNextPlanItem(context: Context, index: Int){
         if (!mAutoFlag){
             return
         }
+        reportPlan(index)
         val nextIndex = index+1
+        startItem(context,nextIndex)
+    }
 
-        if (nextIndex >= (mDataList.size)){
-            L.w("dataList is last index:$nextIndex")
+    fun startItem(context: Context, index: Int){
+        if (index >= (mDataList.size) || index <0){
+            L.w("dataList is last index:$index")
             ToastUtils.showLong("当前课程已学完")
             return
         }
-        val data = mDataList[nextIndex]
+        val data = mDataList[index]
         L.i("nextPlanData: $data")
         when(data.contentType){
             1,2->{
-                toVideo(context,data.contentUrl,data.contentTitle,data.personPlanItemId,nextIndex)
+                toVideo(context,data.contentUrl,data.contentTitle,data.personPlanItemId,index)
                 mPreInitDataCallBack?.preInitDataFinish()
             }
             3->{
@@ -56,16 +64,32 @@ object PlanManager {
 //                wordLearningIntent.putExtra(WordLearningActivity.ZIP_MD5,data.zip.md5)
 //                wordLearningIntent.putExtra(WordLearningActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
 //                context.startActivity(wordLearningIntent)
-                downZip(context,data.zip.url,data.zip.md5,data.contentUrl,nextIndex)
+                downZip(context,data.zip.url,data.zip.md5,data.contentUrl,index)
             }
             5->{
-                toWordLearning(context,data.zip.url,data.zip.md5,data.personPlanItemId,nextIndex)
+                toWordLearning(context,data.zip.url,data.zip.md5,data.personPlanItemId,index)
                 mPreInitDataCallBack?.preInitDataFinish()
             }
             else ->{
                 ToastUtils.showLong("else finish")
             }
         }
+    }
+
+    /**
+     * 上报学完的任务
+     */
+    private fun reportPlan(index: Int){
+        if (index<0){
+            return
+        }
+        val data = mDataList[index]
+        val dispose = WordLearningModel().reportStudyResult(UserManager.personPlanId,data.personPlanItemId,UserManager.personId)
+            .subscribe({
+                L.i("reportPlan success $data")
+            },{
+                it.printStackTrace()
+            })
     }
 
     fun downZip(context: Context,url: String,md5: String,gameJson: String,index: Int) {

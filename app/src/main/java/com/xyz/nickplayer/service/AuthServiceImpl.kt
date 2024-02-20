@@ -2,8 +2,6 @@ package com.xyz.nickplayer.service
 
 import android.content.Context
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.blankj.utilcode.util.GsonUtils
-import com.google.gson.reflect.TypeToken
 import com.xyz.auth.api.BaseAuthService
 import com.xyz.auth.api.ILoginResult
 import com.xyz.base.service.ServiceProvider
@@ -12,7 +10,7 @@ import com.xyz.base.service.auth.bean.LoginResultBean
 import com.xyz.base.service.svc.RESULT
 import com.xyz.base.utils.L
 import com.xyz.base.utils.kt.localeValue
-import com.xyz.edu.manager.UserManager
+import com.nick.base.manager.UserManager
 import kotlin.random.Random
 import kotlin.random.nextLong
 

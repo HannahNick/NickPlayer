@@ -8,7 +8,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.BarUtils
 import com.enick.base.util.TimeUtil
 import com.nick.base.router.BaseRouter
-import com.nick.base.router.PlanManager
+import com.nick.base.manager.PlanManager
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.vod.ui.fragment.VodFragment
@@ -19,7 +19,6 @@ import com.xyz.edu.R
 import com.xyz.edu.contract.IVideoC
 import com.xyz.edu.databinding.ActivityVideoBinding
 import com.xyz.edu.model.VideoModel
-import com.xyz.edu.presenter.PlanPresenter
 import com.xyz.edu.presenter.VideoPresenter
 import com.xyz.proxy.IProxy
 import com.xyz.proxy.KtvPlayProxyManager
@@ -27,7 +26,7 @@ import kotlin.properties.Delegates
 
 @Route(path = BaseRouter.AROUTER_VIDEOACTIVITY)
 class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoCallBack,
-    LiveGestureControlLayer.GestureCallBack,PlanManager.PreInitDataCallBack{
+    LiveGestureControlLayer.GestureCallBack, PlanManager.PreInitDataCallBack{
 
     private val mBinding by lazy { ActivityVideoBinding.inflate(layoutInflater) }
     private var mPersonPlanItemId: String = ""
@@ -112,7 +111,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
     override fun playEnd(playIndex: Int) {
         super.playEnd(playIndex)
         L.i("播放结束，上报学习结果")
-        presenter.reportStudyResult(mPersonPlanItemId)
+//        presenter.reportStudyResult(mPersonPlanItemId)
         PlanManager.toNextPlanItem(this,mItemIndex)
     }
 

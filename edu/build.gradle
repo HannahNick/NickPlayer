@@ -41,8 +41,6 @@ android {
 
 dependencies {
 
-    implementation "com.xyz.base:app:$dependencies_version.app_base"
-
     implementation "com.xyz.luban:proxy-vod:$dependencies_version.proxy_vod"
     implementation "com.xyz.engine:engine:$dependencies_version.engine_ver"
     implementation "com.xyz.auth:api:$dependencies_version.auth_api"

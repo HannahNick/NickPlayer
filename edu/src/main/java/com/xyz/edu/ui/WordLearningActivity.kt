@@ -10,7 +10,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.nick.base.router.BaseRouter
-import com.nick.base.router.PlanManager
+import com.nick.base.manager.PlanManager
 import com.nick.base.vo.MusicVo
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
@@ -32,7 +32,7 @@ import com.xyz.edu.vo.ZipDataVo
  */
 @Route(path = BaseRouter.AROUTER_WORDLEARNINGACTIVITY)
 class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearningC.View, PlayInfoCallBack
-,PlanManager.PreInitDataCallBack{
+, PlanManager.PreInitDataCallBack{
 
     private val mBinding by lazy { ActivityWordLearningBinding.inflate(layoutInflater) }
     private val mDialog by lazy { DialogUtil.getCustomDialog(this, R.layout.layout_word_learning_window,true, Gravity.START) }

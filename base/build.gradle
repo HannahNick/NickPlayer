@@ -56,4 +56,5 @@ dependencies {
 
     api "com.xyz.base:service:$dependencies_version.service_base"
     api "com.xyz.base:utils:$dependencies_version.utils_base"
+    api "com.xyz.base:app:$dependencies_version.app_base"
 }

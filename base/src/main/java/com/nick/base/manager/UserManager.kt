@@ -1,4 +1,4 @@
-package com.xyz.edu.manager
+package com.nick.base.manager
 
 object UserManager {
     var personId: String = ""

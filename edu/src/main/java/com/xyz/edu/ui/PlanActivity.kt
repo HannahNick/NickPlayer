@@ -1,23 +1,18 @@
 package com.xyz.edu.ui
 
-import android.content.Context
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewbinding.context
 import com.blankj.utilcode.util.ToastUtils
-import com.nick.base.router.PlanManager
+import com.nick.base.manager.PlanManager
 import com.xyz.base.service.edu.bean.PlanItemBean
 import com.xyz.base.utils.L
-import com.xyz.edu.R
 import com.xyz.edu.contract.IPlanC
 import com.xyz.edu.databinding.ActivityPlanBinding
 import com.xyz.edu.model.PlanModel
 import com.xyz.edu.presenter.PlanPresenter
 import com.xyz.edu.ui.adapter.PlanListAdapter
 import com.xyz.edu.util.ListAdapterUtil
-import com.xyz.game.GameStart
 
 /**
  * 学习计划列表

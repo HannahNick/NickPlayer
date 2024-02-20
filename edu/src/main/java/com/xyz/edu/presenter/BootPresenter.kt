@@ -1,12 +1,13 @@
 package com.xyz.edu.presenter
 
 import android.content.Context
-import com.nick.base.router.PlanManager
+import com.nick.base.manager.PlanManager
 import com.xyz.auth.api.IAuthService
 import com.xyz.base.app.rx.io2Main
+import com.xyz.base.service.edu.bean.PlanItemBean
 import com.xyz.base.utils.L
 import com.xyz.edu.contract.IBootC
-import com.xyz.edu.manager.UserManager
+import com.nick.base.manager.UserManager
 import com.xyz.edu.model.PlanModel
 import com.xyz.edu.presenter.base.DisposablePresenter
 import com.xyz.edu.util.ListAdapterUtil
@@ -26,8 +27,8 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
                 UserManager.personPlanItemId = result.personPlanItemId
                 UserManager.personPlanId = result.personPlanId
 //                view.loginSuccess()
-                requestListData()
-//                getPersonPlanList()
+                getPersonPlanList()
+//                requestListData()
 //                PlanManager.toVideo(context,"","","",1)
             },{
                 it.printStackTrace()
@@ -50,25 +51,48 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
             }).apply { compositeDisposable.add(this) }
     }
 
-    private fun requestListData() {
+    /**
+     * 获取学习列表
+     */
+    private fun requestListData(personPlanItemId: String) {
         planModel.getPersonPlanItemList(UserManager.personPlanId,1, ListAdapterUtil.PAGE_SIZE)
             .io2Main()
             .subscribe({
                 PlanManager.initData(it.result.pageContent)
-                PlanManager.toNextPlanItem(context,-1)
+                val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
+                L.i("requestListData: startIndex $itemIndex")
+                PlanManager.startItem(context,itemIndex)
             },{
                 it.printStackTrace()
             }).apply { compositeDisposable.add(this) }
     }
 
+    /**
+     * 获取当前用户学习计划
+     */
     private fun getPersonPlanList(){
         planModel.getPersonPlanList(UserManager.personId,1,ListAdapterUtil.PAGE_SIZE)
             .io2Main()
             .subscribe({
-               L.i(it)
+                L.i("getPersonPlanList data:$it")
+
+                requestListData(it.result.pageContent[0].personPlanItemId)
             },{
                 it.printStackTrace()
             }).apply { compositeDisposable.add(this) }
+    }
+
+    /**
+     * 查看学习进度
+     */
+    private fun checkHaveStudyItem(personPlanItemId: String,data: List<PlanItemBean>): Int{
+        var itemIndex = -1
+        data.forEachIndexed { index, planItemBean ->
+            if (planItemBean.personPlanItemId ==personPlanItemId ){
+                itemIndex = index
+            }
+        }
+        return itemIndex
     }
 
 }

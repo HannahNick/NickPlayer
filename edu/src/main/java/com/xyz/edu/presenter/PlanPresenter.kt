@@ -1,28 +1,14 @@
 package com.xyz.edu.presenter
 
 import android.content.Context
-import android.content.Intent
-import com.blankj.utilcode.util.FileIOUtils
-import com.blankj.utilcode.util.FileUtils
-import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.ZipUtils
-import com.google.gson.reflect.TypeToken
-import com.nick.base.http.HttpManager
 import com.xyz.auth.api.IAuthService
-import com.xyz.base.app.mvp.BasePresenter
 import com.xyz.base.app.rx.io2Main
 import com.xyz.base.utils.L
 import com.xyz.edu.contract.IPlanC
-import com.xyz.edu.manager.UserManager
+import com.nick.base.manager.UserManager
 import com.xyz.edu.model.BootModel
 import com.xyz.edu.presenter.base.BaseListPresenter
-import com.xyz.edu.ui.WordLearningActivity
 import com.xyz.edu.util.ListAdapterUtil
-import com.xyz.edu.vo.ZipDataVo
-import io.reactivex.Flowable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import java.io.File
 
 class PlanPresenter(context: Context, view: IPlanC.View, model: IPlanC.Model): BaseListPresenter<IPlanC.View, IPlanC.Model>(context,view, model),
     IPlanC.Presenter {

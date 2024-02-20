@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.nick.base.router.PlanManager
+import com.nick.base.manager.PlanManager
 
 open class AppActivity : AppCompatActivity(), PlanManager.PreInitDataCallBack {
     protected var backPressedTime1: Long = 0

@@ -3,16 +3,14 @@ package com.xyz.edu.ui
 import android.content.Intent
 import android.os.Bundle
 import com.blankj.utilcode.util.ToastUtils
-import com.nick.base.router.PlanManager
-import com.xyz.auth.api.IAuthService
+import com.nick.base.manager.PlanManager
 import com.xyz.base.utils.L
 import com.xyz.edu.contract.IBootC
 import com.xyz.edu.databinding.ActivityBootBinding
-import com.xyz.edu.manager.UserManager
 import com.xyz.edu.model.BootModel
 import com.xyz.edu.presenter.BootPresenter
 
-class BootActivity : BaseActivity<IBootC.Presenter>(), IBootC.View,PlanManager.PreInitDataCallBack {
+class BootActivity : BaseActivity<IBootC.Presenter>(), IBootC.View, PlanManager.PreInitDataCallBack {
 
     private val mBinding by lazy { ActivityBootBinding.inflate(layoutInflater) }
     override fun createPresenter(): IBootC.Presenter {
