@@ -7,7 +7,7 @@
         android:roundIcon="@mipmap/edu_icon"
         >
         <activity
-            android:name="com.xyz.edu.ui.BootActivity"
+            android:name="com.xyz.edu.ui.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="landscape"
             android:exported="true">

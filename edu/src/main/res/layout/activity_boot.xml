@@ -5,7 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.BootActivity"
-    android:background="@drawable/boot_background"
     >
-
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/boot_background3"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

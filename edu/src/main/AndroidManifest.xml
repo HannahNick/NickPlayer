@@ -5,15 +5,17 @@
 
     <application>
         <activity
+            android:name=".ui.LoginActivity" />
+        <activity
             android:name=".ui.PlanActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="landscape"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ui.WordLearningActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="landscape"
-            android:exported="false"/>
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ui.VideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
