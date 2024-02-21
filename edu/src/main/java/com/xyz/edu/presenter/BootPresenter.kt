@@ -72,7 +72,8 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
                 PlanManager.initData(it.result.pageContent)
                 val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
                 L.i("requestListData: startIndex $itemIndex")
-                PlanManager.startItem(context,itemIndex)
+                PlanManager.toPlanSelect()
+//                PlanManager.startItem(context,itemIndex)
             },{
                 it.printStackTrace()
             }).apply { compositeDisposable.add(this) }

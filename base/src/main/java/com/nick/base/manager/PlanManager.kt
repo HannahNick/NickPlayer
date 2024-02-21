@@ -186,6 +186,11 @@ object PlanManager {
             .navigation()
     }
 
+    fun toPlanSelect(){
+        ARouter.getInstance().build(BaseRouter.STUDY_SELECT)
+            .navigation()
+    }
+
     /**
      * 这个回调是为了在当前页面提前加载下一个页面需要的数据做个缓冲，
      */

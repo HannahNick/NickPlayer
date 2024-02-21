@@ -56,6 +56,7 @@ dependencies {
     implementation "com.alibaba:arouter-api:$dependencies_version.arouter_api"
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     kapt "com.alibaba:arouter-compiler:$dependencies_version.arouter_compiler"
 
     testImplementation 'junit:junit:4.13.2'
