@@ -176,6 +176,16 @@ object PlanManager {
             .navigation()
     }
 
+    fun toLogin(){
+        ARouter.getInstance().build(BaseRouter.LOGIN)
+            .navigation()
+    }
+
+    fun toRegister(){
+        ARouter.getInstance().build(BaseRouter.REGISTER)
+            .navigation()
+    }
+
     /**
      * 这个回调是为了在当前页面提前加载下一个页面需要的数据做个缓冲，
      */

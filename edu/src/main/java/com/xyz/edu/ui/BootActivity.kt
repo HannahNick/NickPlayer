@@ -52,6 +52,10 @@ class BootActivity : BaseActivity<IBootC.Presenter>(), IBootC.View, PlanManager.
         PlanManager.toNextPlanItem(this,-1)
     }
 
+    override fun close() {
+        finish()
+    }
+
     override fun preInitDataFinish() {
         finish()
     }

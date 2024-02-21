@@ -4,13 +4,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.ToastUtils
+import com.nick.base.manager.PlanManager
+import com.nick.base.router.BaseRouter
 import com.xyz.edu.R
 import com.xyz.edu.contract.ILoginC
 import com.xyz.edu.databinding.ActivityLoginBinding
 import com.xyz.edu.model.LoginModel
 import com.xyz.edu.presenter.LoginPresenter
 
+@Route(path = BaseRouter.LOGIN)
 class LoginActivity : BaseActivity<ILoginC.Presenter>(),ILoginC.View {
     private val mBinding by lazy{ActivityLoginBinding.inflate(layoutInflater)}
     override fun createPresenter(): ILoginC.Presenter {
@@ -37,7 +41,9 @@ class LoginActivity : BaseActivity<ILoginC.Presenter>(),ILoginC.View {
                 return@setOnClickListener
             }
             presenter.login(username,pwd)
-
+        }
+        mBinding.tvRegister.setOnClickListener {
+            PlanManager.toRegister()
         }
     }
 

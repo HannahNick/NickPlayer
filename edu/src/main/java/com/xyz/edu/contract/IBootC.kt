@@ -23,6 +23,8 @@ interface IBootC {
         fun toWordLearning(zipUrl: String)
 
         fun dataInitFinish()
+
+        fun close()
     }
 
     interface Model: IBaseContract.IModel{

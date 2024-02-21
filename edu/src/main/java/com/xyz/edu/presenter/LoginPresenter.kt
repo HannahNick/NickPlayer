@@ -1,6 +1,8 @@
 package com.xyz.edu.presenter
 
 import android.content.Context
+import com.blankj.utilcode.util.SPUtils
+import com.nick.base.constants.Constant
 import com.nick.base.manager.PlanManager
 import com.nick.base.manager.UserManager
 import com.xyz.auth.api.IAuthService
@@ -35,6 +37,8 @@ class LoginPresenter(context: Context,view: ILoginC.View,model: ILoginC.Model): 
                 UserManager.personId = result.personId
                 UserManager.personPlanItemId = result.personPlanItemId
                 UserManager.personPlanId = result.personPlanId
+                SPUtils.getInstance().put(Constant.USER_ACCOUNT,personAccount)
+                SPUtils.getInstance().put(Constant.PASSWORD,password)
                 getPersonPlanList()
             },{e->
                 e.printStackTrace()

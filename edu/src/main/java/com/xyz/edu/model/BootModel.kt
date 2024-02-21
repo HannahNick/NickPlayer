@@ -28,9 +28,6 @@ class BootModel(context: Context): BaseModel(context), IBootC.Model {
               age: Int,
               basics : Int,
               sex : Int,): Flowable<RESULT<RegisterBean>>{
-
-
-
         return ServiceProvider.getEduService("http://38.91.106.109:9393").eduRegister(personName, personAccount, password, age, basics, sex)
     }
 
