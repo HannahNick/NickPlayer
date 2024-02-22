@@ -21,14 +21,17 @@ object PlanManager {
 
     var mDataList: ArrayList<PlanItemBean> = ArrayList()
     var mPreInitDataCallBack: PreInitDataCallBack? = null
+    private var mCurrentIndex: Int = 0
 
     /**
      * 自动
      */
     val mAutoFlag = true
-    fun initData(data: List<PlanItemBean>){
+    fun initData(data: List<PlanItemBean>,index: Int){
+        L.i("plan data: $data")
         mDataList.clear()
         mDataList.addAll(data)
+        mCurrentIndex = index
     }
 
     fun registerDataCallBack(preInitDataCallBack: PreInitDataCallBack){
@@ -36,16 +39,17 @@ object PlanManager {
     }
 
 
-    fun toNextPlanItem(context: Context, index: Int){
+    fun toNextPlanItem(context: Context, index: Int = mCurrentIndex,loadingListener: LoadingListener? = null){
         if (!mAutoFlag){
             return
         }
         reportPlan(index)
         val nextIndex = index+1
-        startItem(context,nextIndex)
+        startItem(context,nextIndex,loadingListener)
     }
 
-    fun startItem(context: Context, index: Int){
+    fun startItem(context: Context, index: Int ,loadingListener: LoadingListener? = null){
+        mCurrentIndex = index
         if (index >= (mDataList.size) || index <0){
             L.w("dataList is last index:$index")
             ToastUtils.showLong("当前课程已学完")
@@ -64,6 +68,7 @@ object PlanManager {
 //                wordLearningIntent.putExtra(WordLearningActivity.ZIP_MD5,data.zip.md5)
 //                wordLearningIntent.putExtra(WordLearningActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
 //                context.startActivity(wordLearningIntent)
+                loadingListener?.showLoading()
                 downZip(context,data.zip.url,data.zip.md5,data.contentUrl,index)
             }
             5->{
@@ -92,14 +97,14 @@ object PlanManager {
             })
     }
 
-    fun downZip(context: Context,url: String,md5: String,gameJson: String,index: Int) {
+    fun downZip(context: Context,url: String,md5: String,gameJson: String,index: Int,loadingListener: LoadingListener? = null) {
         //1.判断压缩文件是否存在
         val zipFile = File("${context.filesDir}/zip/$md5")
         L.i("zipFilePath: $zipFile")
 //        val zipFile = File("${context.filesDir}/zip/$md5")
         if (FileUtils.isFileExists(zipFile)){
             L.i("FileExists")
-            findGameJson(context,zipFile,gameJson,index)
+            findGameJson(context,zipFile,gameJson,index,loadingListener)
             return
         }
         //2.不存在就去下载
@@ -115,7 +120,7 @@ object PlanManager {
                 val writeFileFlag = FileIOUtils.writeFileFromBytesByStream("${context.filesDir}/zip/$md5", it.bytes())
                 if (writeFileFlag){
                     L.i("writeFileFlag: success")
-                    findGameJson(context,File("${context.filesDir}/zip/$md5"),gameJson,index)
+                    findGameJson(context,File("${context.filesDir}/zip/$md5"),gameJson,index,loadingListener)
                 }else{
                     FileUtils.delete("${context.filesDir}/zip/$md5")
                     L.e("writeFileFlag is fail!")
@@ -125,7 +130,7 @@ object PlanManager {
             })
     }
 
-    fun findGameJson(context: Context, zipFile: File, gameJson: String,index: Int){
+    private fun findGameJson(context: Context, zipFile: File, gameJson: String,index: Int,loadingListener: LoadingListener? = null){
         val dispose = Flowable.just(zipFile)
             .map {//判断是否已解压
                 FileUtils.isFileExists("${context.filesDir.absolutePath}/plan/${zipFile.name}")
@@ -145,6 +150,8 @@ object PlanManager {
                 mPreInitDataCallBack?.preInitDataFinish()
             },{
                 it.printStackTrace()
+            },{
+                loadingListener?.hideLoading()
             })
     }
 
@@ -191,6 +198,11 @@ object PlanManager {
             .navigation()
     }
 
+    fun toHome(){
+        ARouter.getInstance().build(BaseRouter.HOME)
+            .navigation()
+    }
+
     /**
      * 这个回调是为了在当前页面提前加载下一个页面需要的数据做个缓冲，
      */
@@ -199,5 +211,11 @@ object PlanManager {
          * 数据预初始化完成后通知调用端关闭页面完成跳转
          */
         fun preInitDataFinish()
+    }
+
+    interface LoadingListener{
+        fun showLoading()
+
+        fun hideLoading()
     }
 }

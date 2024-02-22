@@ -5,11 +5,17 @@
 
     <application>
         <activity
+            android:name=".ui.HomeActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape" />
+        <activity
             android:name=".ui.StudySelectActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:launchMode="singleTask"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ui.RegisterActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

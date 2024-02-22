@@ -20,7 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep public class com.xyz.edu.vo.**{*;}
--keep public class com.xyz.edu.ui.**{*;}
--keep public class com.xyz.base.service.edu.bean.**{*;}
+-keep class com.xyz.edu.vo.**{*;}
+-keep class com.xyz.edu.ui.**{*;}
 

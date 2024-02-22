@@ -69,10 +69,10 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
         planModel.getPersonPlanItemList(UserManager.personPlanId,1, ListAdapterUtil.PAGE_SIZE)
             .io2Main()
             .subscribe({
-                PlanManager.initData(it.result.pageContent)
                 val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
+                PlanManager.initData(it.result.pageContent,itemIndex)
                 L.i("requestListData: startIndex $itemIndex")
-                PlanManager.toPlanSelect()
+                PlanManager.toHome()
 //                PlanManager.startItem(context,itemIndex)
             },{
                 it.printStackTrace()

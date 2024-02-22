@@ -54,10 +54,8 @@ dependencies {
     implementation "com.orhanobut:dialogplus:$dependencies_version.dialogplus"
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$dependencies_version.quickAdapter"
     implementation "com.alibaba:arouter-api:$dependencies_version.arouter_api"
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     kapt "com.alibaba:arouter-compiler:$dependencies_version.arouter_compiler"
+    implementation 'com.daimajia.androidanimations:library:2.4@aar'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

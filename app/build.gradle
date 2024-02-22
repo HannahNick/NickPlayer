@@ -46,8 +46,8 @@ android {
 //        applicationId "com.xyz.vlive"
         minSdk sdk_version.minSdkVersion
         targetSdk sdk_version.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.1"
         flavorDimensions "app"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

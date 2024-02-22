@@ -63,10 +63,10 @@ class LoginPresenter(context: Context,view: ILoginC.View,model: ILoginC.Model): 
         mBootModel.getPersonPlanItemList(UserManager.personPlanId,1, ListAdapterUtil.PAGE_SIZE)
             .io2Main()
             .subscribe({
-                PlanManager.initData(it.result.pageContent)
                 val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
+                PlanManager.initData(it.result.pageContent,itemIndex)
                 L.i("requestListData: startIndex $itemIndex")
-                PlanManager.startItem(context,itemIndex)
+                PlanManager.toHome()
             },{
                 it.printStackTrace()
             },{
