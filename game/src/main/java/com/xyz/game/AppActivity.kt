@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import com.nick.base.manager.DialogManager
 import com.nick.base.manager.PlanManager
+import com.orhanobut.dialogplus.DialogPlus
 
 open class AppActivity : AppCompatActivity(), PlanManager.PreInitDataCallBack {
     protected var backPressedTime1: Long = 0
     protected var backPressedTime2: Long = 0
     var itemIndex:Int = 0
+    private val dialogPlus by lazy { DialogManager.initLoading(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         itemIndex = intent.getIntExtra("itemIndex",0)
@@ -41,7 +44,16 @@ open class AppActivity : AppCompatActivity(), PlanManager.PreInitDataCallBack {
 //        }
     }
     fun finish(flag:Boolean){
-        PlanManager.toNextPlanItem(this,itemIndex)
+        PlanManager.toNextPlanItem(this,itemIndex,object : PlanManager.LoadingListener{
+            override fun showLoading() {
+                dialogPlus.show()
+            }
+
+            override fun hideLoading() {
+                dialogPlus.dismiss()
+            }
+
+        })
     }
 
     override fun preInitDataFinish() {

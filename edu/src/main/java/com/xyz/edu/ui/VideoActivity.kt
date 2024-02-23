@@ -65,7 +65,6 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         BarUtils.setStatusBarVisibility(this,false)
         PlanManager.registerDataCallBack(this)
         initView()
-        initBackListener()
     }
 
     private fun initView(){
@@ -113,19 +112,6 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         L.i("播放结束，上报学习结果")
 //        presenter.reportStudyResult(mPersonPlanItemId)
         PlanManager.toNextPlanItem(this,mItemIndex)
-    }
-
-    override fun back() {
-        super.back()
-        TimeUtil.confirmClick { finish() }
-    }
-
-    private fun initBackListener(){
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
-            override fun handleOnBackPressed() {
-                TimeUtil.confirmClick { finish() }
-            }
-        })
     }
 
     override fun preInitDataFinish() {

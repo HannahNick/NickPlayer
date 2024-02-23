@@ -1,40 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
 
-    <color name="colorBgButton">#FECC3F</color>
-    <color name="colorBgButtonPress">#FFE289</color>
-    <color name="colorBgButtonDisable">#B8C2CE</color>
-    <color name="colorBlackT">#aaffffff</color>
-
-    <color name="titleColor">#222222</color>
-    <color name="lineColor">#10000000</color>
-    <color name="textColor">#909090</color>
-
-    <color name="coupon_background">#FFD5D6</color>
-    <color name="coupon_stroke">#FFA0A0</color>
-    <color name="goodspec_stroke">#949494</color>
-    <color name="userinfo_bg">#EFF2F6</color>
-    <color name="goodspec_solid">#FDCD45</color>
-    <color name="binding_bg">#73D759</color>
-    <color name="login_edt_bg">#FFFCF6</color>
-    <color name="relative_goodtitle">#EFF2F6</color>
-    <color name="protocol_text_color">#5CA5F7</color>
-    <color name="shopdetail_bottom_bg">#eaeaea</color>
-    <color name="shopcart_delete">#FF8C00</color>
-    <color name="cannot_select_gift">#90ffffff</color>
-    <color name="back_bg">#60000000</color>
-    <color name="sign_text_color">#646464</color>
-    <color name="has_subscribe">#e2e2e2</color>
-    <color name="arrival_reminding_bg">#fdd34e</color>
-    <color name="sort_self_othersupport_tag_select">#ffa423</color>
-    <color name="sort_first_dir_bg">#f7f8f9</color>
-
-    <color name="blackTransparent_50">#40000000</color>
 </resources>

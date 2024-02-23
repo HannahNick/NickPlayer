@@ -3,11 +3,14 @@ package com.xyz.edu.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileUtils
 import com.daimajia.androidanimations.library.Techniques
 import com.daimajia.androidanimations.library.YoYo
+import com.enick.base.util.TimeUtil
+import com.nick.base.manager.DialogManager
 import com.nick.base.manager.PlanManager
 import com.nick.base.router.BaseRouter
 import com.nick.base.vo.MusicVo
@@ -20,6 +23,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ActivityHomeBinding.inflate(layoutInflater) }
     private val mNickExoPlayer by lazy { NickExoPlayer(this) }
+    private val mLoadingDialog by lazy { DialogManager.initLoading(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
@@ -53,7 +57,7 @@ class HomeActivity : AppCompatActivity() {
                 })
             }
             btnContinue.setOnClickListener {
-                PlanManager.toNextPlanItem(this@HomeActivity, loadingListener = object : PlanManager.LoadingListener{
+                PlanManager.startItem(this@HomeActivity, loadingListener = object : PlanManager.LoadingListener{
                     override fun showLoading() {
                         btnContinue.isClickable = false
                         aviLoading.visibility = View.VISIBLE
@@ -67,6 +71,7 @@ class HomeActivity : AppCompatActivity() {
                 })
             }
         }
+        initBackListener()
     }
 
     private fun playAnim(){
@@ -84,11 +89,24 @@ class HomeActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         mNickExoPlayer.play()
+        mBinding.btnContinue.visibility = if (PlanManager.mCurrentIndex<0){
+            View.GONE
+        }else{
+            View.VISIBLE
+        }
     }
 
     private fun loadData(): MutableList<MusicVo>{
         val filePath = "file:///android_asset/home3.mp4"
         return listOf(MusicVo("1","albumName","",filePath)).toMutableList()
+    }
+
+    private fun initBackListener(){
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                TimeUtil.confirmClick { finish() }
+            }
+        })
     }
 
 }

@@ -52,6 +52,7 @@
                 android:textSize="@dimen/sp25"
                 android:gravity="start|center"
                 android:paddingRight="@dimen/dp_10"
+                android:inputType="numberSigned"
                 />
         </LinearLayout>
         <LinearLayout

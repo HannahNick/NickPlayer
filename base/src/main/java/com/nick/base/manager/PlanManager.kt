@@ -21,7 +21,7 @@ object PlanManager {
 
     var mDataList: ArrayList<PlanItemBean> = ArrayList()
     var mPreInitDataCallBack: PreInitDataCallBack? = null
-    private var mCurrentIndex: Int = 0
+    var mCurrentIndex: Int = 0
 
     /**
      * 自动
@@ -48,7 +48,7 @@ object PlanManager {
         startItem(context,nextIndex,loadingListener)
     }
 
-    fun startItem(context: Context, index: Int ,loadingListener: LoadingListener? = null){
+    fun startItem(context: Context, index: Int = mCurrentIndex ,loadingListener: LoadingListener? = null){
         mCurrentIndex = index
         if (index >= (mDataList.size) || index <0){
             L.w("dataList is last index:$index")
@@ -69,7 +69,7 @@ object PlanManager {
 //                wordLearningIntent.putExtra(WordLearningActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
 //                context.startActivity(wordLearningIntent)
                 loadingListener?.showLoading()
-                downZip(context,data.zip.url,data.zip.md5,data.contentUrl,index)
+                downZip(context,data.zip.url,data.zip.md5,data.contentUrl,index,loadingListener)
             }
             5->{
                 toWordLearning(context,data.zip.url,data.zip.md5,data.personPlanItemId,index)
@@ -145,12 +145,14 @@ object PlanManager {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
+                L.i("toGame")
                 //将文件信息传回页面
                 toGame("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}",gameJson,index)
                 mPreInitDataCallBack?.preInitDataFinish()
             },{
                 it.printStackTrace()
             },{
+                L.i("final fun")
                 loadingListener?.hideLoading()
             })
     }

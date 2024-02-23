@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:indicatorName="BallClipRotateIndicator"
+        app:indicatorColor="@color/colorBgButton"
         tools:visibility="visible"
         app:layout_constraintTop_toTopOf="@id/sv_video"
         app:layout_constraintStart_toStartOf="@id/sv_video"

@@ -54,6 +54,7 @@
                 android:textSize="@dimen/sp25"
                 android:gravity="start|center"
                 android:maxLines="1"
+                android:inputType="numberSigned"
                 android:paddingEnd="@dimen/dp_10"
 
                 />
@@ -161,7 +162,7 @@
                 android:hint="请输入年龄"
                 android:gravity="start|center"
                 android:maxLines="1"
-                android:inputType="number"
+                android:inputType="numberSigned"
                 android:textSize="@dimen/sp25"
                 android:paddingRight="@dimen/dp_10"
                 />

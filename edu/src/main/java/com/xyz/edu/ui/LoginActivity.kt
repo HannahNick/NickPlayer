@@ -48,7 +48,7 @@ class LoginActivity : BaseActivity<ILoginC.Presenter>(),ILoginC.View {
     }
 
     override fun loginSuccess() {
-
+        finish()
     }
 
     override fun loginFail(msg: String) {

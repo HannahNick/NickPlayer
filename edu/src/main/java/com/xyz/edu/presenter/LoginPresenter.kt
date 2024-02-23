@@ -67,6 +67,7 @@ class LoginPresenter(context: Context,view: ILoginC.View,model: ILoginC.Model): 
                 PlanManager.initData(it.result.pageContent,itemIndex)
                 L.i("requestListData: startIndex $itemIndex")
                 PlanManager.toHome()
+                view.loginSuccess()
             },{
                 it.printStackTrace()
             },{

@@ -86,8 +86,8 @@ class RegisterPresenter(context: Context,view: IRegisterC.View,model: IRegisterC
                 val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
                 PlanManager.initData(it.result.pageContent,itemIndex)
                 L.i("requestListData: startIndex $itemIndex")
-                PlanManager.startItem(context,itemIndex)
-
+                PlanManager.toHome()
+                view.registerSuccess()
             },{
                 it.printStackTrace()
             },{
