@@ -1,5 +1,9 @@
 package com.nick.base.vo.enum
 
-enum class UrlType{
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+enum class UrlType: Parcelable{
     M3U8,DEFAULT
 }

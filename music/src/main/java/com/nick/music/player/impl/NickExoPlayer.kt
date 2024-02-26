@@ -1,19 +1,29 @@
 package com.nick.music.player.impl
 
+import android.R
 import android.content.Context
 import android.view.SurfaceHolder
 import androidx.media3.common.*
+import androidx.media3.common.util.Util
 import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultDataSourceFactory
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.FileDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.ClippingMediaSource
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.common.collect.ImmutableList
+import com.nick.base.vo.*
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.TrackType
+
 
 class NickExoPlayer(context: Context): AbsPlayer() {
     private val mDataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
@@ -163,6 +173,20 @@ class NickExoPlayer(context: Context): AbsPlayer() {
         }else{
             mPlayer.setMediaItem(MediaItem.fromUri(url))
         }
+        mPlayer.prepare()
+    }
+
+    override fun prepareUrlByClipping(url: String, urlType: UrlType, start: Long, end: Long) {
+        val clipSource = if (urlType == UrlType.M3U8){
+            val hlsMediaSource = HlsMediaSource.Factory(mDataSourceFactory).createMediaSource(MediaItem.fromUri(url))
+            ClippingMediaSource(hlsMediaSource,start,end)
+        }else{
+            // 创建 MediaSource
+            val mediaSource: MediaSource = ProgressiveMediaSource.Factory(mDataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(url))
+            ClippingMediaSource(mediaSource,start,end)
+        }
+        mPlayer.setMediaSource(clipSource)
         mPlayer.prepare()
     }
 

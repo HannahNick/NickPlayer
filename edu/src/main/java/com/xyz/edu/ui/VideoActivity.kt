@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.BarUtils
 import com.enick.base.util.TimeUtil
 import com.nick.base.router.BaseRouter
 import com.nick.base.manager.PlanManager
+import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.vod.ui.fragment.VodFragment
@@ -36,6 +37,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         const val VIDEO_NAME = "titleName"
         const val PERSON_PLAN_ITEM_ID = "personPlanItemId"
         const val ITEM_INDEX = "itemIndex"
+        const val ZIP_PATH = "zipPath"
 
         fun start(context: Context, url: String, titleName: String, personPlanItemId: String, itemIndex: Int){
             val videoIntent = Intent(context,VideoActivity::class.java)
@@ -43,6 +45,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
             videoIntent.putExtra(VIDEO_NAME,titleName)
             videoIntent.putExtra(PERSON_PLAN_ITEM_ID,personPlanItemId)
             videoIntent.putExtra(ITEM_INDEX,itemIndex)
+//            videoIntent.putExtra(ZIP_PATH)
             context.startActivity(videoIntent)
         }
     }
@@ -84,7 +87,10 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         val proxyUrl = mProxy?.buildProxyUrl(videoUrl)?.apply {
             L.i(" buildProxyUrl $this")
         }?:""
-        val vodFragment = VodFragment.newInstance(arrayListOf(proxyUrl), arrayListOf(videoName))
+        val vodFragment = VodFragment.newInstance(arrayListOf(MusicVo(
+            path = proxyUrl,
+            liveName = videoName
+        )))
         val transaction = supportFragmentManager.beginTransaction()
         transaction.add(R.id.fl_contain, vodFragment)
         transaction.commit()

@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -57,6 +58,7 @@ dependencies {
     api "com.xyz.base:service:$dependencies_version.service_base"
     api "com.xyz.base:utils:$dependencies_version.utils_base"
     api "com.xyz.base:app:$dependencies_version.app_base"
+    api "com.xyz.module:vod-play:$dependencies_version.vod_play"
     api "com.wang.avi:library:$dependencies_version.avi"
     api "com.orhanobut:dialogplus:$dependencies_version.dialogplus"
 }

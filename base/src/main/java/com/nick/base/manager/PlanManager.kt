@@ -69,7 +69,9 @@ object PlanManager {
 //                wordLearningIntent.putExtra(WordLearningActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
 //                context.startActivity(wordLearningIntent)
                 loadingListener?.showLoading()
-                downZip(context,data.zip.url,data.zip.md5,data.contentUrl,index,loadingListener)
+                downZip(context,data.zip.url,data.zip.md5){ zipFile->
+                    findGameJson(context,zipFile,data.contentUrl,index,loadingListener)
+                }
             }
             5->{
                 toWordLearning(context,data.zip.url,data.zip.md5,data.personPlanItemId,index)
@@ -96,6 +98,32 @@ object PlanManager {
                 it.printStackTrace()
             })
     }
+
+    fun downZip(context: Context,url: String,md5: String,block:(file: File)->Unit){
+        //1.判断压缩文件是否存在
+        val zipFile = File("${context.filesDir}/zip/$md5")
+        L.i("zipFilePath: $zipFile")
+        if (FileUtils.isFileExists(zipFile)){
+            L.i("FileExists")
+            block(zipFile)
+            return
+        }
+        val dispose = HttpManager.api.downloadFile(url)
+            .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+            .subscribe({
+                val writeFileFlag = FileIOUtils.writeFileFromBytesByStream("${context.filesDir}/zip/$md5", it.bytes())
+                if (writeFileFlag){
+                    L.i("writeFileFlag: success")
+                    block(zipFile)
+                }else{
+                    FileUtils.delete(zipFile)
+                    L.e("writeFileFlag is fail!")
+                }
+            },{
+                it.printStackTrace()
+            })
+    }
+
 
     fun downZip(context: Context,url: String,md5: String,gameJson: String,index: Int,loadingListener: LoadingListener? = null) {
         //1.判断压缩文件是否存在

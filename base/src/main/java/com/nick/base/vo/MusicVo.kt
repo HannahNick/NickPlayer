@@ -1,7 +1,10 @@
 package com.nick.base.vo
 
+import android.os.Parcelable
 import com.nick.base.vo.enum.UrlType
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class MusicVo (
     val id: String = "",
     /**
@@ -40,4 +43,4 @@ data class MusicVo (
      * 歌词路径
      */
     val lyricPath: String = "",
-)
+): Parcelable

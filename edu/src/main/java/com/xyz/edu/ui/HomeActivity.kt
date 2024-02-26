@@ -23,7 +23,6 @@ class HomeActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ActivityHomeBinding.inflate(layoutInflater) }
     private val mNickExoPlayer by lazy { NickExoPlayer(this) }
-    private val mLoadingDialog by lazy { DialogManager.initLoading(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)

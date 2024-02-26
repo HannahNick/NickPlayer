@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="subtitles_style">
+        <item name="android:layout_gravity">center_horizontal|bottom</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">@dimen/px90</item>
+        <item name="android:paddingTop">@dimen/px6</item>
+        <item name="android:paddingEnd">@dimen/px90</item>
+        <item name="android:paddingBottom">@dimen/px6</item>
+        <item name="android:shadowColor">@color/black_50</item>
+        <item name="android:shadowDx">3</item>
+        <item name="android:shadowDy">3</item>
+        <item name="android:shadowRadius">10</item>
+        <item name="android:textColor">@color/white_100</item>
+        <item name="android:textSize">@dimen/sp40</item>
+        <item name="android:textStyle">bold</item>
+        <item name="stroke_size">@dimen/px6</item>
+        <item name="stroke_color">@color/black_90</item>
+        <item name="stroke_text_able">false</item>
+    </style>
+</resources>

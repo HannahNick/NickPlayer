@@ -15,6 +15,7 @@ ext {
             arouter_compiler     : '1.5.2',
 
             app_base             : '0.2.33',
+            vod_play             : '0.0.23',
             service_base         : '0.4.31.3',
             utils_base           : '0.1.32',
             engine_ver           : "0.1.0",

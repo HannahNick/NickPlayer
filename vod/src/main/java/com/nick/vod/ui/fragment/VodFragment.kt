@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.TimeUtils
@@ -17,6 +18,9 @@ import com.nick.vod.R
 import com.nick.vod.databinding.LayoutVodBinding
 import com.nick.vod.view.LiveGestureControlLayer
 import com.nick.vod.wiget.GestureMessageCenter
+import com.xyz.vod.play.widget.SubRipTextView
+import java.io.File
+import java.util.Arrays
 import kotlin.collections.ArrayList
 
 class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
@@ -28,11 +32,10 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     companion object{
         val URL_LIST_PARAM = "URL_LIST_PARAM"
         val VIDEO_LIST_NAME = "VIDEO_LIST_NAME"
-        fun newInstance(urlList: ArrayList<String>,nameList: ArrayList<String>): VodFragment {
+        fun newInstance(urlList: ArrayList<MusicVo>): VodFragment {
             val fragment = VodFragment()
             val args = Bundle()
-            args.putStringArrayList(URL_LIST_PARAM, urlList)
-            args.putStringArrayList(VIDEO_LIST_NAME, nameList)
+            args.putParcelableArrayList(URL_LIST_PARAM, urlList)
             fragment.setArguments(args)
             return fragment
         }
@@ -56,15 +59,11 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     private fun initData(){
 //        LogUtils.i("电影本地路径:${PathUtils.getExternalMoviesPath()}/bear.mp4  isExists: ${File(PathUtils.getExternalMoviesPath()+"/bear.mp4").exists()}")
         GestureMessageCenter.registerCallBack(this)
-        val urlList = arguments?.getStringArrayList(URL_LIST_PARAM)
-        val nameList = arguments?.getStringArrayList(VIDEO_LIST_NAME)
+        val urlList = arguments?.getParcelableArrayList<MusicVo>(URL_LIST_PARAM)
 
         if (urlList!=null){
-            val data = urlList.mapIndexed { index, s ->
-                return@mapIndexed MusicVo(path = s, pathType = UrlType.DEFAULT, liveName = nameList?.get(index)?:"")
-            }
-            LogUtils.i("dataList: $data")
-            mPlayerControl.setPlayList(data)
+            LogUtils.i("urlList: $urlList")
+            mPlayerControl.setPlayList(urlList)
         }else{
             LogUtils.w("data is empty")
         }
@@ -100,6 +99,8 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
             tvPlayTime.text = playPositionText
             sbSeek.progress = position
             gcLayer.flushPlayStatus()
+
+//            srtvSubtitle.setPosition(position.toLong())
         }
 
     }
@@ -141,5 +142,21 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     override fun onDestroy() {
         super.onDestroy()
         mPlayerControl.release()
+    }
+    fun showSubtitle(subtitleFile: File?, baseOffset: Long){
+        mBindingView.apply {
+            if (subtitleFile == null) {
+                srtvSubtitle.visibility = View.GONE
+            } else {
+                srtvSubtitle.visibility = View.VISIBLE
+                srtvSubtitle.setSrtSource(
+                    file = subtitleFile,
+                    type = SubRipTextView.Type.COMMON,
+                    baseOffset = baseOffset
+                )
+//                srtvSubtitle.setOffset(subtitleAdjustment?.timeOffset?.times(1000) ?: 0)
+            }
+        }
+
     }
 }

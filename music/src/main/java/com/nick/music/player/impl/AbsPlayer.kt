@@ -226,6 +226,11 @@ abstract class AbsPlayer: PlayerControl {
     abstract fun prepareUrl(url: String,urlType: UrlType = UrlType.DEFAULT)
 
     /**
+     * 准备播放并指定播放片段
+     */
+    abstract fun prepareUrlByClipping(url: String,urlType: UrlType = UrlType.DEFAULT,start: Long,end: Long)
+
+    /**
      * 播放暂停
      */
     abstract fun playerPause()

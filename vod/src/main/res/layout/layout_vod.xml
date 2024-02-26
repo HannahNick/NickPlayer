@@ -15,6 +15,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintDimensionRatio="16:9" />
+    <com.xyz.vod.play.widget.SubRipTextView
+        android:id="@+id/srtv_subtitle"
+        style="@style/subtitles_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.95"
+        app:stroke_color="@color/black_90"
+        app:stroke_size="@dimen/px6"
+        app:stroke_text_able="true"
+        tools:text="船長的航海日記\nCaptain's Voyage Diary \n收到遇難信號，但沒有跡象表明，然后说了一句很长的话…\nA distress signal was received, but no sign, and then a long speech..." />
     <com.wang.avi.AVLoadingIndicatorView
         android:id="@+id/lpb_loading"
         android:layout_width="wrap_content"

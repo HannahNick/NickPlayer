@@ -92,6 +92,10 @@ class NickPlayer: AbsPlayer(){
         mMediaPlayer.prepareAsync()
     }
 
+    override fun prepareUrlByClipping(url: String, urlType: UrlType, start: Long, end: Long) {
+
+    }
+
     override fun playerPause() {
         mMediaPlayer.pause()
     }
