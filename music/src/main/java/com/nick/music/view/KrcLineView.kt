@@ -495,6 +495,10 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     }
 
     fun drawNext(index: Int){
+        //已经预画好了下一行歌词就不要再画了
+        if (isDrawPreview){
+            return
+        }
         if (mLineLyricsList.size-1<index){
             mOriginLineLyrics = ""
             mSubsidiaryLineLyrics = ""
