@@ -6,6 +6,7 @@ import com.blankj.utilcode.util.FileIOUtils
 import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.ZipUtils
+import com.nick.base.R
 import com.nick.base.http.HttpManager
 import com.nick.base.model.WordLearningModel
 import com.nick.base.router.BaseRouter
@@ -175,7 +176,7 @@ object PlanManager {
             .subscribe({
                 L.i("toGame")
                 //将文件信息传回页面
-                toGame("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}",gameJson,index)
+                toGame(context,"${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}",gameJson,index)
                 mPreInitDataCallBack?.preInitDataFinish()
             },{
                 it.printStackTrace()
@@ -204,13 +205,13 @@ object PlanManager {
             .navigation()
     }
 
-    fun toGame(path:String,json:String,itemIndex: Int){
+    fun toGame(context: Context,path:String,json:String,itemIndex: Int){
         L.i("toGame path:$path,json:$json,index:$itemIndex")
         ARouter.getInstance().build(BaseRouter.AROUTER_GAME)
             .withString("path", path)
             .withString("json", json)
             .withInt("itemIndex", itemIndex)
-            .navigation()
+            .navigation(context)
     }
 
     fun toLogin(){
@@ -228,9 +229,10 @@ object PlanManager {
             .navigation()
     }
 
-    fun toHome(){
+    fun toHome(context: Context){
         ARouter.getInstance().build(BaseRouter.HOME)
-            .navigation()
+            .withTransition(R.anim.activity_gide_in_anim,R.anim.activity_gide_out_anim)
+            .navigation(context)
     }
 
     /**

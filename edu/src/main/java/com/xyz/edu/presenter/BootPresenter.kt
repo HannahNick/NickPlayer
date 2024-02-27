@@ -72,7 +72,8 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
                 val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
                 PlanManager.initData(it.result.pageContent,itemIndex)
                 L.i("requestListData: startIndex $itemIndex")
-                PlanManager.toHome()
+                PlanManager.toHome(context)
+                view.close()
 //                PlanManager.startItem(context,itemIndex)
             },{
                 it.printStackTrace()
@@ -87,7 +88,6 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
             .io2Main()
             .subscribe({
                 L.i("getPersonPlanList data:$it")
-
                 requestListData(it.result.pageContent[0].personPlanItemId)
             },{
                 it.printStackTrace()
