@@ -14,12 +14,14 @@ import com.nick.base.manager.DialogManager
 import com.nick.base.manager.PlanManager
 import com.nick.base.router.BaseRouter
 import com.nick.base.vo.MusicVo
+import com.nick.music.entity.PlayInfo
+import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.impl.NickExoPlayer
 import com.nick.music.server.PlayMode
 import com.xyz.edu.R
 import com.xyz.edu.databinding.ActivityHomeBinding
 @Route(path = BaseRouter.HOME)
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(){
 
     private val mBinding by lazy { ActivityHomeBinding.inflate(layoutInflater) }
     private val mNickExoPlayer by lazy { NickExoPlayer(this) }
@@ -29,7 +31,6 @@ class HomeActivity : AppCompatActivity() {
         BarUtils.setStatusBarVisibility(this,false)
         initPlayer()
         initListener()
-        playAnim()
     }
 
     private fun initPlayer(){
@@ -87,12 +88,15 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        mNickExoPlayer.play()
-        mBinding.btnContinue.visibility = if (PlanManager.mCurrentIndex<0){
-            View.GONE
-        }else{
-            View.VISIBLE
+        mBinding.apply {
+            btnContinue.visibility = if (PlanManager.mCurrentIndex<0){
+                View.GONE
+            }else{
+                View.VISIBLE
+            }
         }
+        mNickExoPlayer.play()
+
     }
 
     private fun loadData(): MutableList<MusicVo>{

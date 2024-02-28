@@ -97,7 +97,7 @@ class PlanActivity :  BaseActivity<IPlanC.Presenter>(), IPlanC.View {
     override fun getPlanItemList(dataList: List<PlanItemBean>) {
         L.i(dataList)
         ListAdapterUtil.setUpData(mBinding.srlRefreshlayout,mPlanAdapter,dataList,null)
-        PlanManager.initData(dataList,0)
+        PlanManager.initData(this,dataList,0)
 //        PlanManager.toNextPlanItem(this)
     }
 

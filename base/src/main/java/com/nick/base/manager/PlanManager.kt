@@ -10,6 +10,7 @@ import com.nick.base.R
 import com.nick.base.http.HttpManager
 import com.nick.base.model.WordLearningModel
 import com.nick.base.router.BaseRouter
+import com.nick.base.util.LRUFileCache
 import com.xyz.base.app.rx.io2Main
 import com.xyz.base.service.edu.bean.PlanItemBean
 import com.xyz.base.utils.L
@@ -23,16 +24,18 @@ object PlanManager {
     var mDataList: ArrayList<PlanItemBean> = ArrayList()
     var mPreInitDataCallBack: PreInitDataCallBack? = null
     var mCurrentIndex: Int = 0
+    val mDownLoadFileCache by lazy { LRUFileCache(1) }
 
     /**
      * 自动
      */
     val mAutoFlag = true
-    fun initData(data: List<PlanItemBean>,index: Int){
+    fun initData(context: Context,data: List<PlanItemBean>,index: Int){
         L.i("plan data: $data")
         mDataList.clear()
         mDataList.addAll(data)
         mCurrentIndex = index
+        mDownLoadFileCache.initializeCache("${context.filesDir}")
     }
 
     fun registerDataCallBack(preInitDataCallBack: PreInitDataCallBack){
@@ -106,6 +109,7 @@ object PlanManager {
         L.i("zipFilePath: $zipFile")
         if (FileUtils.isFileExists(zipFile)){
             L.i("FileExists")
+            mDownLoadFileCache.cacheFile(zipFile)
             block(zipFile)
             return
         }
@@ -115,6 +119,7 @@ object PlanManager {
                 val writeFileFlag = FileIOUtils.writeFileFromBytesByStream("${context.filesDir}/zip/$md5", it.bytes())
                 if (writeFileFlag){
                     L.i("writeFileFlag: success")
+                    mDownLoadFileCache.cacheFile(zipFile)
                     block(zipFile)
                 }else{
                     FileUtils.delete(zipFile)

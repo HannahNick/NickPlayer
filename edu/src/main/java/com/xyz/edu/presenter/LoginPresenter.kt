@@ -64,7 +64,7 @@ class LoginPresenter(context: Context,view: ILoginC.View,model: ILoginC.Model): 
             .io2Main()
             .subscribe({
                 val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
-                PlanManager.initData(it.result.pageContent,itemIndex)
+                PlanManager.initData(context,it.result.pageContent,itemIndex)
                 L.i("requestListData: startIndex $itemIndex")
                 PlanManager.toHome(context)
                 view.loginSuccess()

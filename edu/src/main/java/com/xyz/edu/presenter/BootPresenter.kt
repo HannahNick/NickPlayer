@@ -70,7 +70,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
             .io2Main()
             .subscribe({
                 val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
-                PlanManager.initData(it.result.pageContent,itemIndex)
+                PlanManager.initData(context,it.result.pageContent,itemIndex)
                 L.i("requestListData: startIndex $itemIndex")
                 PlanManager.toHome(context)
                 view.close()
