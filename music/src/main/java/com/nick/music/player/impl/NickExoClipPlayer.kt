@@ -7,110 +7,111 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.source.ClippingMediaSource
-import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.common.collect.ImmutableList
-import com.nick.base.vo.*
 import com.nick.base.vo.enum.UrlType
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.TrackType
+import com.xyz.base.utils.L
 
 
-class NickExoPlayer(context: Context): AbsPlayer() {
+class NickExoClipPlayer(context: Context): AbsPlayer() {
     private val mDataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
     private val mPlayer = ExoPlayer.Builder(context).build()
-
     private val mLoadingToken = "LOADING"
-    init {
-        mPlayer.addListener(object : Player.Listener{
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                super.onPlaybackStateChanged(playbackState)
-                LogUtils.i("playbackState:$playbackState")
-                when(playbackState){
-                    Player.STATE_READY-> {
-                        LogUtils.i("duration: ${mPlayer.duration}")
-                        mDuration = mPlayer.duration.toInt()
-                        mPositionCallBackList.forEach { callback ->
-                            LogUtils.i("回调准备开始")
+    private var mEndPosition = Long.MAX_VALUE
+    private var mNeedSeek = false
+
+    private val mPlayerListener = object : Player.Listener{
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            super.onPlaybackStateChanged(playbackState)
+            LogUtils.i("playbackState:$playbackState")
+            when(playbackState){
+                Player.STATE_READY-> {
+                    LogUtils.i("duration: ${mPlayer.duration}")
+                    mDuration = mPlayer.duration.toInt()
+                    mPositionCallBackList.forEach { callback ->
+                        LogUtils.i("回调准备开始")
+                        showLoading(false)
+                        callback.prepareStart(getPlayInfo())
+                    }
+                    if (mPlayNow){
+                        if (mNeedSeek){
+                            seek(mClipStartPosition)
+                            return
+                        }
+                        mPlayer.play()
+                        LogUtils.i("播放器已播放")
+                        mPositionCallBackList.forEach { callback->
                             showLoading(false)
-                            callback.prepareStart(getPlayInfo())
+                            callback.startPlay(mPlayer.currentPosition)
                         }
-                        if (mPlayNow){
-                            mPlayer.play()
-                            LogUtils.i("播放器已播放")
-                            mPositionCallBackList.forEach { callback->
-                                showLoading(false)
-                                callback.startPlay(mPlayer.currentPosition)
-                            }
-                            LogUtils.i("已回调开始播放")
-                            mPlayStatus = PlayStatus.PLAY
-                            mErrorTimes = 0
-                        }
-                    }
-                    Player.STATE_ENDED-> {
-                        LogUtils.i("mPlayMode:${mPlayMode.name}")
-                        mPositionCallBackList.forEach { callback ->
-                            LogUtils.i("回调播放结束")
-                            callback.playEnd(mIndex)
-                        }
-                        when(mPlayMode){
-                            PlayMode.RANDOM ->{
-                                playNextRandom()
-                            }
-                            PlayMode.SINGLE ->{
-                                seek(mClipStartPosition)
-                            }
-                            PlayMode.CYCLE ->{
-                                next()
-                            }else->{
-                                if (mIndex == mMusicData.size-1){
-                                    mPlayNow = false
-                                    seek(mClipStartPosition)
-                                    pause()
-                                }else{
-                                    next()
-                                }
-                            }
-                        }
-
-                    }
-                    else->{
-                        showLoading(true)
+                        LogUtils.i("已回调开始播放")
+                        mPlayStatus = PlayStatus.PLAY
+                        mErrorTimes = 0
                     }
                 }
-            }
+                Player.STATE_ENDED-> {
+                    LogUtils.i("mPlayMode:${mPlayMode.name}")
+                    mPositionCallBackList.forEach { callback ->
+                        LogUtils.i("回调播放结束")
+                        callback.playEnd(mIndex)
+                    }
+                    when(mPlayMode){
+                        PlayMode.RANDOM ->{
+                            playNextRandom()
+                        }
+                        PlayMode.SINGLE ->{
+                            seek(mClipStartPosition)
+                        }
+                        PlayMode.CYCLE ->{
+                            next()
+                        }else->{
+                        if (mIndex == mMusicData.size-1){
+                            mPlayNow = false
+                            seek(mClipStartPosition)
+                            pause()
+                        }else{
+                            next()
+                        }
+                    }
+                    }
 
-            override fun onPlayerError(error: PlaybackException) {
-                super.onPlayerError(error)
-                LogUtils.e("onPlayerError: $error")
-                if (mErrorTimes==3){
-                    LogUtils.e("播放重试失败")
-                    ToastUtils.showLong("播放重试失败")
-                    return
                 }
-                mErrorTimes++
-                mPlayerHasPrepare = false
-                mPlayer.stop()
-                play(mIndex)
-            }
-
-            override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
-                if(reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION){//当设置单曲循环的时候，会走这个回调函数而不会走 上面的 playbackState == Player.STATE_ENDED
-                    LogUtils.i("onPositionDiscontinuity")
+                else->{
+                    showLoading(true)
                 }
-
             }
+        }
 
-            override fun onTracksChanged(tracks: Tracks) {
-                super.onTracksChanged(tracks)
-                //当音轨切换成功后，更新UI
-                trackLog(tracks.groups)
+        override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+            LogUtils.e("onPlayerError: $error")
+            if (mErrorTimes==3){
+                LogUtils.e("播放重试失败")
+                ToastUtils.showLong("播放重试失败")
+                return
             }
-        })
+            mErrorTimes++
+            mPlayerHasPrepare = false
+            mPlayer.stop()
+            play(mIndex)
+        }
+
+        override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
+            L.i("onPositionDiscontinuity")
+        }
+
+        override fun onTracksChanged(tracks: Tracks) {
+            super.onTracksChanged(tracks)
+            //当音轨切换成功后，更新UI
+            trackLog(tracks.groups)
+        }
+    }
+    init {
+        mPlayer.addListener(mPlayerListener)
         super.init()
     }
 
@@ -172,13 +173,18 @@ class NickExoPlayer(context: Context): AbsPlayer() {
     }
 
     override fun prepareUrlByClipping(url: String, urlType: UrlType, start: Long, end: Long) {
+        L.i("prepareUrlByClipping")
         mIsClip = true
         mClipStartPosition = start
         mPlayNow = true
         if (urlType == UrlType.M3U8){
+            mEndPosition = end
+            if (start>0){
+                mNeedSeek = true
+            }
+            L.i("prepare m3u8")
             val hlsMediaSource = HlsMediaSource.Factory(mDataSourceFactory).createMediaSource(MediaItem.fromUri(url))
-            val clipSource = ClippingMediaSource(hlsMediaSource,start,end)
-            mPlayer.setMediaSource(clipSource)
+            mPlayer.setMediaSource(hlsMediaSource)
             mPlayer.prepare()
         }else{
             // 创建 MediaSource
@@ -206,7 +212,11 @@ class NickExoPlayer(context: Context): AbsPlayer() {
     }
 
     override fun callBackPosition(position: Int) {
-
+        if (position >= mEndPosition) {
+            LogUtils.i("newPosition.positionMs >= mEndPosition")
+            mPlayer.pause() // 停止播放
+            mPlayerListener.onPlaybackStateChanged(Player.STATE_ENDED)
+        }
     }
 
     override fun setPlayWhenReady(ready: Boolean) {
@@ -214,11 +224,13 @@ class NickExoPlayer(context: Context): AbsPlayer() {
     }
 
     override fun seek(num: Int) {
+        mNeedSeek = false
         LogUtils.i("seek: ${num.toLong()}")
         mPlayer.seekTo(num.toLong())
     }
 
     fun seek(num: Long){
+        mNeedSeek = false
         LogUtils.i("seek: $num")
         mPlayer.seekTo(num)
     }

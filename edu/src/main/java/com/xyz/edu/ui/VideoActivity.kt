@@ -10,6 +10,7 @@ import com.enick.base.util.TimeUtil
 import com.nick.base.router.BaseRouter
 import com.nick.base.manager.PlanManager
 import com.nick.base.vo.MusicVo
+import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.vod.ui.fragment.VodFragment
@@ -89,7 +90,8 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         }?:""
         val vodFragment = VodFragment.newInstance(MusicVo(
             path = proxyUrl,
-            liveName = videoName
+            liveName = videoName,
+            pathType = UrlType.M3U8
         ))
         val transaction = supportFragmentManager.beginTransaction()
         transaction.add(R.id.fl_contain, vodFragment)

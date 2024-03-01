@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.TimeUtils
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
+import com.nick.music.player.impl.NickExoClipPlayer
 import com.nick.music.player.impl.NickExoPlayer
 import com.nick.vod.databinding.LayoutVodBinding
 import com.nick.vod.view.LiveGestureControlLayer
@@ -22,7 +23,7 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     LiveGestureControlLayer.GestureCallBack{
 
     private lateinit var mBindingView: LayoutVodBinding
-    private val mPlayerControl by lazy { NickExoPlayer(requireContext()) }
+    private val mPlayerControl by lazy { NickExoClipPlayer(requireContext()) }
 
     companion object{
         val VIDEO_PARAM = "URL_LIST_PARAM"

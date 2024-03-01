@@ -104,6 +104,10 @@ class NickPlayer: AbsPlayer(){
         return mMediaPlayer.currentPosition
     }
 
+    override fun callBackPosition(position: Int) {
+
+    }
+
     override fun setPlayWhenReady(ready: Boolean) {
     }
 

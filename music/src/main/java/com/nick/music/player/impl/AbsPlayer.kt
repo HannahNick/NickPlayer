@@ -67,6 +67,7 @@ abstract class AbsPlayer: PlayerControl {
                 }
 
                 mCurrentPosition = getPlayPosition()
+                callBackPosition(mCurrentPosition)
                 mPositionCallBackList.forEach {
                     it.playPosition(mCurrentPosition)
                 }
@@ -248,5 +249,7 @@ abstract class AbsPlayer: PlayerControl {
      * 获取当前播放位置
      */
     abstract fun getPlayPosition(): Int
+
+    abstract fun callBackPosition(position: Int)
 
 }
