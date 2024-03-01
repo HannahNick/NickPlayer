@@ -54,6 +54,8 @@ interface PlayerControl {
      */
     fun playSource(musicVo: MusicVo)
 
+    fun playSourceByClip(musicVo: MusicVo,start: Long,end: Long)
+
     /**
      * 重唱
      */

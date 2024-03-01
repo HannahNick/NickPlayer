@@ -46,6 +46,9 @@ abstract class AbsPlayer: PlayerControl {
     protected var mErrorTimes = 0
     //是否绑定了Surface
     protected var mHasAttachSurfaceHolder = false
+    //是否只播放片段
+    protected var mIsClip = false
+    protected var mClipStartPosition = 0L
 
 
     protected val mHandler = Handler(Looper.getMainLooper())
@@ -193,6 +196,12 @@ abstract class AbsPlayer: PlayerControl {
     override fun playSource(musicVo: MusicVo) {
         mMusicData.add(mIndex,musicVo)
         play(mIndex)
+    }
+
+    override fun playSourceByClip(musicVo: MusicVo, start: Long, end: Long) {
+        mMusicData.add(mIndex,musicVo)
+        setDataSource(listOf(musicVo))
+        prepareUrlByClipping(musicVo.path,musicVo.pathType,start, end)
     }
 
     override fun setPlayList(data: List<MusicVo>) {

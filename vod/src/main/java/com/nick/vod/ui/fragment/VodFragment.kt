@@ -5,23 +5,18 @@ import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.TimeUtils
 import com.nick.base.vo.MusicVo
-import com.nick.base.vo.enum.UrlType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.impl.NickExoPlayer
-import com.nick.vod.R
 import com.nick.vod.databinding.LayoutVodBinding
 import com.nick.vod.view.LiveGestureControlLayer
 import com.nick.vod.wiget.GestureMessageCenter
 import com.xyz.vod.play.widget.SubRipTextView
 import java.io.File
-import java.util.Arrays
-import kotlin.collections.ArrayList
 
 class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     LiveGestureControlLayer.GestureCallBack{
@@ -30,12 +25,11 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     private val mPlayerControl by lazy { NickExoPlayer(requireContext()) }
 
     companion object{
-        val URL_LIST_PARAM = "URL_LIST_PARAM"
-        val VIDEO_LIST_NAME = "VIDEO_LIST_NAME"
-        fun newInstance(urlList: ArrayList<MusicVo>): VodFragment {
+        val VIDEO_PARAM = "URL_LIST_PARAM"
+        fun newInstance(musicVo: MusicVo): VodFragment {
             val fragment = VodFragment()
             val args = Bundle()
-            args.putParcelableArrayList(URL_LIST_PARAM, urlList)
+            args.putParcelable(VIDEO_PARAM, musicVo)
             fragment.setArguments(args)
             return fragment
         }
@@ -59,11 +53,12 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     private fun initData(){
 //        LogUtils.i("电影本地路径:${PathUtils.getExternalMoviesPath()}/bear.mp4  isExists: ${File(PathUtils.getExternalMoviesPath()+"/bear.mp4").exists()}")
         GestureMessageCenter.registerCallBack(this)
-        val urlList = arguments?.getParcelableArrayList<MusicVo>(URL_LIST_PARAM)
+        val musicVo = arguments?.getParcelable<MusicVo>(VIDEO_PARAM)
 
-        if (urlList!=null){
-            LogUtils.i("urlList: $urlList")
-            mPlayerControl.setPlayList(urlList)
+        if (musicVo!=null){
+            LogUtils.i("urlList: $musicVo")
+//            mPlayerControl.setPlayList(musicVo)
+            mPlayerControl.playSourceByClip(musicVo,5000,7000)
         }else{
             LogUtils.w("data is empty")
         }

@@ -24,7 +24,7 @@ object PlanManager {
     var mDataList: ArrayList<PlanItemBean> = ArrayList()
     var mPreInitDataCallBack: PreInitDataCallBack? = null
     var mCurrentIndex: Int = 0
-    val mDownLoadFileCache by lazy { LRUFileCache(1) }
+    val mDownLoadFileCache by lazy { LRUFileCache(30) }
 
     /**
      * 自动

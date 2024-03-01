@@ -87,10 +87,10 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         val proxyUrl = mProxy?.buildProxyUrl(videoUrl)?.apply {
             L.i(" buildProxyUrl $this")
         }?:""
-        val vodFragment = VodFragment.newInstance(arrayListOf(MusicVo(
+        val vodFragment = VodFragment.newInstance(MusicVo(
             path = proxyUrl,
             liveName = videoName
-        )))
+        ))
         val transaction = supportFragmentManager.beginTransaction()
         transaction.add(R.id.fl_contain, vodFragment)
         transaction.commit()

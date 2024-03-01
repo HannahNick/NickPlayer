@@ -1,15 +1,10 @@
 package com.nick.music.player.impl
 
-import android.R
 import android.content.Context
 import android.view.SurfaceHolder
 import androidx.media3.common.*
-import androidx.media3.common.util.Util
 import androidx.media3.datasource.DataSource
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultDataSourceFactory
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.FileDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.ClippingMediaSource
@@ -67,14 +62,14 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                                 playNextRandom()
                             }
                             PlayMode.SINGLE ->{
-                                seek(0)
+                                seek(mClipStartPosition)
                             }
                             PlayMode.CYCLE ->{
                                 next()
                             }else->{
                                 if (mIndex == mMusicData.size-1){
                                     mPlayNow = false
-                                    seek(0)
+                                    seek(mClipStartPosition)
                                     pause()
                                 }else{
                                     next()
@@ -177,17 +172,29 @@ class NickExoPlayer(context: Context): AbsPlayer() {
     }
 
     override fun prepareUrlByClipping(url: String, urlType: UrlType, start: Long, end: Long) {
-        val clipSource = if (urlType == UrlType.M3U8){
+        mIsClip = true
+        mClipStartPosition = start
+        mPlayNow = true
+        if (urlType == UrlType.M3U8){
             val hlsMediaSource = HlsMediaSource.Factory(mDataSourceFactory).createMediaSource(MediaItem.fromUri(url))
-            ClippingMediaSource(hlsMediaSource,start,end)
+            val clipSource = ClippingMediaSource(hlsMediaSource,start,end)
+            mPlayer.setMediaSource(clipSource)
+            mPlayer.prepare()
         }else{
             // 创建 MediaSource
-            val mediaSource: MediaSource = ProgressiveMediaSource.Factory(mDataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(url))
-            ClippingMediaSource(mediaSource,start,end)
+            val mediaItem: MediaItem = MediaItem.Builder()
+                .setUri(url)
+                .setClippingConfiguration(
+                    MediaItem.ClippingConfiguration.Builder()
+                        .setStartPositionMs(start)
+                        .setEndPositionMs(end)
+                        .build()
+                )
+                .build()
+            mPlayer.setMediaItem(mediaItem)
+            mPlayer.prepare()
         }
-        mPlayer.setMediaSource(clipSource)
-        mPlayer.prepare()
+
     }
 
     override fun playerPause() {
@@ -205,6 +212,11 @@ class NickExoPlayer(context: Context): AbsPlayer() {
     override fun seek(num: Int) {
         LogUtils.i("seek: ${num.toLong()}")
         mPlayer.seekTo(num.toLong())
+    }
+
+    fun seek(num: Long){
+        LogUtils.i("seek: $num")
+        mPlayer.seekTo(num)
     }
 
     override fun setKey(key: Float) {

@@ -7,6 +7,7 @@ import android.view.*
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
+import com.nick.base.vo.MusicVo
 import com.nick.music.R
 import com.nick.vod.ui.fragment.VodFragment
 import com.nick.vod.view.LiveGestureControlLayer
@@ -15,7 +16,11 @@ import com.nick.vod.wiget.GestureMessageCenter
 
 class VodDialog: DialogFragment(),LiveGestureControlLayer.GestureCallBack {
 
-    private val vodFragment = VodFragment()
+    private val vodFragment by lazy {
+        VodFragment.newInstance(MusicVo(
+            path = "${context?.filesDir}/vod/eac.mp4"
+        ))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
