@@ -250,6 +250,9 @@ abstract class AbsPlayer: PlayerControl {
      */
     abstract fun getPlayPosition(): Int
 
+    /**
+     * 回调当前播放位置
+     */
     abstract fun callBackPosition(position: Int)
 
 }

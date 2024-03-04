@@ -69,14 +69,14 @@ class NickExoClipPlayer(context: Context): AbsPlayer() {
                         PlayMode.CYCLE ->{
                             next()
                         }else->{
-                        if (mIndex == mMusicData.size-1){
-                            mPlayNow = false
-                            seek(mClipStartPosition)
-                            pause()
-                        }else{
-                            next()
+                            if (mIndex == mMusicData.size-1){
+                                mPlayNow = false
+                                seek(mClipStartPosition)
+                                pause()
+                            }else{
+                                next()
+                            }
                         }
-                    }
                     }
 
                 }
@@ -173,7 +173,7 @@ class NickExoClipPlayer(context: Context): AbsPlayer() {
     }
 
     override fun prepareUrlByClipping(url: String, urlType: UrlType, start: Long, end: Long) {
-        L.i("prepareUrlByClipping")
+        L.i("prepareUrlByClipping start:$start end:$end")
         mIsClip = true
         mClipStartPosition = start
         mPlayNow = true
@@ -212,8 +212,9 @@ class NickExoClipPlayer(context: Context): AbsPlayer() {
     }
 
     override fun callBackPosition(position: Int) {
+        L.i("callBackPosition:$position")
         if (position >= mEndPosition) {
-            LogUtils.i("newPosition.positionMs >= mEndPosition")
+            LogUtils.i("position:$position >= mEndPosition: $mEndPosition")
             mPlayer.pause() // 停止播放
             mPlayerListener.onPlaybackStateChanged(Player.STATE_ENDED)
         }
@@ -292,6 +293,8 @@ class NickExoClipPlayer(context: Context): AbsPlayer() {
 
     override fun release() {
         super.release()
+        mEndPosition = Long.MAX_VALUE
+        mNeedSeek = false
         mPlayer.release()
     }
 

@@ -59,7 +59,7 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
         if (musicVo!=null){
             LogUtils.i("urlList: $musicVo")
 //            mPlayerControl.setPlayList(musicVo)
-            mPlayerControl.playSourceByClip(musicVo,5000,7000)
+            mPlayerControl.playSourceByClip(musicVo,7000,21000)
         }else{
             LogUtils.w("data is empty")
         }
