@@ -3,10 +3,8 @@ package com.xyz.edu.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.BarUtils
-import com.enick.base.util.TimeUtil
 import com.nick.base.router.BaseRouter
 import com.nick.base.manager.PlanManager
 import com.nick.base.vo.MusicVo
@@ -34,11 +32,11 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
     private var mPersonPlanItemId: String = ""
     private var mItemIndex: Int = 0
     companion object{
-        const val VIDEO_URL = "url"
+        const val VIDEO_URL = "videoUrl"
         const val VIDEO_NAME = "titleName"
         const val PERSON_PLAN_ITEM_ID = "personPlanItemId"
         const val ITEM_INDEX = "itemIndex"
-        const val ZIP_PATH = "zipPath"
+        const val ZIP_URL = "zipUrl"
 
         fun start(context: Context, url: String, titleName: String, personPlanItemId: String, itemIndex: Int){
             val videoIntent = Intent(context,VideoActivity::class.java)
@@ -73,11 +71,13 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
 
     private fun initView(){
         GestureMessageCenter.registerCallBack(this)
-        mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
-        mItemIndex = intent.getIntExtra(ITEM_INDEX,0)
-        val videoUrl = intent.getStringExtra(VIDEO_URL)?:""
+        val data = PlanManager.mDataList[PlanManager.mCurrentIndex]
+
+        mPersonPlanItemId = data.personPlanItemId
+        mItemIndex = PlanManager.mCurrentIndex
+        val videoUrl = data.contentUrl
 //        val videoUrl = "http://video.f666666.xyz/mp4/17190049/file/313_17190049"
-        val videoName = intent.getStringExtra(VIDEO_NAME)?:""
+        val videoName = data.contentTitle
 
         mProxy = if (videoUrl.endsWith("m3u8")){
             KtvPlayProxyManager.createKtvProxy(this)
@@ -125,6 +125,10 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
     override fun preInitDataFinish() {
         L.i("preInitDataFinish")
         finish()
+    }
+
+    override fun getSubtitleFile(filePath: String) {
+        TODO("Not yet implemented")
     }
 
 }

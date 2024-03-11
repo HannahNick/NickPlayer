@@ -16,7 +16,7 @@ ext {
 
             app_base             : '0.2.33',
             vod_play             : '0.0.23',
-            service_base         : '0.4.31.3',
+            service_base         : '0.4.31.6',
             utils_base           : '0.1.32',
             engine_ver           : "0.1.0",
             luban_ktv_proxy      : "1.0.7",

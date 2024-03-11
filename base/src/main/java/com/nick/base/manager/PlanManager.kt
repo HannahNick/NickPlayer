@@ -11,7 +11,6 @@ import com.nick.base.http.HttpManager
 import com.nick.base.model.WordLearningModel
 import com.nick.base.router.BaseRouter
 import com.nick.base.util.LRUFileCache
-import com.xyz.base.app.rx.io2Main
 import com.xyz.base.service.edu.bean.PlanItemBean
 import com.xyz.base.utils.L
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -63,7 +62,7 @@ object PlanManager {
         L.i("nextPlanData: $data")
         when(data.contentType){
             1,2->{
-                toVideo(context,data.contentUrl,data.contentTitle,data.personPlanItemId,index)
+                toVideo(context,data.contentUrl,data.contentTitle,data.personPlanItemId,data.zip.url,index)
                 mPreInitDataCallBack?.preInitDataFinish()
             }
             3->{
@@ -74,7 +73,10 @@ object PlanManager {
 //                context.startActivity(wordLearningIntent)
                 loadingListener?.showLoading()
                 downZip(context,data.zip.url,data.zip.md5){ zipFile->
-                    findGameJson(context,zipFile,data.contentUrl,index,loadingListener)
+                    findInvokeFile(context,zipFile,data.contentUrl,index,loadingListener){file->
+                        L.i("findInvokeFilePath: ${file.parent}, fileName: ${file.name}")
+                        toGame(context,file.parent!!,file.name, mCurrentIndex)
+                    }
                 }
             }
             5->{
@@ -130,41 +132,12 @@ object PlanManager {
             })
     }
 
-
-    fun downZip(context: Context,url: String,md5: String,gameJson: String,index: Int,loadingListener: LoadingListener? = null) {
-        //1.判断压缩文件是否存在
-        val zipFile = File("${context.filesDir}/zip/$md5")
-        L.i("zipFilePath: $zipFile")
-//        val zipFile = File("${context.filesDir}/zip/$md5")
-        if (FileUtils.isFileExists(zipFile)){
-            L.i("FileExists")
-            findGameJson(context,zipFile,gameJson,index,loadingListener)
-            return
-        }
-        //2.不存在就去下载
-//        val wrapUrl = url.appendUrlSwitchStrategy(Utils.UrlSwitchStrategy.TCP_THAN_UDP).appendDispatchStrategy(
-//            Utils.DispatchStrategy.VideoDispatch(
-//                UserManager.token,
-//                UserManager.productCode
-//            )
-//        )
-        val dispose = HttpManager.api.downloadFile(url)
-            .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-            .subscribe({
-                val writeFileFlag = FileIOUtils.writeFileFromBytesByStream("${context.filesDir}/zip/$md5", it.bytes())
-                if (writeFileFlag){
-                    L.i("writeFileFlag: success")
-                    findGameJson(context,File("${context.filesDir}/zip/$md5"),gameJson,index,loadingListener)
-                }else{
-                    FileUtils.delete("${context.filesDir}/zip/$md5")
-                    L.e("writeFileFlag is fail!")
-                }
-            },{
-                it.printStackTrace()
-            })
-    }
-
-    private fun findGameJson(context: Context, zipFile: File, gameJson: String,index: Int,loadingListener: LoadingListener? = null){
+    /**
+     * 解压文件，并找到对应需要执行的文件
+     * zipFile:压缩文件
+     * fileName:后端指定需要使用的文件
+     */
+    private fun findInvokeFile(context: Context, zipFile: File, fileName: String, index: Int, loadingListener: LoadingListener? = null, block:(file: File)->Unit){
         val dispose = Flowable.just(zipFile)
             .map {//判断是否已解压
                 FileUtils.isFileExists("${context.filesDir.absolutePath}/plan/${zipFile.name}")
@@ -181,7 +154,7 @@ object PlanManager {
             .subscribe({
                 L.i("toGame")
                 //将文件信息传回页面
-                toGame(context,"${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}",gameJson,index)
+                block.invoke(File("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}/$fileName"))
                 mPreInitDataCallBack?.preInitDataFinish()
             },{
                 it.printStackTrace()
@@ -192,12 +165,8 @@ object PlanManager {
     }
 
 
-    fun toVideo(context: Context, url: String, titleName: String, personPlanItemId: String, itemIndex: Int){
+    fun toVideo(context: Context, videoUrl: String, titleName: String, personPlanItemId: String, zipUrl: String, itemIndex: Int){
         ARouter.getInstance().build(BaseRouter.AROUTER_VIDEOACTIVITY)
-            .withString("url", url)
-            .withString("titleName", titleName)
-            .withString("personPlanItemId", personPlanItemId)
-            .withInt("itemIndex", itemIndex)
             .navigation()
     }
 

@@ -212,7 +212,7 @@ class NickExoClipPlayer(context: Context): AbsPlayer() {
     }
 
     override fun callBackPosition(position: Int) {
-        L.i("callBackPosition:$position")
+//        L.i("callBackPosition:$position")
         if (position >= mEndPosition) {
             LogUtils.i("position:$position >= mEndPosition: $mEndPosition")
             mPlayer.pause() // 停止播放

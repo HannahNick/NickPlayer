@@ -1,6 +1,7 @@
 package com.xyz.edu.presenter
 
 import android.content.Context
+import com.nick.base.manager.PlanManager
 import com.xyz.base.app.rx.io2Main
 import com.xyz.edu.contract.IVideoC
 import com.nick.base.manager.UserManager
@@ -21,5 +22,11 @@ class VideoPresenter(context: Context, view: IVideoC.View, model: IVideoC.Model)
                 it.printStackTrace()
             }).apply { compositeDisposable.add(this) }
 
+    }
+
+    override fun downSubtitleFile(url: String,md5: String) {
+        PlanManager.downZip(context,url,md5){
+
+        }
     }
 }

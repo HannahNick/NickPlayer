@@ -51,7 +51,7 @@ class PlanActivity :  BaseActivity<IPlanC.Presenter>(), IPlanC.View {
 //                        videoIntent.putExtra(VideoActivity.VIDEO_NAME,data.contentTitle)
 //                        videoIntent.putExtra(VideoActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
 //                        startActivity(videoIntent)
-                        PlanManager.toVideo(context,data.contentUrl,data.contentTitle,data.personPlanItemId,position)
+//                        PlanManager.toVideo(context,data.contentUrl,data.contentTitle,data.personPlanItemId,data.zip.url,position)
                     }
                     3->{
 //                        val wordLearningIntent = Intent(this@PlanActivity,WordLearningActivity::class.java)
@@ -59,7 +59,7 @@ class PlanActivity :  BaseActivity<IPlanC.Presenter>(), IPlanC.View {
 //                        wordLearningIntent.putExtra(WordLearningActivity.ZIP_MD5,data.zip.md5)
 //                        wordLearningIntent.putExtra(WordLearningActivity.PERSON_PLAN_ITEM_ID,data.personPlanItemId)
 //                        startActivity(wordLearningIntent)
-                        PlanManager.downZip(context,data.zip.url,data.zip.md5,data.contentUrl,position)
+//                        PlanManager.downZip(context,data.zip.url,data.zip.md5,data.contentUrl,position)
                     }
                     5->{
 //                        val wordLearningIntent = Intent(this@PlanActivity,WordLearningActivity::class.java)
