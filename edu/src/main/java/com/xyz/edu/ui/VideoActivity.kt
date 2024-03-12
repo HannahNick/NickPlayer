@@ -80,7 +80,6 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         val videoUrl = data.contentUrl
 //        val videoUrl = "http://video.f666666.xyz/mp4/17190049/file/313_17190049"
         val videoName = data.contentTitle
-
         mProxy = if (videoUrl.endsWith("m3u8")){
             KtvPlayProxyManager.createKtvProxy(this)
         }else{
@@ -90,7 +89,6 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         val proxyUrl = mProxy?.buildProxyUrl(videoUrl)?.apply {
             L.i(" buildProxyUrl $this")
         }?:""
-        presenter.downSubtitleFile(data.zip.url,data.zip.md5,data.contentData)
         mVodFragment = VodFragment.newInstance(MusicVo(
             path = proxyUrl,
             liveName = videoName,
@@ -101,6 +99,8 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         val transaction = supportFragmentManager.beginTransaction()
         transaction.add(R.id.fl_contain, mVodFragment)
         transaction.commit()
+        presenter.downSubtitleFile(data.zip.url,data.zip.md5,data.contentData)
+
     }
 
     override fun onDestroy() {

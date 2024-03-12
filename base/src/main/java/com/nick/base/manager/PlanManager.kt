@@ -76,6 +76,7 @@ object PlanManager {
                     findInvokeFile(context,zipFile.name,data.contentUrl,loadingListener){file->
                         L.i("findInvokeFilePath: ${file.parent}, fileName: ${file.name}")
                         toGame(context,file.parent!!,file.name, mCurrentIndex)
+                        mPreInitDataCallBack?.preInitDataFinish()
                     }
                 }
             }
@@ -154,7 +155,6 @@ object PlanManager {
             .subscribe({
                 //将文件信息传回页面
                 block.invoke(File("${context.filesDir.absolutePath}/plan/${zipFileName}/$fileName"))
-                mPreInitDataCallBack?.preInitDataFinish()
             },{
                 it.printStackTrace()
             },{

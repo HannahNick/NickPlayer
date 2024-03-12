@@ -98,7 +98,7 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
             sbSeek.progress = position
             gcLayer.flushPlayStatus()
 
-//            srtvSubtitle.setPosition(position.toLong())
+            srtvSubtitle.setPosition(position.toLong())
         }
 
     }
