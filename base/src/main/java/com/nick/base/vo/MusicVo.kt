@@ -43,4 +43,12 @@ data class MusicVo (
      * 歌词路径
      */
     val lyricPath: String = "",
+    /**
+     * 播放开始时间
+     */
+    var startTime: Long = 0L,
+    /**
+     * 播放结束时间
+     */
+    var stopTime: Long = 0L,
 ): Parcelable

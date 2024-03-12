@@ -6,6 +6,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.TimeUtils
 import com.nick.base.vo.MusicVo
@@ -16,6 +17,7 @@ import com.nick.music.player.impl.NickExoPlayer
 import com.nick.vod.databinding.LayoutVodBinding
 import com.nick.vod.view.LiveGestureControlLayer
 import com.nick.vod.wiget.GestureMessageCenter
+import com.xyz.base.utils.L
 import com.xyz.vod.play.widget.SubRipTextView
 import java.io.File
 
@@ -59,7 +61,7 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
         if (musicVo!=null){
             LogUtils.i("urlList: $musicVo")
 //            mPlayerControl.setPlayList(musicVo)
-            mPlayerControl.playSourceByClip(musicVo,7000,21000)
+            mPlayerControl.playSourceByClip(musicVo,musicVo.startTime,musicVo.stopTime)
         }else{
             LogUtils.w("data is empty")
         }
@@ -140,17 +142,18 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
         mPlayerControl.release()
     }
     fun showSubtitle(subtitleFile: File?, baseOffset: Long){
+        L.i("showSubtitle: ${subtitleFile?.absolutePath}")
         mBindingView.apply {
-            if (subtitleFile == null) {
-                srtvSubtitle.visibility = View.GONE
-            } else {
+            if (FileUtils.isFileExists(subtitleFile)) {
                 srtvSubtitle.visibility = View.VISIBLE
                 srtvSubtitle.setSrtSource(
-                    file = subtitleFile,
+                    file = subtitleFile!!,
                     type = SubRipTextView.Type.COMMON,
                     baseOffset = baseOffset
                 )
 //                srtvSubtitle.setOffset(subtitleAdjustment?.timeOffset?.times(1000) ?: 0)
+            } else {
+                srtvSubtitle.visibility = View.GONE
             }
         }
 

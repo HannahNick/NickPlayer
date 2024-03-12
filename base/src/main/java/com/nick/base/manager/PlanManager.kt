@@ -73,7 +73,7 @@ object PlanManager {
 //                context.startActivity(wordLearningIntent)
                 loadingListener?.showLoading()
                 downZip(context,data.zip.url,data.zip.md5){ zipFile->
-                    findInvokeFile(context,zipFile,data.contentUrl,index,loadingListener){file->
+                    findInvokeFile(context,zipFile.name,data.contentUrl,loadingListener){file->
                         L.i("findInvokeFilePath: ${file.parent}, fileName: ${file.name}")
                         toGame(context,file.parent!!,file.name, mCurrentIndex)
                     }
@@ -134,32 +134,30 @@ object PlanManager {
 
     /**
      * 解压文件，并找到对应需要执行的文件
-     * zipFile:压缩文件
+     * zipFile:压缩文件完整路径
      * fileName:后端指定需要使用的文件
      */
-    private fun findInvokeFile(context: Context, zipFile: File, fileName: String, index: Int, loadingListener: LoadingListener? = null, block:(file: File)->Unit){
-        val dispose = Flowable.just(zipFile)
+    fun findInvokeFile(context: Context, zipFileName: String, fileName: String, loadingListener: LoadingListener? = null, block:(file: File)->Unit){
+        val dispose = Flowable.just(zipFileName)
             .map {//判断是否已解压
-                FileUtils.isFileExists("${context.filesDir.absolutePath}/plan/${zipFile.name}")
+                FileUtils.isFileExists("${context.filesDir.absolutePath}/plan/${zipFileName}")
             }
             .map {
                 if (it){//已经解压了就直接遍历文件返回
-                    FileUtils.listFilesInDir("${context.filesDir}/plan/${FileUtils.getFileNameNoExtension(zipFile)}")
+                    FileUtils.listFilesInDir("${context.filesDir}/plan/$zipFileName")
                 }else{//没解压过就解压文件并遍历返回
-                    ZipUtils.unzipFile(zipFile, File("${context.filesDir}/plan/${zipFile.name}"))
+                    ZipUtils.unzipFile(File("${context.filesDir}/zip/$zipFileName"), File("${context.filesDir}/plan/${zipFileName}"))
                 }
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                L.i("toGame")
                 //将文件信息传回页面
-                block.invoke(File("${context.filesDir.absolutePath}/plan/${FileUtils.getFileNameNoExtension(zipFile)}/$fileName"))
+                block.invoke(File("${context.filesDir.absolutePath}/plan/${zipFileName}/$fileName"))
                 mPreInitDataCallBack?.preInitDataFinish()
             },{
                 it.printStackTrace()
             },{
-                L.i("final fun")
                 loadingListener?.hideLoading()
             })
     }

@@ -22,6 +22,7 @@ import com.xyz.edu.model.VideoModel
 import com.xyz.edu.presenter.VideoPresenter
 import com.xyz.proxy.IProxy
 import com.xyz.proxy.KtvPlayProxyManager
+import java.io.File
 import kotlin.properties.Delegates
 
 @Route(path = BaseRouter.AROUTER_VIDEOACTIVITY)
@@ -31,6 +32,7 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
     private val mBinding by lazy { ActivityVideoBinding.inflate(layoutInflater) }
     private var mPersonPlanItemId: String = ""
     private var mItemIndex: Int = 0
+    private lateinit var mVodFragment: VodFragment
     companion object{
         const val VIDEO_URL = "videoUrl"
         const val VIDEO_NAME = "titleName"
@@ -88,13 +90,16 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         val proxyUrl = mProxy?.buildProxyUrl(videoUrl)?.apply {
             L.i(" buildProxyUrl $this")
         }?:""
-        val vodFragment = VodFragment.newInstance(MusicVo(
+        presenter.downSubtitleFile(data.zip.url,data.zip.md5,data.contentData)
+        mVodFragment = VodFragment.newInstance(MusicVo(
             path = proxyUrl,
             liveName = videoName,
-            pathType = UrlType.M3U8
+            pathType = UrlType.M3U8,
+            startTime = data.startTime,
+            stopTime = data.stopTime
         ))
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.add(R.id.fl_contain, vodFragment)
+        transaction.add(R.id.fl_contain, mVodFragment)
         transaction.commit()
     }
 
@@ -127,8 +132,8 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         finish()
     }
 
-    override fun getSubtitleFile(filePath: String) {
-        TODO("Not yet implemented")
+    override fun getSubtitleFile(file: File) {
+        mVodFragment.showSubtitle(file,0)
     }
 
 }

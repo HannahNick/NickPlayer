@@ -24,9 +24,11 @@ class VideoPresenter(context: Context, view: IVideoC.View, model: IVideoC.Model)
 
     }
 
-    override fun downSubtitleFile(url: String,md5: String) {
-        PlanManager.downZip(context,url,md5){
-
+    override fun downSubtitleFile(zipUrl: String, md5: String,subtitleFileName: String) {
+        PlanManager.downZip(context,zipUrl,md5){
+            PlanManager.findInvokeFile(context,md5,subtitleFileName,null){subtitleFile->
+                view.getSubtitleFile(subtitleFile)
+            }
         }
     }
 }
