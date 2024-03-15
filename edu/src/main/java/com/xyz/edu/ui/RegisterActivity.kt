@@ -85,6 +85,7 @@ class RegisterActivity : BaseActivity<IRegisterC.Presenter>(),IRegisterC.View {
     override fun registerFail(msg: String) {
         ToastUtils.showLong(msg)
         mBinding.btnRegister.isClickable = true
+        showLoading(false)
     }
 
     override fun showLoading(show: Boolean, loadingText: CharSequence?) {

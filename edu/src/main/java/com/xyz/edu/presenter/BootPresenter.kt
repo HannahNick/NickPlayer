@@ -2,6 +2,7 @@ package com.xyz.edu.presenter
 
 import android.content.Context
 import android.text.TextUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.SPUtils
 import com.nick.base.constants.Constant
 import com.nick.base.manager.PlanManager
@@ -69,6 +70,7 @@ class BootPresenter(context: Context, view: IBootC.View, model: IBootC.Model): D
         planModel.getPersonPlanItemList(UserManager.personPlanId,1, ListAdapterUtil.PAGE_SIZE)
             .io2Main()
             .subscribe({
+                LogUtils.json(it)
                 val itemIndex = checkHaveStudyItem(personPlanItemId,it.result.pageContent)
                 PlanManager.initData(context,it.result.pageContent,itemIndex)
                 L.i("requestListData: startIndex $itemIndex")

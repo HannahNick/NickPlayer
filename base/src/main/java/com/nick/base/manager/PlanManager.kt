@@ -41,14 +41,16 @@ object PlanManager {
         mPreInitDataCallBack = preInitDataCallBack
     }
 
-
+    /**
+     * return: 是否最后一条
+     */
     fun toNextPlanItem(context: Context, index: Int = mCurrentIndex,loadingListener: LoadingListener? = null){
         if (!mAutoFlag){
             return
         }
         reportPlan(index)
         val nextIndex = index+1
-        startItem(context,nextIndex,loadingListener)
+        return startItem(context,nextIndex,loadingListener)
     }
 
     fun startItem(context: Context, index: Int = mCurrentIndex ,loadingListener: LoadingListener? = null){
@@ -56,6 +58,7 @@ object PlanManager {
         if (index >= (mDataList.size) || index <0){
             L.w("dataList is last index:$index")
             ToastUtils.showLong("当前课程已学完")
+            mPreInitDataCallBack?.preInitDataFinish()
             return
         }
         val data = mDataList[index]
@@ -88,6 +91,7 @@ object PlanManager {
                 ToastUtils.showLong("else finish")
             }
         }
+        return
     }
 
     /**
