@@ -134,6 +134,8 @@
             app:layout_constraintBottom_toBottomOf="@id/iv_full_screen"
             app:layout_constraintTop_toTopOf="@id/iv_full_screen"
             app:layout_constraintStart_toEndOf="@id/iv_play"
+            android:tag="invisible"
+            android:visibility="gone"
             />
 
     </com.nick.vod.view.VodGestureControlLayer>

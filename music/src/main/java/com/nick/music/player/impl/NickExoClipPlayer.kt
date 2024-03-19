@@ -89,7 +89,7 @@ class NickExoClipPlayer(context: Context): AbsPlayer() {
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
             LogUtils.e("onPlayerError: $error")
-            if (mErrorTimes==3){
+            if (mErrorTimes==10){
                 LogUtils.e("播放重试失败")
                 ToastUtils.showLong("播放重试失败")
                 return
