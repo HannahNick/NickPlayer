@@ -46,6 +46,7 @@ dependencies {
     implementation "com.xyz.auth:api:$dependencies_version.auth_api"
     implementation "com.xyz.module:download-support:$dependencies_version.download_support"
     implementation "com.xyz.module:download-udp-external:$dependencies_version.download_udp_external"
+    implementation "androidx.cardview:cardview:1.0.0"
     implementation project(path: ':music')
     implementation project(path: ':vod')
     implementation project(path: ':base')
@@ -54,6 +55,9 @@ dependencies {
 
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$dependencies_version.quickAdapter"
     implementation "com.alibaba:arouter-api:$dependencies_version.arouter_api"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     kapt "com.alibaba:arouter-compiler:$dependencies_version.arouter_compiler"
     implementation 'com.daimajia.androidanimations:library:2.4@aar'
 

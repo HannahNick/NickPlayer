@@ -27,7 +27,6 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
     private lateinit var mPlayerControl: PlayerControl
     private val mHandler = Handler(Looper.getMainLooper())
     private val mGestureDetectorCompat = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
-
         override fun onDown(e: MotionEvent): Boolean {
             onToggleVisibility()
             return super.onDown(e)

@@ -10,6 +10,7 @@ ext {
             android_appcompat    : "1.6.1",
             android_material     : "1.10.0",
             constraintlayout     : "2.1.4",
+            cardview             : "1.0.0",
 
             arouter_api          : '1.5.2',
             arouter_compiler     : '1.5.2',

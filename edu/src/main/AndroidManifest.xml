@@ -4,45 +4,41 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
+<!--        <activity-->
+<!--            android:name=".ui.DragSelectGameActivity"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".ui.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
-            android:launchMode="singleTask"
-            android:screenOrientation="landscape" />
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.StudySelectActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
-            android:launchMode="singleTask"
-            android:screenOrientation="landscape" />
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.RegisterActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
-            android:launchMode="singleTask"
-            android:screenOrientation="landscape" />
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
-            android:launchMode="singleTask"
-            android:screenOrientation="landscape" />
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.PlanActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="false"
-            android:screenOrientation="landscape" />
+            android:exported="false" />
         <activity
             android:name=".ui.WordLearningActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="false"
-            android:screenOrientation="landscape" />
+            android:exported="false" />
         <activity
             android:name=".ui.VideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="false"
-            android:screenOrientation="landscape" />
+            android:exported="false" />
     </application>
 
 </manifest>
