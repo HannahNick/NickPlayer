@@ -4,11 +4,12 @@ import android.graphics.Rect
 import android.view.View
 import com.xyz.edu.widget.MovingCardView
 import com.xyz.edu.widget.RotateView
+import com.xyz.edu.widget.TargetParent
 
 class BoundaryChecker(private val listener: BoundaryListener) {
-    private val targets = mutableListOf<RotateView>()
+    private val targets = mutableListOf<TargetParent>()
 
-    fun addTarget(target: RotateView) {
+    fun addTarget(target: TargetParent) {
         targets.add(target)
     }
 
@@ -24,7 +25,7 @@ class BoundaryChecker(private val listener: BoundaryListener) {
         }
     }
 
-    fun connectSource(source: MovingCardView,block:(RotateView)-> Unit){
+    fun connectSource(source: MovingCardView,block:(TargetParent)-> Unit){
         val sourceRect = Rect()
         source.getGlobalVisibleRect(sourceRect)
         targets.forEach { target ->

@@ -3,6 +3,7 @@ package com.xyz.edu.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.blankj.utilcode.util.BarUtils
 import com.xyz.edu.callback.DragCallBack
 import com.xyz.edu.databinding.ActivityDragSelectGameBinding
 import com.xyz.edu.manager.BoundaryChecker
@@ -16,17 +17,11 @@ class DragSelectGameActivity : AppCompatActivity(),DragCallBack,BoundaryChecker.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
+        BarUtils.setStatusBarVisibility(this,false)
 
         mBinding.apply {
-            val pointX = (cardViewA.x + cardViewA.width)/2
-            val pointY = cardViewA.y
-            ropeImage.pivotX = pointX
-            ropeImage.pivotY = pointY
             cardViewB.dragCallBack = this@DragSelectGameActivity
-            rotateView.setOnClickListener {
-                rotateView.play()
-            }
-            mBoundaryChecker.addTarget(mBinding.rotateView)
+            mBoundaryChecker.addTarget(mBinding.tpContain)
         }
 
     }
@@ -37,7 +32,6 @@ class DragSelectGameActivity : AppCompatActivity(),DragCallBack,BoundaryChecker.
 
     override fun playConnect(view: MovingCardView) {
         mBoundaryChecker.connectSource(view){
-            mBinding.root.removeView(view)
             it.addSource(view)
         }
     }

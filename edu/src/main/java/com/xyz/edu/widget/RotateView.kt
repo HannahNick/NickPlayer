@@ -1,23 +1,17 @@
 package com.xyz.edu.widget
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
-import android.view.animation.AnticipateOvershootInterpolator
 import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
-import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.children
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import com.blankj.utilcode.util.ConvertUtils
@@ -29,7 +23,7 @@ class RotateView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     var doPlay: Boolean = false
-    val rotate1 = ObjectAnimator.ofFloat(this, "rotation", 0f, 15f).apply {
+    val rotate1 = ObjectAnimator.ofFloat(this, "rotation", 0f, 10f).apply {
         startDelay = 550
         duration=3000
         //先加速后减速
@@ -52,7 +46,7 @@ class RotateView @JvmOverloads constructor(
         })
     }
 
-    val rotate2 = ObjectAnimator.ofFloat(this, "rotation", 15f, -15f).apply {
+    val rotate2 = ObjectAnimator.ofFloat(this, "rotation", 10f, -10f).apply {
         repeatCount = ObjectAnimator.INFINITE
         repeatMode = ObjectAnimator.REVERSE
         duration = 3000
@@ -74,33 +68,59 @@ class RotateView @JvmOverloads constructor(
     }
 
     fun addSource(source: MovingCardView){
-        val layoutParams = ConstraintLayout.LayoutParams(
-            ConstraintLayout.LayoutParams.WRAP_CONTENT,
-            ConvertUtils.dp2px(50f))
-        addView(source,layoutParams)
-        animateViewToCenter(source,this)
-        //这是一个异步操作
-        requestLayout()
-        doPlay = true
-    }
-
-    private fun animateViewToCenter(view: View, container: ConstraintLayout) {
-        view.post {
-            val transition = ChangeBounds()
-            //慢慢加速到指定位置
-            transition.interpolator = AccelerateInterpolator()
-            transition.duration = 500
-
-            TransitionManager.beginDelayedTransition(container, transition)
-
-            val layoutParams = view.layoutParams as ConstraintLayout.LayoutParams
+        moveSource(source){
+            (source.parent as? ViewGroup)?.removeView(source)
+            val layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConvertUtils.dp2px(50f))
             layoutParams.startToStart = R.id.ropeImage
             layoutParams.endToEnd = R.id.ropeImage
             layoutParams.bottomToBottom = R.id.ropeImage
-            view.layoutParams = layoutParams
-            view.x = 0f
-            view.y = 0f
+            addView(source,layoutParams)
+            val paddingDp = ConvertUtils.dp2px(20f)
+            setPadding(paddingDp,0,paddingDp,paddingDp)
+//        animateViewToCenter(source,this)
+            source.x = 0f
+            source.y = 0f
+//        这是一个异步操作
+            requestLayout()
+            doPlay = true
         }
+
+    }
+
+    private fun moveSource(source: MovingCardView,block:()->Unit){
+        //获取当前View的左上角绝对坐标
+        val targetLocation = IntArray(2)
+        getLocationInWindow(targetLocation)
+
+        val targetX = targetLocation[0] - source.width*0.5 + width*0.5  // 目标X坐标 左上角点的坐标-答案宽度的一半+目标宽度的一半
+        val targetY = targetLocation[1]+ height - source.height  // 目标Y坐标
+
+//        val location = IntArray(2)
+//        source.getLocationOnScreen(location)
+        val currentX = source.x
+        val currentY = source.y
+        L.i("开始动画: pivotX:${source.pivotX} pivotY:${source.pivotY} width:${source.width} height:${source.height} X:${source.x} Y:${source.y}")
+        L.i("targetX:${targetX} targetY:${targetY}")
+
+        val animX = ObjectAnimator.ofFloat(source, "translationX", currentX, targetX.toFloat())
+        val animY = ObjectAnimator.ofFloat(source, "translationY", currentY, targetY.toFloat())
+
+        animX.duration = 300  // 动画持续时间，例如1000毫秒
+        animY.duration = 300
+
+        // 同时执行两个动画
+        val animSet = AnimatorSet()
+        animSet.addListener(object :AnimatorListenerAdapter(){
+            override fun onAnimationEnd(animation: Animator) {
+                super.onAnimationEnd(animation)
+                block.invoke()
+            }
+        })
+        animSet.interpolator = DecelerateInterpolator()
+        animSet.playTogether(animX, animY)
+        animSet.start()
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
