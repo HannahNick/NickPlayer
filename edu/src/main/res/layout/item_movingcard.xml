@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.xyz.edu.widget.MovingCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view_b"
+    android:layout_width="wrap_content"
+    android:layout_height="40dp"
+    android:background="@color/white_100"
+    android:gravity="center"
+    >
+</com.xyz.edu.widget.MovingCardView>

@@ -16,25 +16,22 @@ class BoundaryChecker(private val listener: BoundaryListener) {
     fun checkBoundaries(source: MovingCardView) {
         val sourceRect = Rect()
         source.getGlobalVisibleRect(sourceRect)
-
-        targets.forEach { target ->
-            val targetRect = Rect()
-            target.getGlobalVisibleRect(targetRect)
-            val intersects = Rect.intersects(sourceRect, targetRect)
-            listener.onBoundaryIntersected(source, target,intersects)
-        }
+        val targetRect = Rect()
+        val target = targets[source.targetIndex]
+        target.getGlobalVisibleRect(targetRect)
+        val intersects = Rect.intersects(sourceRect, targetRect)
+        listener.onBoundaryIntersected(source, target,intersects)
     }
 
     fun connectSource(source: MovingCardView,block:(TargetParent)-> Unit){
         val sourceRect = Rect()
         source.getGlobalVisibleRect(sourceRect)
-        targets.forEach { target ->
-            val targetRect = Rect()
-            target.getGlobalVisibleRect(targetRect)
-            val intersects = Rect.intersects(sourceRect, targetRect)
-            if (intersects){
-                block(target)
-            }
+        val targetRect = Rect()
+        val target = targets[source.targetIndex]
+        target.getGlobalVisibleRect(targetRect)
+        val intersects = Rect.intersects(sourceRect, targetRect)
+        if (intersects){
+            block(target)
         }
     }
 

@@ -6,39 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.DragSelectGameActivity">
-    <com.xyz.edu.widget.TargetParent
-        android:id="@+id/tp_contain"
-        android:layout_width="wrap_content"
+
+    <com.xyz.edu.widget.HorizontalDistributeViewGroup
+        android:id="@+id/ll_target_pool"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-
-
-    <com.xyz.edu.widget.MovingCardView
-        android:id="@+id/card_view_b"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/dp_50"
-        app:cardCornerRadius="@dimen/dp_10"
-        app:cardElevation="@dimen/dp_6"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        >
-
-        <TextView
-            android:id="@+id/info_text_b"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingStart="@dimen/dp_5"
-            android:paddingEnd="@dimen/dp_5"
-            android:gravity="center"
-            android:text="CardViewB"
-            android:textColor="@color/black"
-            android:textSize="@dimen/sp32"
-            />
-    </com.xyz.edu.widget.MovingCardView>
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

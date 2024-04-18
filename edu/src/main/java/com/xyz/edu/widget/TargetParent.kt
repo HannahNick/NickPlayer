@@ -14,7 +14,7 @@ class TargetParent @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr){
 
     private val mBinding = ViewTargetBinding.inflate(LayoutInflater.from(context),this,true)
-
+    var index: Int = -1
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
@@ -22,6 +22,14 @@ class TargetParent @JvmOverloads constructor(
     }
 
     fun addSource(source: MovingCardView){
-        mBinding.rotateView.addSource(source)
+        mBinding.rotateView.apply {
+            if (rotate1.isStarted||rotate2.isStarted){
+                L.i("动画已经在动了")
+                return
+            }
+            this.addSource(source)
+        }
+
+
     }
 }

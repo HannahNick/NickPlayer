@@ -24,7 +24,6 @@ class RotateView @JvmOverloads constructor(
 
     var doPlay: Boolean = false
     val rotate1 = ObjectAnimator.ofFloat(this, "rotation", 0f, 10f).apply {
-        startDelay = 550
         duration=3000
         //先加速后减速
         interpolator = DecelerateInterpolator()
@@ -72,7 +71,7 @@ class RotateView @JvmOverloads constructor(
             (source.parent as? ViewGroup)?.removeView(source)
             val layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConvertUtils.dp2px(50f))
+                ConvertUtils.dp2px(40f))
             layoutParams.startToStart = R.id.ropeImage
             layoutParams.endToEnd = R.id.ropeImage
             layoutParams.bottomToBottom = R.id.ropeImage
@@ -106,9 +105,11 @@ class RotateView @JvmOverloads constructor(
 
         val animX = ObjectAnimator.ofFloat(source, "translationX", currentX, targetX.toFloat())
         val animY = ObjectAnimator.ofFloat(source, "translationY", currentY, targetY.toFloat())
+        val animR = ObjectAnimator.ofFloat(source, "rotation", source.rotation, 0f)
 
         animX.duration = 300  // 动画持续时间，例如1000毫秒
         animY.duration = 300
+        animR.duration = 300
 
         // 同时执行两个动画
         val animSet = AnimatorSet()
@@ -119,7 +120,7 @@ class RotateView @JvmOverloads constructor(
             }
         })
         animSet.interpolator = DecelerateInterpolator()
-        animSet.playTogether(animX, animY)
+        animSet.playTogether(animX, animY,animR)
         animSet.start()
     }
 
