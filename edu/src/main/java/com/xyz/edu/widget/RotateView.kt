@@ -23,29 +23,13 @@ class RotateView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     var doPlay: Boolean = false
-    val rotate1 = ObjectAnimator.ofFloat(this, "rotation", 0f, 10f).apply {
+    val rotate1 = ObjectAnimator.ofFloat(this, View.ROTATION, 0f, 10f).apply {
         duration=3000
         //先加速后减速
         interpolator = DecelerateInterpolator()
-        addListener(object : android.animation.Animator.AnimatorListener {
-            override fun onAnimationStart(animation: android.animation.Animator) {
-
-            }
-
-            override fun onAnimationEnd(animation: android.animation.Animator) {
-                rotate2.start()
-            }
-
-            override fun onAnimationCancel(animation: android.animation.Animator) {
-            }
-
-            override fun onAnimationRepeat(animation: android.animation.Animator) {
-            }
-
-        })
     }
 
-    val rotate2 = ObjectAnimator.ofFloat(this, "rotation", 10f, -10f).apply {
+    val rotate2 = ObjectAnimator.ofFloat(this, View.ROTATION, 10f, -10f).apply {
         repeatCount = ObjectAnimator.INFINITE
         repeatMode = ObjectAnimator.REVERSE
         duration = 3000
@@ -62,16 +46,17 @@ class RotateView @JvmOverloads constructor(
         //设置旋转圆心坐标
         this.pivotX = width*0.5f
         this.pivotY = 0f
-
-        rotate1.start()
+        val animatorSet = AnimatorSet()
+        animatorSet.playSequentially(rotate1,rotate2)
+        animatorSet.start()
     }
 
     fun addSource(source: MovingCardView){
         moveSource(source){
             (source.parent as? ViewGroup)?.removeView(source)
-            val layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConvertUtils.dp2px(40f))
+            val layoutParams = LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                ConvertUtils.dp2px(50f))
             layoutParams.startToStart = R.id.ropeImage
             layoutParams.endToEnd = R.id.ropeImage
             layoutParams.bottomToBottom = R.id.ropeImage

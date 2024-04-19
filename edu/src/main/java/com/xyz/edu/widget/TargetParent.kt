@@ -4,7 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.DrawableRes
+import androidx.annotation.Nullable
+import androidx.annotation.RawRes
 import com.blankj.utilcode.util.ConvertUtils
+import com.bumptech.glide.Glide
 import com.xyz.base.utils.L
 import com.xyz.edu.databinding.ViewTargetBinding
 import kotlin.math.max
@@ -29,7 +33,11 @@ class TargetParent @JvmOverloads constructor(
             }
             this.addSource(source)
         }
+    }
 
-
+    fun setImg(@RawRes @DrawableRes resourceId: Int){
+        Glide.with(context)
+            .load(resourceId)
+            .into(mBinding.ivTarget)
     }
 }

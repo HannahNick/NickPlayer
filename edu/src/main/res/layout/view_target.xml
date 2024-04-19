@@ -4,33 +4,33 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_view_a"
-        android:layout_width="@dimen/dp_100"
-        android:layout_height="@dimen/dp_100"
+    <RelativeLayout
+        android:id="@+id/rl_target_contain"
+        android:layout_width="@dimen/dp_150"
+        android:layout_height="@dimen/dp_150"
+        android:background="@drawable/image_board"
+        android:padding="@dimen/dp_5"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:cardCornerRadius="@dimen/dp_10"
-        app:cardElevation="@dimen/dp_6"
         >
 
         <ImageView
-            android:id="@+id/info_text_a"
+            android:id="@+id/iv_target"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
             android:src="@drawable/ic_launcher"
             android:background="@color/white_100"
             />
-    </androidx.cardview.widget.CardView>
+    </RelativeLayout>
     <com.xyz.edu.widget.RotateView
         android:id="@+id/rotate_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/card_view_a"
-        app:layout_constraintStart_toStartOf="@id/card_view_a"
-        app:layout_constraintEnd_toEndOf="@id/card_view_a">
+        app:layout_constraintTop_toBottomOf="@id/rl_target_contain"
+        app:layout_constraintStart_toStartOf="@id/rl_target_contain"
+        app:layout_constraintEnd_toEndOf="@id/rl_target_contain">
         <ImageView
             android:id="@+id/ropeImage"
             android:layout_width="@dimen/dp_20"

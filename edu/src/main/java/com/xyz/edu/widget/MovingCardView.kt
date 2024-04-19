@@ -6,12 +6,10 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.MotionEvent
-import android.widget.FrameLayout
 import android.widget.RelativeLayout
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.cardview.widget.CardView
 import com.blankj.utilcode.util.ConvertUtils
-import com.xyz.base.utils.L
 import com.xyz.edu.R
 import com.xyz.edu.callback.DragCallBack
 
@@ -19,34 +17,39 @@ class MovingCardView@JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    private var initialX = 0f
-    private var initialY = 0f
-    private var downRawX = 0f
-    private var downRawY = 0f
-    var dragCallBack: DragCallBack? = null
-    var isInTarget: Boolean = false
-    var isConnect: Boolean = false
-    var targetIndex: Int = -1
+    private var mInitialX = 0f
+    private var mInitialY = 0f
+    private var mDownRawX = 0f
+    private var mDownRawY = 0f
+    //拖拽回调
+    var mDragCallBack: DragCallBack? = null
+    //当前View是否进入到目标范围
+    var mIsInTarget: Boolean = false
+    //当前View是否连接到了目标
+    var mIsConnect: Boolean = false
+    //目标的下标
+    var mTargetIndex: Int = -1
 
-    private val textView: AppCompatTextView by lazy { AppCompatTextView(context) }
+    private val mTextView: AppCompatTextView by lazy { AppCompatTextView(context) }
 
     init {
-        textView.apply {
+        mTextView.apply {
             setPadding(ConvertUtils.dp2px(5f),0,ConvertUtils.dp2px(5f),0)
-            setTextColor(Color.BLACK)
-            setTextSize(ConvertUtils.sp2px(8f).toFloat())
+            setTextColor(Color.WHITE)
+            setTextSize(ConvertUtils.sp2px(10f).toFloat())
             gravity = Gravity.CENTER
             text = "MovingCardView"
             height = ConvertUtils.dp2px(40f)
         }
-        addView(textView)
+        addView(mTextView)
+        background = AppCompatResources.getDrawable(context,R.drawable.answer_bg)
     }
 
 
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         //已经连接就不允许交互
-        if (isConnect){
+        if (mIsConnect){
             return true
         }
         val action = event.actionMasked
@@ -54,32 +57,32 @@ class MovingCardView@JvmOverloads constructor(
         when (action) {
             MotionEvent.ACTION_DOWN -> {
                 // Save the initial position.
-                initialX = x
-                initialY = y
+                mInitialX = x
+                mInitialY = y
 
                 // Remember where we started (for dragging)
-                downRawX = event.rawX
-                downRawY = event.rawY
+                mDownRawX = event.rawX
+                mDownRawY = event.rawY
             }
             MotionEvent.ACTION_MOVE -> {
                 // Calculate the distance moved
-                dragCallBack?.isMoving(this)
+                mDragCallBack?.isMoving(this)
 //                L.i("move,${dragCallBack==null}")
-                val dx = event.rawX - downRawX
-                val dy = event.rawY - downRawY
+                val dx = event.rawX - mDownRawX
+                val dy = event.rawY - mDownRawY
 
                 // Move the object
-                x = initialX + dx
-                y = initialY + dy
+                x = mInitialX + dx
+                y = mInitialY + dy
 
                 // Invalidate to request a redraw
                 invalidate()
             }
             MotionEvent.ACTION_UP -> {
                 // Use ObjectAnimator to animate back to the original position
-                if (isInTarget){
-                    dragCallBack?.playConnect(this)
-                    isConnect = true
+                if (mIsInTarget){
+                    mDragCallBack?.playConnect(this)
+                    mIsConnect = true
                 }else{
                     animateBack()
                 }
@@ -90,11 +93,11 @@ class MovingCardView@JvmOverloads constructor(
 
     private fun animateBack() {
         // Animate X position
-        val animatorX = ObjectAnimator.ofFloat(this, "x", x, initialX)
+        val animatorX = ObjectAnimator.ofFloat(this, "x", x, mInitialX)
         animatorX.duration = 300
 
         // Animate Y position
-        val animatorY = ObjectAnimator.ofFloat(this, "y", y, initialY)
+        val animatorY = ObjectAnimator.ofFloat(this, "y", y, mInitialY)
         animatorY.duration = 300
 
         animatorX.start()
@@ -102,7 +105,7 @@ class MovingCardView@JvmOverloads constructor(
     }
 
     fun setText(content: String){
-        textView.text = content
+        mTextView.text = content
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

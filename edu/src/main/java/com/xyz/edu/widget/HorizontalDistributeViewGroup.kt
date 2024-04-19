@@ -34,33 +34,24 @@ class HorizontalDistributeViewGroup(context: Context, attrs: AttributeSet? = nul
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val count = childCount
-        val width = r - l // ViewGroup的总宽度
+        val width = r - l - paddingLeft - paddingRight // 考虑左右内边距
 
-        // 计算所有可见子视图的总宽度
-        var totalChildWidth = 0
-        for (i in 0 until count) {
-            val child = getChildAt(i)
-            totalChildWidth += child.measuredWidth
-        }
-
-        // 计算居中布局的起始 X 坐标
-        var currentX = (width - totalChildWidth) / 2
+        // 计算每个子视图应分配的宽度
+        val childWidth = width / count
 
         for (i in 0 until count) {
             val child = getChildAt(i)
-            val childWidth = child.measuredWidth
-            val childHeight = child.measuredHeight
+            val childMeasuredWidth = child.measuredWidth
+            val childMeasuredHeight = child.measuredHeight
 
-            val childLeft = currentX
-            val childTop = paddingTop // 垂直方向上可以根据需要调整对齐方式
-            val childRight = childLeft + childWidth
-            val childBottom = childTop + childHeight
+            // 计算每个子视图的左边和右边位置
+            val childLeft = paddingLeft + i * childWidth + (childWidth - childMeasuredWidth) / 2
+            val childTop = 0
+            val childRight = childLeft + childMeasuredWidth
+            val childBottom = childTop + childMeasuredHeight
 
             // 布局子视图
             child.layout(childLeft, childTop, childRight, childBottom)
-
-            // 更新 currentX，准备下一个子视图的布局
-            currentX += childWidth
         }
     }
 }
