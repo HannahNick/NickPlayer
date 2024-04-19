@@ -30,19 +30,17 @@ class MovingCardView@JvmOverloads constructor(
     //目标的下标
     var mTargetIndex: Int = -1
 
-    private val mTextView: AppCompatTextView by lazy { AppCompatTextView(context) }
+    private val mTextView: AppCompatTextView by lazy { AppCompatTextView(context).apply {
+            this.setPadding(ConvertUtils.dp2px(5f),0,ConvertUtils.dp2px(5f),ConvertUtils.dp2px(5f))
+        this.setTextColor(Color.WHITE)
+        this.setTextSize(ConvertUtils.sp2px(10f).toFloat())
+        this.text = "大大打打大大多多"
+    } }
 
     init {
-        mTextView.apply {
-            setPadding(ConvertUtils.dp2px(5f),0,ConvertUtils.dp2px(5f),0)
-            setTextColor(Color.WHITE)
-            setTextSize(ConvertUtils.sp2px(10f).toFloat())
-            gravity = Gravity.CENTER
-            text = "MovingCardView"
-            height = ConvertUtils.dp2px(40f)
-        }
         addView(mTextView)
         background = AppCompatResources.getDrawable(context,R.drawable.answer_bg)
+        gravity = Gravity.CENTER
     }
 
 
