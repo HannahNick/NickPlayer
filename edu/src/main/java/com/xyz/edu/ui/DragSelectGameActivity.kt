@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -24,6 +25,8 @@ import com.xyz.edu.manager.BoundaryChecker
 import com.xyz.edu.util.ViewUtil
 import com.xyz.edu.widget.MovingCardView
 import com.xyz.edu.widget.TargetParent
+import com.xyz.game.AppActivity
+import org.cocos2dx.javascript.InstantAppActivity
 
 class DragSelectGameActivity : AppCompatActivity(),DragCallBack,BoundaryChecker.BoundaryListener {
 
@@ -55,9 +58,10 @@ class DragSelectGameActivity : AppCompatActivity(),DragCallBack,BoundaryChecker.
             for (i in 0 until targetList.size){
                 mBoundaryChecker.addTarget(targetList[i])
                 llTargetPool.addView(targetList[i])
+                targetList[i].showAnimate()
             }
             ivBack.setOnClickListener {
-                finish()
+                startActivity(Intent(this@DragSelectGameActivity,CocosTestActivity::class.java))
             }
         }
         mMovingCardList.addAll(listOf(

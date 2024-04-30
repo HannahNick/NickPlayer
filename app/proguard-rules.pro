@@ -31,3 +31,42 @@
 # -keep class * implements com.alibaba.android.arouter.facade.template.IProvider
 
 -keep class com.xyz.base.service.edu.bean.**{*;}
+
+#-------------------cocos----------------------------
+-keep public class org.cocos2dx.** { *; }
+-dontwarn org.cocos2dx.**
+
+# Proguard Apache HTTP for release
+-keep class org.apache.http.** { *; }
+-dontwarn org.apache.http.**
+
+# Proguard okhttp for release
+-keep class okhttp3.** { *; }
+-dontwarn okhttp3.**
+
+-keep class okio.** { *; }
+-dontwarn okio.**
+
+# Proguard Android Webivew for release. you can comment if you are not using a webview
+-keep public class android.net.http.SslError
+-keep public class android.webkit.WebViewClient
+
+-dontwarn android.webkit.WebView
+-dontwarn android.net.http.SslError
+-dontwarn android.webkit.WebViewClient
+
+# keep anysdk for release. you can comment if you are not using anysdk
+-keep public class com.anysdk.** { *; }
+-dontwarn com.anysdk.**
+
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn android.hardware.BatteryState
+-dontwarn android.hardware.lights.Light
+-dontwarn android.hardware.lights.LightState$Builder
+-dontwarn android.hardware.lights.LightState
+-dontwarn android.hardware.lights.LightsManager$LightsSession
+-dontwarn android.hardware.lights.LightsManager
+-dontwarn android.hardware.lights.LightsRequest$Builder
+-dontwarn android.hardware.lights.LightsRequest
+-dontwarn android.net.ssl.SSLSockets
+-dontwarn android.os.VibratorManager

@@ -10,6 +10,8 @@ import android.widget.RelativeLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatTextView
 import com.blankj.utilcode.util.ConvertUtils
+import com.daimajia.androidanimations.library.Techniques
+import com.daimajia.androidanimations.library.YoYo
 import com.xyz.edu.R
 import com.xyz.edu.callback.DragCallBack
 
@@ -108,5 +110,12 @@ class MovingCardView@JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
+    }
+
+    fun showInAnimate(){
+        YoYo.with(Techniques.Swing)
+            .delay(600)
+            .duration(1000)
+            .playOn(this)
     }
 }

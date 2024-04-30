@@ -4,9 +4,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
-<!--        <activity-->
-<!--            android:name=".ui.DragSelectGameActivity"-->
-<!--            android:exported="false" />-->
+        <activity
+            android:name=".ui.CocosTestActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="singleTask" />
+        <!-- <activity -->
+        <!-- android:name=".ui.DragSelectGameActivity" -->
+        <!-- android:exported="false" /> -->
         <activity
             android:name=".ui.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -39,6 +44,14 @@
             android:name=".ui.VideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false" />
+
+        <meta-data
+            android:name="aia-compat-api-min-version"
+            android:value="1" />
+
+        <meta-data android:name="android.app.lib_name"
+            android:value="cocos2djs" />
+
     </application>
 
 </manifest>

@@ -27,7 +27,7 @@ object ViewUtil {
                 view.visibility = View.VISIBLE
                 var overlap: Boolean
                 L.i("container.width: ${container.width} height:${container.height},view.width:${view.width} height:${view.height} rotation:${view.rotation}")
-
+                view.showInAnimate()
                 do {
                     val randomX = Random.nextInt(0,container.width - view.width)
                     val randomY = Random.nextInt(container.height*2/3,container.height - view.height)

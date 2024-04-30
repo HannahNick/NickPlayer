@@ -43,6 +43,9 @@ ext {
             dialogplus           : "1.11",
             quickAdapter           : "2.9.45",
             gson                : "2.8.5",
+
+            //cocos
+            cocoslib            : "0.0.1.13",
     ]
 
     getProjectName = { Project project ->

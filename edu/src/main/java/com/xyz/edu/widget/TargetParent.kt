@@ -9,6 +9,8 @@ import androidx.annotation.Nullable
 import androidx.annotation.RawRes
 import com.blankj.utilcode.util.ConvertUtils
 import com.bumptech.glide.Glide
+import com.daimajia.androidanimations.library.Techniques
+import com.daimajia.androidanimations.library.YoYo
 import com.xyz.base.utils.L
 import com.xyz.edu.databinding.ViewTargetBinding
 import kotlin.math.max
@@ -39,5 +41,11 @@ class TargetParent @JvmOverloads constructor(
         Glide.with(context)
             .load(resourceId)
             .into(mBinding.ivTarget)
+    }
+
+    fun showAnimate(){
+        YoYo.with(Techniques.ZoomInDown)
+            .duration(500)
+            .playOn(this)
     }
 }

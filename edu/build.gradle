@@ -55,6 +55,10 @@ dependencies {
 
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$dependencies_version.quickAdapter"
     implementation "com.alibaba:arouter-api:$dependencies_version.arouter_api"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation "com.xyz.game:lib:$dependencies_version.cocoslib"
+    implementation "com.xyz.game:instance:$dependencies_version.cocoslib"
     kapt "com.alibaba:arouter-compiler:$dependencies_version.arouter_compiler"
     implementation 'com.daimajia.androidanimations:library:2.4@aar'
 
