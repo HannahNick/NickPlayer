@@ -7,7 +7,6 @@
     <application>
         <activity
             android:name=".ui.MusicPlayActivity"
-            android:exported="false"
             android:screenOrientation="portrait"
             >
             <meta-data

@@ -10,6 +10,7 @@ import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.callback.PositionInitFinishListener
+import com.nick.music.entity.Rhythm
 import com.nick.music.model.KrcLineWord
 import com.nick.music.model.LyricsLineInfo
 import com.nick.music.model.TranslateLrcLineInfo
@@ -69,7 +70,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
     /**
      * 歌词数据
      */
-    protected val mRhythmList = ArrayList<RhythmView.Rhythm>()
+    protected val mRhythmList = ArrayList<Rhythm>()
 
     /**
      * 行歌词数据
@@ -357,7 +358,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
         return char in sentence.substring(threeFourthsPosition)
     }
 
-    private fun findCurrentLyrics(currentTime: Long): RhythmView.Rhythm? {
+    private fun findCurrentLyrics(currentTime: Long): Rhythm? {
         var left = 0
         var right = mRhythmList.size - 1
         while (left <= right) {
@@ -398,7 +399,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
             mLineLyricsList.add(KrcLineWord(origin = it.value.lineLyrics))
             duration.forEachIndexed { index, l ->
                 val lastWord = duration.size == index+1
-                mRhythmList.add(RhythmView.Rhythm(
+                mRhythmList.add(Rhythm(
                     duration = l,
                     startTime = startTime[index],
                     wordIndex = wordsIndex[index],
@@ -453,7 +454,7 @@ abstract class KrcLineView @JvmOverloads constructor(context: Context, attribute
 
             duration.forEachIndexed { index, l ->
                 val lastWord = duration.size == index+1
-                val rhythm = RhythmView.Rhythm(
+                val rhythm = Rhythm(
                         duration = l,
                         startTime = startTime[index],
                         wordIndex = wordsIndex[index],

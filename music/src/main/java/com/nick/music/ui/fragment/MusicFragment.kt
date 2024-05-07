@@ -259,12 +259,14 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
     override fun playPosition(position: Int) {
         val playTime = TimeUtils.millis2String(position.toLong(),"mm:ss")
 
+
         lifecycleScope.launchWhenResumed {
             withContext(Dispatchers.Main){
                 mBinding.apply {
                     skPositionBar.progress = position
                     tvPlayTime.text = playTime
                     ktvLyric.setCurrentPosition(position.toLong())
+                    rlvLyrics.setCurrentPosition(position.toLong())
                 }
             }
         }
@@ -290,6 +292,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
             if (krcInfo!=null){
                 rtvRhythm.setData(krcInfo,playInfoDuration)
                 ktvLyric.setData(krcInfo)
+                rlvLyrics.setData(krcInfo)
                 tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
                 tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
             }
