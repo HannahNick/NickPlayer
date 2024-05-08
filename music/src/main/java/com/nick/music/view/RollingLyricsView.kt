@@ -12,6 +12,7 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
 import com.blankj.utilcode.util.LogUtils
 import com.nick.music.R
 import com.nick.music.entity.Rhythm
@@ -72,18 +73,14 @@ class RollingLyricsView @JvmOverloads constructor(context: Context, attributeSet
      */
     private var isRolling = false
 
-    /**
-     * 已唱的y轴位置
-     */
-    var yPosition = height/2 - yOffset
-
+    private var lyricHeights = mutableListOf<Int>()
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
         mOriginWordsPaint.apply {
             typeface = Typeface.DEFAULT_BOLD
-            textSize = (bottom-top)/5f
+            textSize = 50f
             color = context.resources.getColor(R.color.white,null)
             letterSpacing = 0.1f//设置文本间距
             textAlign = Paint.Align.LEFT
@@ -91,7 +88,7 @@ class RollingLyricsView @JvmOverloads constructor(context: Context, attributeSet
 
         mWordsSingPaint.apply {
             typeface = Typeface.DEFAULT_BOLD
-            textSize = (bottom-top)/5f
+            textSize = 50f
             color = context.resources.getColor(R.color.male_voice,null)
             letterSpacing = 0.1f
             textAlign = Paint.Align.LEFT
@@ -102,66 +99,37 @@ class RollingLyricsView @JvmOverloads constructor(context: Context, attributeSet
         }
     }
 
-//    override fun onDraw(canvas: Canvas) {
-//        super.onDraw(canvas)
-//
-//        if (mLineLyricsList.isEmpty()) return
-//
-//        canvas.drawLine(0f,height/2f,width.toFloat(),height/2f,mLinePaint)
-//        for (i in 0 until mLineLyricsList.size){
-//            val lyric = mLineLyricsList[i].origin
-//            //当前要唱的行歌词
-//            if (mCurrentLineIndex == i){
-//                drawLyricText(canvas,lyric,width,mWordsSingPaint)
-//                continue
-//            }
-//            drawLyricText(canvas,lyric,width,mOriginWordsPaint)
-//        }
-//    }
+    fun setLyricHeights() {
+        lyricHeights.clear()
+        mLineLyricsList.forEach { lyric ->
+            val layout = createStaticLayout(lyric.origin, TextPaint(mWordsSingPaint), (width - paddingLeft - paddingRight))
+            lyricHeights.add(layout.height)
+        }
+        yOffset = lyricHeights[0]/2f
+    }
+
+    private fun createStaticLayout(lyric: String, paint: TextPaint, width: Int): StaticLayout {
+        return StaticLayout.Builder.obtain(lyric, 0, lyric.length, paint, width)
+            .setAlignment(Layout.Alignment.ALIGN_CENTER)
+            .build()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (mLineLyricsList.isEmpty()) return
-
+        var currentY = height / 2f - yOffset // 初始Y位置为视图中心
         canvas.drawLine(0f,height/2f,width.toFloat(),height/2f,mLinePaint)
-        for (i in 0 until mLineLyricsList.size){
-            val lyric = mLineLyricsList[i].origin
-            val y = (height / 2) + (i - mCurrentLineIndex) * mWordsSingPaint.textSize * 2 // 计算每行歌词的基线位置
-            //当前要唱的行歌词
-            if (mCurrentLineIndex == i){
-                drawLyricText(canvas,lyric,width,y,mWordsSingPaint)
-                continue
-            }
-            drawLyricText(canvas,lyric,width,y,mOriginWordsPaint)
+        canvas.drawLine(width/2f,0f,width/2f,height.toFloat(),mLinePaint)
+
+        mLineLyricsList.indices.forEach { index ->
+            val lyric = mLineLyricsList[index]
+            val layout = createStaticLayout(lyric.origin, if (index==mCurrentLineIndex) TextPaint(mWordsSingPaint) else TextPaint(mOriginWordsPaint), (width - paddingLeft - paddingRight))
+            canvas.save()
+            canvas.translate(0f, currentY)
+            layout.draw(canvas)
+            canvas.restore()
+            currentY += lyricHeights[index]  // 更新Y位置为下一行歌词的起始位置
         }
-    }
-
-    private fun drawLyricText(canvas: Canvas, text: String, width: Int, yPos: Float,paint: Paint) {
-        val textPaint = TextPaint(paint) // 使用现有的 Paint 设置创建 TextPaint
-        val staticLayout = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, width)
-            .setAlignment(Layout.Alignment.ALIGN_CENTER)
-            .build()
-
-        canvas.save()
-        // 计算居中偏移
-        val textHeight = staticLayout.height
-        canvas.translate(0f, yPos - textHeight / 2)  // 调整canvas位置到文本绘制起点
-        staticLayout.draw(canvas)
-        canvas.restore()
-    }
-
-    private fun drawLyricText(canvas: Canvas, text: String, width: Int,paint: Paint) {
-        val textPaint = TextPaint(paint) // 使用现有的 Paint 设置创建 TextPaint
-        val staticLayout = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, width)
-            .setAlignment(Layout.Alignment.ALIGN_CENTER)
-            .build()
-
-        canvas.save()
-        // 计算居中偏移
-        canvas.translate(0f, yPosition)  // 调整canvas位置到文本绘制起点
-        staticLayout.draw(canvas)
-        canvas.restore()
-        yPosition = yPosition + staticLayout.height - yOffset
     }
 
     fun setData(lyricsInfo: LyricsInfo){
@@ -173,25 +141,26 @@ class RollingLyricsView @JvmOverloads constructor(context: Context, attributeSet
     }
 
     private fun smoothScrollToNext() {
+
+        if (mCurrentLineIndex >= mLineLyricsList.size - 1) return
         isRolling = true
 
-        val textPaint = TextPaint(mOriginWordsPaint)
-        val text = mLineLyricsList[mCurrentLineIndex].origin
-        val staticLayout = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, width)
-            .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-            .build()
+        val currentHeight = lyricHeights[mCurrentLineIndex]
+        val nextHeight = lyricHeights[mCurrentLineIndex + 1]
+        val scrollAmount = (currentHeight + nextHeight) / 2f // 平均两行高度的一半作为滚动距离
+        L.i("scrollAmount: $scrollAmount")
 
-        val animator = ValueAnimator.ofFloat( yOffset,yOffset+staticLayout.height.toFloat())
+        // 配置并启动动画，动画逻辑类似上一个解决方案
+        val animator = ValueAnimator.ofFloat(yOffset, yOffset+scrollAmount)
         animator.addUpdateListener { animation ->
             yOffset = animation.animatedValue as Float
-            L.i("yOffset: $yOffset")
             invalidate()
         }
-        animator.duration = 300  // 动画持续时间，可根据需要调整
+        animator.duration = 300  // 设置动画持续时间
+        animator.interpolator = LinearInterpolator()  // 设置动画插值器
         animator.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                // 动画结束时更新当前歌词索引，重置 yOffset
-                isRolling = false
+                // 动画结束后更新当前歌词索引，并重置偏移量
                 invalidate()
             }
         })
@@ -299,6 +268,7 @@ class RollingLyricsView @JvmOverloads constructor(context: Context, attributeSet
             tempIndex++
 
         }
+        setLyricHeights()
         invalidate()
     }
 
@@ -306,5 +276,6 @@ class RollingLyricsView @JvmOverloads constructor(context: Context, attributeSet
         mRhythmList.clear()
         mLineLyricsList.clear()
         mCurrentPlayDataIndex= 0
+        yOffset = 0f
     }
 }
