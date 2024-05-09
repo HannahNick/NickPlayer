@@ -6,12 +6,16 @@ import android.util.Base64;
 import android.util.Pair;
 
 
+import com.blankj.utilcode.util.ConvertUtils;
+import com.blankj.utilcode.util.DeviceUtils;
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.nick.music.model.LyricsInfo;
 import com.nick.music.model.LyricsLineInfo;
 import com.nick.music.model.LyricsTag;
 import com.nick.music.model.TranslateLrcLineInfo;
+import com.nick.music.util.LyricsUtils;
 import com.nick.music.util.RandomIndexUtil;
 
 import org.json.JSONArray;
@@ -72,11 +76,18 @@ public class KrcLyricsFileReader extends LyricsFileReader {
 
     private final Paint mPaint = new Paint();
     //屏幕是1920的宽度，但是歌词view有间距，所以就设置1820为最大显示宽度
-    private final static float MAX_Width = 1820f;
+    private float MAX_Width = 1820f;
 
     private float mTextSize = 0f;
 
+    private float mRollTextSize = 30f;
+    private final Paint mRollPaint = new Paint();
+
     public KrcLyricsFileReader() {
+        mRollPaint.setTextSize(mRollTextSize);
+        mTextSize = 30f;
+        mPaint.setTextSize(mTextSize);
+        MAX_Width = ConvertUtils.dp2px(500);
     }
 
     @Override
@@ -457,6 +468,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         List<LyricsLineInfo> transliterationResult = new ArrayList<>();
         //没有进行过分割就直接返回
         if (splitLyricsLine.size() == 1) {
+            LyricsUtils.splitLrcLyrics(lyricsLineInfo,mRollPaint, MAX_Width);
             originResult.add(lyricsLineInfo);
             if (transliterationLyricsLineInfo != null) {
                 transliterationResult.add(transliterationLyricsLineInfo);
@@ -511,7 +523,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             tempLyricsLineInfo.setWordsStartTime(tempWordsStartTime);
             tempLyricsLineInfo.setWordsDisInterval(tempWordsDisInterval);
             tempLyricsLineInfo.setLyricsWords2(tempLyricsWords);
-
+            LyricsUtils.splitLrcLyrics(tempLyricsLineInfo,mRollPaint,MAX_Width);
             originResult.add(tempLyricsLineInfo);
             baseIndex = endIndex;
         }

@@ -57,6 +57,20 @@ public class LyricsLineInfo {
         return mLyricsWords;
     }
 
+    /**
+     * 分割歌词行歌词
+     */
+    private List<LyricsLineInfo> mSplitDynamicLrcLineInfos;
+
+    public List<LyricsLineInfo> getSplitLyricsLineInfos() {
+        return mSplitDynamicLrcLineInfos;
+    }
+
+    public void setSplitLyricsLineInfos(
+            List<LyricsLineInfo> splitDynamicLrcLineInfos) {
+        this.mSplitDynamicLrcLineInfos = splitDynamicLrcLineInfos;
+    }
+
     public void setLyricsWords(String[] lyricsWords) {
         if (lyricsWords == null) return;
         String[] tempArray = new String[lyricsWords.length];

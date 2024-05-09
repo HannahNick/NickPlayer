@@ -25,6 +25,7 @@ import com.nick.music.R
 import com.nick.music.databinding.FragmentMusicPlayBinding
 import com.nick.music.entity.PlayInfo
 import com.nick.music.krc.KrcLyricsFileReader
+import com.nick.music.model.LyricsInfo
 import com.nick.music.model.LyricsTag
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
@@ -266,7 +267,8 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
                     skPositionBar.progress = position
                     tvPlayTime.text = playTime
                     ktvLyric.setCurrentPosition(position.toLong())
-                    rlvLyrics.setCurrentPosition(position.toLong())
+//                    rlvLyrics.setCurrentPosition(position.toLong())
+                    mlvLyrics.updateManyLrcView(position.toLong())
                 }
             }
         }
@@ -292,9 +294,15 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
             if (krcInfo!=null){
                 rtvRhythm.setData(krcInfo,playInfoDuration)
                 ktvLyric.setData(krcInfo)
-                rlvLyrics.setData(krcInfo)
+//                rlvLyrics.setData(krcInfo)
                 tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
                 tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
+                mlvLyrics.apply {
+                    initLrcData()
+                    setData(krcInfo.lyricsLineInfoTreeMap,krcInfo.transliterationLrcLineInfos,krcInfo.transliterationLrcLineInfos)
+
+
+                }
             }
 
         }
