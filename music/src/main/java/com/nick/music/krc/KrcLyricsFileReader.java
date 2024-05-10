@@ -472,9 +472,12 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             LyricsUtils.splitLrcLyrics(lyricsLineInfo,mRollPaint, MAX_Width);
             originResult.add(lyricsLineInfo);
             if (transliterationLyricsLineInfo != null) {
+                LyricsUtils.splitLrcLyrics(transliterationLyricsLineInfo,mRollPaint, MAX_Width);
+                transliterationLyricsLineInfo.setWordsDisInterval(lyricsLineInfo.getWordsDisInterval());
                 transliterationResult.add(transliterationLyricsLineInfo);
+                L.i("transliterationResult:"+transliterationResult);
             }
-//            L.i("originResult:"+originResult+"\ntransliterationResult:"+transliterationResult);
+
             return new Pair<>(originResult, transliterationResult);
         }
 
@@ -517,7 +520,10 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                     tempTlLyricsLineInfo.setLyricsWords(Arrays.copyOfRange(transliterationLyricsLineInfo.getLyricsWords(), baseIndex, endIndex));
                     tempTlLyricsLineInfo.setLineLyrics(sumTransliteration(Arrays.copyOfRange(transliterationLyricsLineInfo.getLyricsWords(), baseIndex, endIndex)));
                 }
+                LyricsUtils.splitLrcLyrics(tempTlLyricsLineInfo,mRollPaint, MAX_Width);
+                transliterationLyricsLineInfo.setWordsDisInterval(lyricsLineInfo.getWordsDisInterval());
                 transliterationResult.add(tempTlLyricsLineInfo);
+                L.i("transliterationResult:"+tempTlLyricsLineInfo);
             }
             tempLyricsLineInfo.setLineLyrics(s);
             tempLyricsLineInfo.setWordsIndex(tempWordsIndex);

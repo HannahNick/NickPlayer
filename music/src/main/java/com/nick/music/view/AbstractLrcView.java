@@ -18,6 +18,7 @@ import com.nick.music.model.LyricsInfo;
 import com.nick.music.model.LyricsLineInfo;
 import com.nick.music.util.ColorUtils;
 import com.nick.music.util.LyricsUtils;
+import com.xyz.base.utils.L;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -428,6 +429,7 @@ public abstract class AbstractLrcView extends View {
         mLrcLineInfos.putAll(treeMap);
         mTranslateLrcLineInfos.addAll(translateLrcLineInfos);
         mTransliterationLrcLineInfos.addAll(transliterationLrcLineInfos);
+        L.i(String.format("treeMap: %s ,mTransliterationLrcLineInfos: %s ",treeMap.size(),mTransliterationLrcLineInfos.size()));
     }
 
     /**
@@ -1109,6 +1111,7 @@ public abstract class AbstractLrcView extends View {
         } else if (mExtraLrcStatus == EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
             //显示音译歌词
             if (mTransliterationLrcLineInfos != null && mTransliterationLrcLineInfos.size() > 0) {
+                // TODO: 2024/5/10  mExtraSplitLyricsLineNum 查看值
                 mExtraSplitLyricsLineNum = LyricsUtils.getSplitExtraLyricsLineNum(mTransliterationLrcLineInfos, mLyricsLineNum, playProgress, 0);
 
                 mExtraLyricsWordIndex = LyricsUtils.getExtraLyricsWordIndex(mTransliterationLrcLineInfos, mLyricsLineNum, playProgress, 0);

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.blankj.utilcode.util.LogUtils;
 import com.nick.music.R;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -196,9 +197,8 @@ public class LyricsLineInfo {
     @Override
     public String toString() {
         return "LyricsLineInfo{" +
-                "mStartTime=" + mStartTime +
-                ", mEndTime=" + mEndTime +
-                ", mLineLyrics='" + mLineLyrics + '\'' +
+                "mLyricsWords=" + Arrays.toString(mLyricsWords) +
+                "mSplitDynamicLrcLineInfos=" +
                 '}';
     }
 }

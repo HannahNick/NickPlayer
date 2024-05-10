@@ -457,6 +457,7 @@ public class ManyLyricsView extends AbstractLrcView {
             } else if (i == curLyricsLineNum) {
                 //绘画动感歌词
                 float lineLyricsHLWidth = LyricsUtils.getLineLyricsHLWidth(LyricsInfo.DYNAMIC, paint, splitLyricsLineInfos.get(i), splitLyricsWordIndex, lyricsWordHLTime);
+                L.i(String.format("text: %s  lineLyricsHLWidth: %s",text,lineLyricsHLWidth));
                 LyricsUtils.drawDynamicText(canvas, paint, paintHL, paintColors, paintHLColors, text, lineLyricsHLWidth, textX, lineBottomY);
 
             } else if (i > curLyricsLineNum) {

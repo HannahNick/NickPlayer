@@ -33,6 +33,7 @@ import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
 import com.nick.music.util.Ring
+import com.nick.music.view.AbstractLrcView
 import com.nick.music.view.RhythmView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -300,7 +301,6 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
                 mlvLyrics.apply {
                     initLrcData()
                     setData(krcInfo.lyricsLineInfoTreeMap,krcInfo.transliterationLrcLineInfos,krcInfo.transliterationLrcLineInfos)
-
 
                 }
             }
