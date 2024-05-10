@@ -28,6 +28,7 @@ import com.nick.music.model.LyricsInfo;
 import com.nick.music.model.LyricsLineInfo;
 import com.nick.music.util.ColorUtils;
 import com.nick.music.util.LyricsUtils;
+import com.xyz.base.utils.L;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -313,7 +314,6 @@ public class ManyLyricsView extends AbstractLrcView {
 
         //获取中间位置
         mCentreY = (getHeight() + LyricsUtils.getTextHeight(paintHL)) * 0.5f + getLineAtHeightY(lyricsLineNum) - mOffsetY;
-
 
         //画当前行歌词
         //获取分割后的歌词列表
@@ -727,6 +727,7 @@ public class ManyLyricsView extends AbstractLrcView {
                     duration = duration * getLineSizeNum(lyricsLineNum);
                 }
                 int deltaY = getLineAtHeightY(newLyricsLineNum) - mScroller.getFinalY();
+//                L.i(String.format("newLyricsLineNum:%s ,lyricsLineNum:%s ,getFinalY:%s ,deltaY:%s",newLyricsLineNum,lyricsLineNum,mScroller.getFinalY(),deltaY));
                 mScroller.startScroll(0, mScroller.getFinalY(), 0, deltaY, duration);
 
             }

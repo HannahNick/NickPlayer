@@ -17,6 +17,7 @@ import com.nick.music.model.LyricsTag;
 import com.nick.music.model.TranslateLrcLineInfo;
 import com.nick.music.util.LyricsUtils;
 import com.nick.music.util.RandomIndexUtil;
+import com.xyz.base.utils.L;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -87,7 +88,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         mRollPaint.setTextSize(mRollTextSize);
         mTextSize = 30f;
         mPaint.setTextSize(mTextSize);
-        MAX_Width = ConvertUtils.dp2px(500);
+        MAX_Width = ConvertUtils.dp2px(200);
     }
 
     @Override
@@ -487,7 +488,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         int[] tempWordsIndex;
         long[] tempWordsStartTime;
         long[] tempWordsDisInterval;
-        long tempStartTime = 0;
+        long tempStartTime = lyricsLineInfo.getStartTime();;
 
 
         for (String s : splitLyricsLine) {

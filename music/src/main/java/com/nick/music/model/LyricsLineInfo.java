@@ -192,9 +192,13 @@ public class LyricsLineInfo {
 //
 //    }
 
-    @NonNull
+
     @Override
     public String toString() {
-        return mLineLyrics;
+        return "LyricsLineInfo{" +
+                "mStartTime=" + mStartTime +
+                ", mEndTime=" + mEndTime +
+                ", mLineLyrics='" + mLineLyrics + '\'' +
+                '}';
     }
 }

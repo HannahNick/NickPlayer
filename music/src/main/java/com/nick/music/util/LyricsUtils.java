@@ -9,6 +9,7 @@ import android.graphics.Shader;
 import com.nick.music.model.LyricsInfo;
 import com.nick.music.model.LyricsLineInfo;
 import com.nick.music.model.TranslateLrcLineInfo;
+import com.xyz.base.utils.L;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -395,16 +396,19 @@ public class LyricsUtils {
             for (int i = 0; i < lyricsLineTreeMap.size(); i++) {
                 if (newPlayingTime >= lyricsLineTreeMap.get(i).getStartTime()
                         && newPlayingTime <= lyricsLineTreeMap.get(i).getEndTime()) {
+//                    L.i(String.format("newPlayingTime: %s 1",newPlayingTime));
                     return i;
                 }
                 if (newPlayingTime > lyricsLineTreeMap.get(i).getEndTime()
                         && i + 1 < lyricsLineTreeMap.size()
                         && newPlayingTime <= lyricsLineTreeMap.get(i + 1).getStartTime()) {
+//                    L.i(String.format("newPlayingTime: %s 2",newPlayingTime));
                     return i;
                 }
             }
             if (newPlayingTime >= lyricsLineTreeMap.get(lyricsLineTreeMap.size() - 1)
                     .getEndTime()) {
+//                L.i(String.format("newPlayingTime: %s 3",newPlayingTime));
                 return lyricsLineTreeMap.size() - 1;
             }
         }

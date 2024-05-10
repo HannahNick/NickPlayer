@@ -57,17 +57,9 @@
         android:text="表演者"
         />
 
-    <com.nick.music.view.RollingLyricsView
-        android:id="@+id/rlv_lyrics"
-        android:layout_width="@dimen/dp_300"
-        android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
     <com.nick.music.view.ManyLyricsView
         android:id="@+id/mlv_lyrics"
-        android:layout_width="@dimen/dp_600"
+        android:layout_width="@dimen/dp_300"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
