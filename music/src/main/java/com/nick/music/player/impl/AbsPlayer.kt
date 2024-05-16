@@ -158,12 +158,22 @@ abstract class AbsPlayer: PlayerControl {
 
     override fun playNextRandom() {
         val musicVo = mHasRandomPlayData.nextData()
-        play(mMusicData.indexOf(musicVo))
+        val index = mMusicData.indexOf(musicVo)
+        if (index==mIndex){
+            seek(0)
+        }else{
+            play(index)
+        }
     }
 
     override fun playLastRandom() {
         val musicVo = mHasRandomPlayData.lastData()
-        play(mMusicData.indexOf(musicVo))
+        val index = mMusicData.indexOf(musicVo)
+        if (index==mIndex){
+            seek(0)
+        }else{
+            play(mMusicData.indexOf(musicVo))
+        }
     }
 
     override fun pause() {

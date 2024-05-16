@@ -66,7 +66,8 @@ class NickExoPlayer(context: Context): AbsPlayer() {
                             }
                             PlayMode.CYCLE ->{
                                 next()
-                            }else->{
+                            }
+                            else->{
                                 if (mIndex == mMusicData.size-1){
                                     mPlayNow = false
                                     seek(mClipStartPosition)

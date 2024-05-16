@@ -131,14 +131,25 @@
         android:padding="@dimen/dp_10"
         />
 
-    <SeekBar
+    <com.nick.music.view.TimeSeekBar
         android:id="@+id/sk_position_bar"
         android:layout_width="@dimen/dp_300"
-        android:layout_height="@dimen/dp_25"
+        android:layout_height="wrap_content"
+        android:progressDrawable="@drawable/custom_seekbar_track"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/iv_play"
         android:layout_marginBottom="@dimen/dp_60"
+        />
+
+    <com.nick.music.view.PlayerSeekBar
+        android:id="@+id/psb_position_bar"
+        android:layout_width="@dimen/dp_300"
+        android:layout_height="@dimen/dp_30"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sk_position_bar"
+        android:layout_marginBottom="@dimen/dp_30"
         />
 
     <androidx.appcompat.widget.AppCompatTextView

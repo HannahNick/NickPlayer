@@ -34,13 +34,14 @@ import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
 import com.nick.music.util.Ring
 import com.nick.music.view.AbstractLrcView
+import com.nick.music.view.PlayerSeekBar
 import com.nick.music.view.RhythmView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.LyricCallBackListener {
+class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.LyricCallBackListener,PlayerSeekBar.SeekCallBack {
 
     private val mBinding by lazy { FragmentMusicPlayBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
@@ -74,6 +75,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
                 LogUtils.i("完成数据请求")
                 mMusicBinder.setPlayList(loadData())
             }
+            mMusicBinder.setPlayMode(PlayMode.CYCLE)
         }
         val registerCallBackTask = Runnable {
             mMusicBinder.registerCallBack(this)
@@ -194,7 +196,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
             }
             rtvRhythm.lyricCallBackListener = this@MusicFragment
         }
-
+        mBinding.psbPositionBar.setSeekCallBack(this)
     }
 
     private fun initAudio(){
@@ -245,6 +247,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
     override fun onDestroy() {
         super.onDestroy()
         mMusicBinder.removeCallBack(this)
+        mBinding.psbPositionBar.release()
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder) {
@@ -265,11 +268,12 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
         lifecycleScope.launchWhenResumed {
             withContext(Dispatchers.Main){
                 mBinding.apply {
-                    skPositionBar.progress = position
+                    skPositionBar.updateThumbText(position)
                     tvPlayTime.text = playTime
                     ktvLyric.setCurrentPosition(position.toLong())
 //                    rlvLyrics.setCurrentPosition(position.toLong())
                     mlvLyrics.updateManyLrcView(position.toLong())
+                    psbPositionBar.updateThumbText(position)
                 }
             }
         }
@@ -279,7 +283,8 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
         val playInfoDuration = playInfo.duration.toLong()
         val durationTime = TimeUtils.millis2String(playInfoDuration,"mm:ss")
         mBinding.apply {
-            skPositionBar.max = playInfo.duration
+            skPositionBar.setTotalDuration(playInfo.duration)
+            psbPositionBar.setTotalDuration(playInfo.duration)
             tvDurationTime.text = durationTime
             tvAlbumName.text = playInfo.albumName
             tvMainActor.text = playInfo.mainActor
@@ -319,5 +324,9 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
 
     override fun currentSingLyric(lyric: String) {
         mBinding.tvLyric.text = lyric
+    }
+
+    override fun playSeek(position: Int) {
+        mMusicBinder.seek(position)
     }
 }

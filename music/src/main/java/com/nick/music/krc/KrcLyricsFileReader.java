@@ -491,7 +491,7 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         int[] tempWordsIndex;
         long[] tempWordsStartTime;
         long[] tempWordsDisInterval;
-        long tempStartTime = lyricsLineInfo.getStartTime();;
+        long tempStartTime = lyricsLineInfo.getStartTime();
 
 
         for (String s : splitLyricsLine) {
