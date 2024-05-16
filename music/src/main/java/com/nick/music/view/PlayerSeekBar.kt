@@ -58,22 +58,22 @@ class PlayerSeekBar@JvmOverloads constructor(
     private var mSeekCallBack: SeekCallBack? = null
 
     private val mTextPaint = Paint().apply {
-        color = Color.WHITE
+        color = ContextCompat.getColor(context,R.color.white_100)
         textSize = 20f
         isAntiAlias = true
         textAlign = Paint.Align.CENTER
     }
     private val mDurationLinePaint = Paint().apply {
-        color = ContextCompat.getColor(context,R.color.black_50) // 框的颜色
+        color = ContextCompat.getColor(context,R.color.black_30)
         strokeWidth = 3f
     }
     private val mPlayFinishLinePaint = Paint().apply {
-        color = ContextCompat.getColor(context,R.color.white_100) // 框的颜色
+        color = ContextCompat.getColor(context,R.color.white_100)
         strokeWidth = 3f
     }
 
     private val mRectPaint: Paint = Paint().apply {
-        color = ContextCompat.getColor(context,R.color.black_30) // 框的颜色
+        color = Color.parseColor("#454e5d") // 框的颜色
         strokeWidth = 10f // 边界的宽度
         isAntiAlias = true // 抗锯齿
     }
@@ -86,9 +86,11 @@ class PlayerSeekBar@JvmOverloads constructor(
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         if (gainFocus){
-            mRectPaint.color = ContextCompat.getColor(context,R.color.white_50)
+            mRectPaint.color = ContextCompat.getColor(context,R.color.white_100)
+            mTextPaint.color = ContextCompat.getColor(context,R.color.black_100)
         }else{
-            mRectPaint.color = ContextCompat.getColor(context,R.color.black_30)
+            mRectPaint.color = Color.parseColor("#454e5d")
+            mTextPaint.color = ContextCompat.getColor(context,R.color.white_100)
         }
         invalidate()
     }
@@ -152,9 +154,9 @@ class PlayerSeekBar@JvmOverloads constructor(
         mTextPaint.getTextBounds(mThumbText,0, mThumbText.length, mTextBounds)
         mRectF.set(
             mPlayOffset, // 左边界
-            (height-mTextBounds.height())/2f, // 上边界
+            (height-mTextBounds.height())/2f - mPadding, // 上边界
             mTextBounds.width().toFloat() + 2*mPadding + mPlayOffset, // 右边界
-            mTextBounds.height().toFloat() + (height-mTextBounds.height())/2f// 下边界
+            mTextBounds.height().toFloat() + (height-mTextBounds.height())/2f + mPadding  // 下边界
         )
         canvas.drawLine(0f,height/2f,width.toFloat(),height/2f,mDurationLinePaint)
         canvas.drawLine(0f,height/2f,mPlayOffset,height/2f,mPlayFinishLinePaint)
