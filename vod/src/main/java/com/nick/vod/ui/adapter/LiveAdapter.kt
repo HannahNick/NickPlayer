@@ -7,6 +7,6 @@ import com.nick.vod.R
 
 class LiveAdapter: BaseQuickAdapter<MusicVo, BaseViewHolder>(R.layout.adapter_live_item) {
     override fun convert(holder: BaseViewHolder, item: MusicVo) {
-        holder.setText(R.id.tv_name,item.liveName)
+        holder.setText(R.id.tv_name,item.songName)
     }
 }

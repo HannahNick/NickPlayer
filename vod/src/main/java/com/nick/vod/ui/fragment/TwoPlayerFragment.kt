@@ -59,7 +59,7 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
     private fun initData(){
         val initDataTask = Runnable {
             val vodPath = "${context?.filesDir?.absolutePath}/vod/adc.mp4"
-            mTwoPlayerBinder.setVodPlayerList(listOf(MusicVo(path = vodPath, pathType = UrlType.DEFAULT, liveName = "浙江卫视")))
+            mTwoPlayerBinder.setVodPlayerList(listOf(MusicVo(path = vodPath, pathType = UrlType.DEFAULT, songName = "浙江卫视")))
             mTwoPlayerBinder.setMusicPlayList(loadData())
         }
         val initSurfaceHolderTask = Runnable {
@@ -132,12 +132,12 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
         LogUtils.i("onServiceDisconnected :${name.className}")
     }
 
-    override fun playPosition(position: Int) {
+    override fun playPosition(position: Long) {
         lifecycleScope.launchWhenResumed {
             withContext(Dispatchers.Main){
                 mBinding.apply {
-                    skPosition.progress = position
-                    ktvLyric.setCurrentPosition(position.toLong())
+                    skPosition.progress = position.toInt()
+                    ktvLyric.setCurrentPosition(position)
                 }
             }
         }
@@ -167,7 +167,7 @@ class TwoPlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack, Surfac
                     ktvLyric.release()
                 }
             }
-            skPosition.max = playInfo.duration
+            skPosition.max = playInfo.duration.toInt()
 
         }
     }

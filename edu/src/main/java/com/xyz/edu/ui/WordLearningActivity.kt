@@ -37,7 +37,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
     private val mBinding by lazy { ActivityWordLearningBinding.inflate(layoutInflater) }
     private val mDialog by lazy { DialogUtil.getCustomDialog(this, R.layout.layout_word_learning_window,true, Gravity.START) }
     private lateinit var mWindowAdapter: WordLearningWindowAdapter
-    private val mAudioPlayer: PlayerControl by lazy { NickExoPlayer(this) }
+    private val mAudioPlayer: PlayerControl by lazy { NickExoPlayer(this,"WordLearningActivity") }
     private lateinit var mImgList:List<String>
     private lateinit var mTextList:List<String>
     private var mPersonPlanItemId: String = ""
@@ -95,18 +95,6 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
         presenter.release()
     }
 
-    override fun playPosition(position: Int) {
-
-    }
-
-    override fun prepareStart(playInfo: PlayInfo) {
-
-    }
-
-    override fun startPlay(position: Long) {
-
-    }
-
     override fun playEnd(playIndex: Int) {
         // 切图，换文本
         val currentIndex = playIndex+1
@@ -129,7 +117,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
         L.i("dirPath:$dirPath ,zipDataList:$zipDataList")
         val audioList = zipDataList.map { MusicVo(
             id = it.id,
-            albumName = it.title,
+            songName = it.title,
             mainActors = "",
             path = "$dirPath/${it.audio}",
             pathType = UrlType.DEFAULT

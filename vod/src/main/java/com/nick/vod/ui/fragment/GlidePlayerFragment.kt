@@ -150,12 +150,12 @@ class GlidePlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack {
 
     }
 
-    override fun playPosition(position: Int) {
+    override fun playPosition(position: Long) {
 
         lifecycleScope.launchWhenResumed {
             withContext(Dispatchers.Main){
                 mBinding.apply {
-                    skPosition.progress = position
+                    skPosition.progress = position.toInt()
                 }
             }
         }
@@ -163,7 +163,7 @@ class GlidePlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack {
 
     override fun prepareStart(playInfo: PlayInfo) {
         mBinding.apply {
-            skPosition.max = playInfo.duration
+            skPosition.max = playInfo.duration.toInt()
         }
     }
 

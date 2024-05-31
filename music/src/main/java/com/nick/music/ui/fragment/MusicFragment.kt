@@ -25,7 +25,6 @@ import com.nick.music.R
 import com.nick.music.databinding.FragmentMusicPlayBinding
 import com.nick.music.entity.PlayInfo
 import com.nick.music.krc.KrcLyricsFileReader
-import com.nick.music.model.LyricsInfo
 import com.nick.music.model.LyricsTag
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
@@ -33,7 +32,6 @@ import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
 import com.nick.music.util.Ring
-import com.nick.music.view.AbstractLrcView
 import com.nick.music.view.PlayerSeekBar
 import com.nick.music.view.RhythmView
 import kotlinx.coroutines.Dispatchers
@@ -261,35 +259,35 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
     override fun onServiceDisconnected(name: ComponentName?) {
     }
 
-    override fun playPosition(position: Int) {
-        val playTime = TimeUtils.millis2String(position.toLong(),"mm:ss")
+    override fun playPosition(position: Long) {
+        val playTime = TimeUtils.millis2String(position,"mm:ss")
 
 
         lifecycleScope.launchWhenResumed {
             withContext(Dispatchers.Main){
                 mBinding.apply {
-                    skPositionBar.updateThumbText(position)
+                    skPositionBar.updateThumbText(position.toInt())
                     tvPlayTime.text = playTime
-                    ktvLyric.setCurrentPosition(position.toLong())
+                    ktvLyric.setCurrentPosition(position)
 //                    rlvLyrics.setCurrentPosition(position.toLong())
-                    mlvLyrics.updateManyLrcView(position.toLong())
-                    psbPositionBar.updateThumbText(position)
+                    mlvLyrics.updateManyLrcView(position)
+                    psbPositionBar.updateThumbText(position.toInt())
                 }
             }
         }
     }
 
     override fun prepareStart(playInfo: PlayInfo) {
-        val playInfoDuration = playInfo.duration.toLong()
+        val playInfoDuration = playInfo.duration
         val durationTime = TimeUtils.millis2String(playInfoDuration,"mm:ss")
         mBinding.apply {
-            skPositionBar.setTotalDuration(playInfo.duration)
-            psbPositionBar.setTotalDuration(playInfo.duration)
+            skPositionBar.setTotalDuration(playInfo.duration.toInt())
+            psbPositionBar.setTotalDuration(playInfo.duration.toInt())
             tvDurationTime.text = durationTime
-            tvAlbumName.text = playInfo.albumName
+            tvAlbumName.text = playInfo.songName
             tvMainActor.text = playInfo.mainActor
             ivPlay.setImageResource(R.drawable.play)
-            if (rtvRhythm.mTitle == playInfo.albumName && rtvRhythm.mActor == playInfo.mainActor){
+            if (rtvRhythm.mTitle == playInfo.songName && rtvRhythm.mActor == playInfo.mainActor){
                 return
             }
             val path = playInfo.lyricPath

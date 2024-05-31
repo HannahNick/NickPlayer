@@ -24,7 +24,7 @@ import com.xyz.edu.databinding.ActivityHomeBinding
 class HomeActivity : AppCompatActivity(){
 
     private val mBinding by lazy { ActivityHomeBinding.inflate(layoutInflater) }
-    private val mNickExoPlayer by lazy { NickExoPlayer(this) }
+    private val mNickExoPlayer by lazy { NickExoPlayer(this,"HomeActivity") }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)

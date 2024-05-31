@@ -17,6 +17,7 @@ import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ServiceUtils
 import com.nick.base.vo.MusicVo
+import com.nick.music.entity.AudioTrackType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.KTVServer
@@ -50,7 +51,7 @@ class TwoPlayerFragment2: Fragment(), ServiceConnection, PlayInfoCallBack, Surfa
         initData()
         initServer()
         mBinding.btnChangeTrack.setOnClickListener {
-            mMusicBinder.changeTrack(TrackType.ORIGIN)
+            mMusicBinder.changeTrack(AudioTrackType.ORIGIN)
         }
 
     }
@@ -113,11 +114,11 @@ class TwoPlayerFragment2: Fragment(), ServiceConnection, PlayInfoCallBack, Surfa
         LogUtils.i("onServiceDisconnected :${name.className}")
     }
 
-    override fun playPosition(position: Int) {
+    override fun playPosition(position: Long) {
         lifecycleScope.launchWhenResumed {
             withContext(Dispatchers.Main){
                 mBinding.apply {
-                    ktvLyricParent.setPlayerPosition(position.toLong())
+                    ktvLyricParent.setPlayerPosition(position)
                 }
             }
         }

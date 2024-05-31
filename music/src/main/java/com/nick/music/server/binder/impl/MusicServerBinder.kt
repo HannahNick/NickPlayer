@@ -3,6 +3,7 @@ package com.nick.music.server.binder.impl
 import android.os.Binder
 import android.view.SurfaceHolder
 import com.nick.base.vo.MusicVo
+import com.nick.music.entity.AudioTrackType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.player.PlayerControl
@@ -21,11 +22,11 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
     }
 
     override fun seek(num: Int) {
-        playerControl.seek(num)
+        playerControl.seek(num.toLong())
     }
 
     override fun setKey(key: Float) {
-        playerControl.setKey(key)
+        playerControl.setKey(key.toInt())
     }
 
     override fun playNext() {
@@ -49,7 +50,7 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
     }
 
     override fun getPlayInfo(): PlayInfo {
-        return playerControl.getPlayInfo()
+        return playerControl.getCurrentInfo()
     }
 
     override fun release() {
@@ -76,7 +77,7 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
         playerControl.attachSurfaceHolder(holder)
     }
 
-    override fun changeTrack(trackType: TrackType) {
+    override fun changeTrack(trackType: AudioTrackType) {
         playerControl.changeTrack(trackType)
     }
 

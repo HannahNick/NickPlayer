@@ -3,6 +3,7 @@ package com.nick.music.server.binder
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.nick.base.vo.MusicVo
+import com.nick.music.entity.AudioTrackType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.PlayMode
@@ -92,5 +93,5 @@ interface MusicBinder {
     /**
      * 切换音轨
      */
-    fun changeTrack(trackType: TrackType)
+    fun changeTrack(trackType: AudioTrackType)
 }

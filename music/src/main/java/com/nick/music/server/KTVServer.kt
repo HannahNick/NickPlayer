@@ -13,8 +13,8 @@ import com.nick.music.server.binder.impl.TwoPlayerServerBinder
 class KTVServer: Service() {
 
 //    private val playerControl = NickPlayer()
-    val vodControl by lazy {   NickExoPlayer(this) }
-    val musicControl by lazy {   NickExoPlayer(this) }
+    val vodControl by lazy {   NickExoPlayer(this,"KTVServer") }
+    val musicControl by lazy {   NickExoPlayer(this,"KTVServer") }
     override fun onCreate() {
         super.onCreate()
 

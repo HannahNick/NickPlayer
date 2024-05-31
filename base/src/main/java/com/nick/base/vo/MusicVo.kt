@@ -10,7 +10,7 @@ data class MusicVo (
     /**
      * 专辑名
      */
-    val albumName: String = "",
+    val songName: String = "",
     /**
      * 演唱者
      */
@@ -18,7 +18,7 @@ data class MusicVo (
     /**
      * 外链地址
      */
-    val path: String,
+    var path: String = "",
     /**
      * url类型
      */
@@ -26,7 +26,7 @@ data class MusicVo (
     /**
      * 图片地址
      */
-    val imgPath: String = "",
+    var imgPath: String = "",
     /**
      * 创建时间
      */
@@ -38,17 +38,9 @@ data class MusicVo (
     /**
      * 直播台名
      */
-    val liveName: String = "",
+//    val liveName: String = "",
     /**
      * 歌词路径
      */
     val lyricPath: String = "",
-    /**
-     * 播放开始时间
-     */
-    var startTime: Long = 0L,
-    /**
-     * 播放结束时间
-     */
-    var stopTime: Long = 0L,
 ): Parcelable

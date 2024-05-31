@@ -84,8 +84,11 @@ class MusicPlayNode<T> {
         return mCurrentNode!!.data
     }
 
-    fun nextData(): T {
+    fun nextData(justNextInfo: Boolean = false): T {
         val nextNode = mCurrentNode!!.next
+        if (justNextInfo){
+            return nextNode!!.data
+        }
         //如果当前是最后一个节点就跳到第一个节点
         mCurrentNode = nextNode ?: mFirstNode
         return mCurrentNode!!.data

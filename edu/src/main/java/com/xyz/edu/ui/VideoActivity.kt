@@ -91,10 +91,8 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         }?:""
         mVodFragment = VodFragment.newInstance(MusicVo(
             path = proxyUrl,
-            liveName = videoName,
+            songName = videoName,
             pathType = UrlType.M3U8,
-            startTime = data.startTime,
-            stopTime = data.stopTime
         ))
         val transaction = supportFragmentManager.beginTransaction()
         transaction.add(R.id.fl_contain, mVodFragment)
@@ -106,18 +104,6 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
     override fun onDestroy() {
         super.onDestroy()
         mProxy?.stop()
-    }
-
-    override fun playPosition(position: Int) {
-
-    }
-
-    override fun prepareStart(playInfo: PlayInfo) {
-
-    }
-
-    override fun startPlay(position: Long) {
-
     }
 
     override fun playEnd(playIndex: Int) {

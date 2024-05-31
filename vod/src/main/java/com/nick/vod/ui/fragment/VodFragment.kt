@@ -12,7 +12,6 @@ import com.blankj.utilcode.util.TimeUtils
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
-import com.nick.music.player.impl.NickExoClipPlayer
 import com.nick.music.player.impl.NickExoPlayer
 import com.nick.vod.databinding.LayoutVodBinding
 import com.nick.vod.view.LiveGestureControlLayer
@@ -25,7 +24,7 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     LiveGestureControlLayer.GestureCallBack{
 
     private lateinit var mBindingView: LayoutVodBinding
-    private val mPlayerControl by lazy { NickExoClipPlayer(requireContext()) }
+    private val mPlayerControl by lazy { NickExoPlayer(requireContext(),"VodFragment") }
 
     companion object{
         val VIDEO_PARAM = "URL_LIST_PARAM"
@@ -61,14 +60,14 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
         if (musicVo!=null){
             LogUtils.i("urlList: $musicVo")
 //            mPlayerControl.setPlayList(musicVo)
-            mPlayerControl.playSourceByClip(musicVo,musicVo.startTime,musicVo.stopTime)
+//            mPlayerControl.playSourceByClip(musicVo,musicVo.startTime,musicVo.stopTime)
         }else{
             LogUtils.w("data is empty")
         }
         mBindingView.gcLayer.apply {
             initMusicBinder(mPlayerControl)
         }
-        mBindingView.tvLiveName.text = mPlayerControl.getPlayInfo().liveName
+//        mBindingView.tvLiveName.text = mPlayerControl.getPlayInfo().liveName
         mPlayerControl.attachSurfaceHolder(mBindingView.svVideo.holder)
 
     }
@@ -91,14 +90,14 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
         }
     }
 
-    override fun playPosition(position: Int) {
+    override fun playPosition(position: Long) {
         val playPositionText = TimeUtils.millis2String(position.toLong(),"mm:ss")
         mBindingView.apply {
             tvPlayTime.text = playPositionText
-            sbSeek.progress = position
+            sbSeek.progress = position.toInt()
             gcLayer.flushPlayStatus()
 
-            srtvSubtitle.setPosition(position.toLong())
+            srtvSubtitle.setPosition(position)
         }
 
     }
@@ -108,7 +107,7 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
         mBindingView.apply {
             tvPlayDuration.text = "/$durationText"
             tvPlayTime.text = "00:00"
-            sbSeek.max = playInfo.duration
+            sbSeek.max = playInfo.duration.toInt()
             gcLayer.flushPlayStatus()
         }
     }
@@ -129,7 +128,7 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
     }
 
     override fun seek(position: Int) {
-        mPlayerControl.seek(position)
+        mPlayerControl.seek(position.toLong())
 
     }
 

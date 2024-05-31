@@ -11,6 +11,8 @@ import com.nick.music.player.PlayerControl
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.util.MusicPlayNode
+import com.xyz.base.utils.Dispatcher
+import com.xyz.base.utils.L
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import java.util.*
 import kotlin.collections.ArrayList
@@ -23,97 +25,125 @@ abstract class AbsPlayer: PlayerControl {
     //首次初始化数据,播放数据
     protected val mMusicData = ArrayList<MusicVo>()
     //随机播放列表数据
-    protected lateinit var mHasRandomPlayData: MusicPlayNode<MusicVo>
-    //每秒回调数据的计时器
-    protected val mTimer = Timer()
+    protected val mHasRandomPlayData: MusicPlayNode<MusicVo> = MusicPlayNode()
+
     //当前播放列表下标
     protected var mIndex: Int = 0
     //当前播放歌曲的总时长
-    protected var mDuration: Int = -1
+    protected var mDuration: Long = -1
     //当前播放时间位置
-    protected var mCurrentPosition: Int = -1
+    protected var mCurrentPosition: Long = -1
     //播放模式
-    protected var mPlayMode = PlayMode.DEFAULT
+    protected var mPlayMode = PlayMode.CYCLE
     //播放状态
     protected var mPlayStatus = PlayStatus.PAUSE
     //播放器是否准备完成(加载好资源)
     protected var mPlayerHasPrepare = false
     //播放位置和信息的回调
-    protected var mPositionCallBackList = HashSet<PlayInfoCallBack>()
+    protected var mPositionCallBackList : Dispatcher<PlayInfoCallBack> = Dispatcher.create()
     //是否立即播放
     protected var mPlayNow = false
     //播放错误次数
     protected var mErrorTimes = 0
     //是否绑定了Surface
     protected var mHasAttachSurfaceHolder = false
-    //是否只播放片段
-    protected var mIsClip = false
+
+    private val mHandler = Handler(Looper.getMainLooper())
+    //播放器回调播放位置控制flag
+    protected var mCancelPlayerPositionCallBackFlag = false
+
     protected var mClipStartPosition = 0L
 
 
-    protected val mHandler = Handler(Looper.getMainLooper())
-    protected var tag = false
+    //播放模式列表
+    protected val mPlayerModeList = MusicPlayNode<PlayMode>().apply {
+        add(PlayMode.CYCLE)
+        add(PlayMode.SINGLE)
+        add(PlayMode.RANDOM)
+        setCurrentNode(PlayMode.CYCLE)
+    }
+    private lateinit var mTag: String
 
-
-    protected fun init(){
-        mHandler.post(object : Runnable {
-            override fun run() {
-                if (tag){
-                    return
-                }
-                if (mPlayStatus == PlayStatus.PAUSE){
-                    mHandler.postDelayed(this, 1000)
-                    return
-                }
-
-                mCurrentPosition = getPlayPosition()
-                callBackPosition(mCurrentPosition)
-                mPositionCallBackList.forEach {
-                    it.playPosition(mCurrentPosition)
-                }
-                mHandler.postDelayed(this, 35)
+    private val mCheckPositionRunnable = object : Runnable{
+        override fun run() {
+            if (mCancelPlayerPositionCallBackFlag){
+                return
             }
-        })
+
+            if (mPlayStatus == PlayStatus.PAUSE){
+                mHandler.postDelayed(this, 1000)
+                return
+            }
+            mCurrentPosition = getPlayPosition()
+            mPositionCallBackList.dispatch {
+                playPosition(mCurrentPosition)
+            }
+            mHandler.postDelayed(this,  35  )
+        }
+    }
+
+    private val mNextInfoRunnable = object : Runnable{
+        override fun run() {
+            mPositionCallBackList.dispatch {
+                nextInfo(getNextCurrentInfo())
+            }
+        }
+    }
+
+    companion object{
+        const val NEXTINFO_RUNNABLE_TOKEN = "nextinfoRunnableToken"
+    }
+
+    protected fun init(tag: String){
+        mTag = tag
+        mHandler.post(mCheckPositionRunnable)
     }
 
 
+
     override fun release() {
-        tag = true
+        mCancelPlayerPositionCallBackFlag = true
         mHandler.removeCallbacksAndMessages(null)
         mMusicData.clear()
         mHasRandomPlayData.reset()
         mPositionCallBackList.clear()
     }
 
-    private fun setDataSource(data: List<MusicVo>){
-        LogUtils.i("setDataSource: $data")
+    private fun setDataSource(data: List<MusicVo>,playIndex: Int){
         mMusicData.clear()
         mMusicData.addAll(data)
-        mIndex = 0
+        mIndex = playIndex
         //设置
         val randomList = ArrayList(mMusicData).shuffled()
-        if (::mHasRandomPlayData.isInitialized){
-            mHasRandomPlayData.reset()
-        }else{
-            mHasRandomPlayData = MusicPlayNode()
-        }
+        mHasRandomPlayData.reset()
         randomList.forEach {
             mHasRandomPlayData.add(it)
         }
+        mHasRandomPlayData.setCurrentNode(data[playIndex])
         mPlayNow = false
     }
 
+    override fun getPlayerList(): List<MusicVo> {
+        return mMusicData
+    }
+
     override fun registerCallBack(callBack: PlayInfoCallBack) {
+        L.i("registerCallBack")
         mPositionCallBackList.add(callBack)
     }
 
     override fun removeCallBack(callBack: PlayInfoCallBack) {
-        if (mPositionCallBackList.contains(callBack)){
+        if (mPositionCallBackList.contain(callBack)){
+            L.i("removeCallBack")
             mPositionCallBackList.remove(callBack)
         }
     }
 
-    override fun getPlayInfo(): PlayInfo {
+    override fun getCurrentInfo(): PlayInfo {
+        if (mMusicData.isEmpty()){
+            return PlayInfo()
+        }
+
         val musicVo = mMusicData[mIndex]
         return PlayInfo().apply {
             dataIndex = mIndex
@@ -121,16 +151,58 @@ abstract class AbsPlayer: PlayerControl {
             playMode = mPlayMode
             currentPosition = getPlayPosition()
             duration = mDuration
-            albumName = musicVo.albumName
+            songName = musicVo.songName
             mainActor = musicVo.mainActors
-            liveName = musicVo.liveName
+//            liveName = musicVo.liveName
             lyricPath = musicVo.lyricPath
             url = musicVo.path
+            imgPath = musicVo.imgPath
         }
     }
 
-    override fun setPlayMode(playMode: PlayMode) {
-        mPlayMode = playMode
+    override fun getNextCurrentInfo(): PlayInfo {
+        if (mMusicData.isEmpty()){
+            return PlayInfo()
+        }
+        val musicVo = when(mPlayMode){
+            PlayMode.RANDOM ->{
+                mHasRandomPlayData.nextData(true)
+            }
+            PlayMode.SINGLE ->{
+                mMusicData[mIndex]
+            }
+            else ->{
+                val nextIndex: Int = if (mIndex+1>=mMusicData.size){
+                    0
+                }else{
+                    mIndex+1
+                }
+                mMusicData[nextIndex]
+            }
+        }
+        return PlayInfo().apply {
+            dataIndex = mMusicData.indexOf(musicVo)
+            playStatus = mPlayStatus
+            playMode = mPlayMode
+            currentPosition = 0
+            duration = 0
+            songName = musicVo.songName
+            mainActor = musicVo.mainActors
+//            liveName = musicVo.liveName
+            lyricPath = musicVo.lyricPath
+            url = musicVo.path
+            imgPath = musicVo.imgPath
+        }
+    }
+
+    override fun setPlayMode(playMode: PlayMode?) {
+        mPlayMode = if (playMode==null){
+            mPlayerModeList.nextData()
+        }else{
+            mPlayerModeList.setCurrentNode(playMode)
+            playMode
+        }
+        L.i("setPlayMode: ${mPlayMode.name}")
     }
 
     override fun getRandomMusicList(): List<MusicVo> {
@@ -142,16 +214,24 @@ abstract class AbsPlayer: PlayerControl {
             return
         }
         if (mIndex == index && mPlayerHasPrepare){
-            if (mPlayStatus==PlayStatus.PAUSE){
+            if (mPlayStatus== PlayStatus.PAUSE){
+                mPlayNow = true
                 startPlay()
-                mPlayStatus = PlayStatus.PLAY
             }
             return
         }
-        mIndex = index
+        forcePlay(index)
+    }
+
+    override fun forcePlay(index: Int) {
+        mHandler.removeCallbacksAndMessages(NEXTINFO_RUNNABLE_TOKEN)
+        mHandler.postDelayed(mNextInfoRunnable,NEXTINFO_RUNNABLE_TOKEN,30000)
         mPlayNow = true
+        mIndex = index
         mPlayerHasPrepare = false
+        mCancelPlayerPositionCallBackFlag = false
         val musicVo = mMusicData[index]
+        L.i("playData: $musicVo")
         playUrl(musicVo.path,musicVo.pathType)
         mHasRandomPlayData.setCurrentNode(musicVo)
     }
@@ -172,18 +252,25 @@ abstract class AbsPlayer: PlayerControl {
         if (index==mIndex){
             seek(0)
         }else{
-            play(mMusicData.indexOf(musicVo))
+            play(index)
         }
     }
 
     override fun pause() {
+        mPlayNow = false
         playerPause()
-        mPlayStatus = PlayStatus.PAUSE
     }
 
     override fun next() {
+        L.i("next playMode: $mPlayMode")
         if (mPlayMode == PlayMode.RANDOM){
             playNextRandom()
+            return
+        }
+        if (mPlayMode == PlayMode.SINGLE){
+            if (isPlay()){
+                seek(0)
+            }
             return
         }
         if (mIndex+1>=mMusicData.size){
@@ -195,6 +282,12 @@ abstract class AbsPlayer: PlayerControl {
     override fun last() {
         if (mPlayMode == PlayMode.RANDOM){
             playLastRandom()
+            return
+        }
+        if (mPlayMode == PlayMode.SINGLE){
+            if (isPlay()){
+                seek(0)
+            }
             return
         }
 
@@ -209,21 +302,35 @@ abstract class AbsPlayer: PlayerControl {
         play(mIndex)
     }
 
-    override fun playSourceByClip(musicVo: MusicVo, start: Long, end: Long) {
-        mMusicData.add(mIndex,musicVo)
-        setDataSource(listOf(musicVo))
-        prepareUrlByClipping(musicVo.path,musicVo.pathType,start, end)
-    }
-
-    override fun setPlayList(data: List<MusicVo>) {
+    override fun setPlayList(data: List<MusicVo>,playIndex: Int) {
+        L.i("$mTag setPlayList: $data")
         if (data.isEmpty()){
-            LogUtils.w("setPlayList data is empty")
+            L.w("$mTag setPlayList data is empty")
             return
         }
-        setDataSource(data)
+        setDataSource(data,playIndex)
         val musicVo = mMusicData[mIndex]
+        L.i("$mTag musicVo: $musicVo")
+        mHandler.removeCallbacksAndMessages(NEXTINFO_RUNNABLE_TOKEN)
+        mHandler.postDelayed(mNextInfoRunnable,NEXTINFO_RUNNABLE_TOKEN,30000)
         prepareUrl(musicVo.path,musicVo.pathType)
+        mPositionCallBackList.dispatch {
+            this.updatePlayList(getPlayerList(),true)
+        }
+    }
 
+    override fun appendPlayList(data: List<MusicVo>) {
+        L.i("$mTag appendPlayList: $data")
+        //添加到普通列表
+        mMusicData.addAll(data)
+        //添加到随机列表
+        val tempRandomList = ArrayList(data).shuffled()
+        tempRandomList.forEach {
+            mHasRandomPlayData.add(it)
+        }
+        mPositionCallBackList.dispatch {
+            this.updatePlayList(data,false)
+        }
     }
 
     override fun hasAttachSurfaceHolder(): Boolean {
@@ -246,23 +353,15 @@ abstract class AbsPlayer: PlayerControl {
     abstract fun prepareUrl(url: String,urlType: UrlType = UrlType.DEFAULT)
 
     /**
-     * 准备播放并指定播放片段
-     */
-    abstract fun prepareUrlByClipping(url: String,urlType: UrlType = UrlType.DEFAULT,start: Long,end: Long)
-
-    /**
      * 播放暂停
      */
     abstract fun playerPause()
 
+    abstract override fun stop()
+
     /**
      * 获取当前播放位置
      */
-    abstract fun getPlayPosition(): Int
-
-    /**
-     * 回调当前播放位置
-     */
-    abstract fun callBackPosition(position: Int)
+    abstract fun getPlayPosition(): Long
 
 }

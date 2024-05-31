@@ -15,7 +15,7 @@ import com.nick.music.player.impl.NickExoPlayer
 import com.nick.music.server.PlayMode
 import java.io.File
 
-class KtvMp3PlayerView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0,private val playerControl:  PlayerControl = NickExoPlayer(context))
+class KtvMp3PlayerView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0,private val playerControl:  PlayerControl = NickExoPlayer(context,"KtvMp3PlayerView"))
     : FrameLayout(context, attributeSet, defStyleAttr),PlayerControl by playerControl{
 
     private val mSurfaceView: SurfaceView
@@ -50,7 +50,7 @@ class KtvMp3PlayerView @JvmOverloads constructor(context: Context, attributeSet:
             // TODO: 加日志
             return
         }
-        playerControl.setPlayList(listOf(MusicVo(path = loopFile.absolutePath, pathType = UrlType.DEFAULT, liveName = "")))
+        playerControl.setPlayList(listOf(MusicVo(path = loopFile.absolutePath, pathType = UrlType.DEFAULT, songName = "")))
     }
 
     fun setPlayerPosition(position: Long){

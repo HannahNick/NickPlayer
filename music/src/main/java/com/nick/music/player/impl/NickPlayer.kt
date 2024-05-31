@@ -6,13 +6,14 @@ import android.view.SurfaceHolder
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.nick.base.vo.enum.UrlType
+import com.nick.music.entity.AudioTrackType
 import com.nick.music.kt.play
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.TrackType
 
 @RequiresApi(Build.VERSION_CODES.Q)
-class NickPlayer: AbsPlayer(){
+class NickPlayer(val tag: String): AbsPlayer(){
     private val mMediaPlayer = MediaPlayer()
 
     init {
@@ -36,30 +37,26 @@ class NickPlayer: AbsPlayer(){
             }
             setOnPreparedListener {
                 mPlayerHasPrepare = true
-                mDuration = it.duration
+                mDuration = it.duration.toLong()
                 if (mPlayNow){
                     it.start()
                     mPlayStatus = PlayStatus.PLAY
                 }
 
-                mPositionCallBackList.forEach { callback->
-                    callback.prepareStart(getPlayInfo())
+                mPositionCallBackList.dispatch {
+                    prepareStart(getCurrentInfo())
                 }
             }
             setOnBufferingUpdateListener { mp,precent ->
                 LogUtils.i("已缓存:${precent}%")
             }
         }
-        super.init()
+        super.init(tag)
         LogUtils.i("初始化完成")
     }
 
-    override fun seek(num: Int) {
-        mMediaPlayer.seekTo(num)
-    }
-
-    override fun setKey(key: Float) {
-        TODO("Not yet implemented")
+    override fun seek(num: Long) {
+        mMediaPlayer.seekTo(num.toInt())
     }
 
     override fun replay() {
@@ -92,20 +89,16 @@ class NickPlayer: AbsPlayer(){
         mMediaPlayer.prepareAsync()
     }
 
-    override fun prepareUrlByClipping(url: String, urlType: UrlType, start: Long, end: Long) {
-
-    }
-
     override fun playerPause() {
         mMediaPlayer.pause()
     }
 
-    override fun getPlayPosition(): Int {
-        return mMediaPlayer.currentPosition
+    override fun stop() {
+        TODO("Not yet implemented")
     }
 
-    override fun callBackPosition(position: Int) {
-
+    override fun getPlayPosition(): Long {
+        return mMediaPlayer.currentPosition.toLong()
     }
 
     override fun setPlayWhenReady(ready: Boolean) {
@@ -124,8 +117,24 @@ class NickPlayer: AbsPlayer(){
     override fun mute() {
     }
 
-    override fun changeTrack(trackType: TrackType) {
+    override fun isPlay(): Boolean {
+        return mMediaPlayer.isPlaying
+    }
 
+    override fun changeTrack(audioTrackType: AudioTrackType) {
+//        mMediaPlayer.selectTrack()
+    }
+
+    override fun getCurrentAudioTrack(): AudioTrackType {
+        TODO("Not yet implemented")
+    }
+
+    override fun toggle() {
+        if (mMediaPlayer.isPlaying){
+            pause()
+        }else{
+            play(mIndex)
+        }
     }
 
 }

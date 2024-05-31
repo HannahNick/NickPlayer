@@ -59,15 +59,15 @@ class LiveFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHold
 //        LogUtils.i("电影本地路径:${PathUtils.getExternalMoviesPath()}/bear.mp4  isExists: ${File(PathUtils.getExternalMoviesPath()+"/bear.mp4").exists()}")
         val initDataTask = Runnable {
             val data = listOf(
-                MusicVo(path = "http://ali-vl.cztv.com/channels/lantian/channel001/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=edb9ed932efb100c8acc51590186e08e&t=1684153870", pathType = UrlType.M3U8, liveName = "浙江卫视"),
-                MusicVo(path = "https://padtx.qing.mgtv.com/nn_live/nn_x64/cWlkPSZzPTQzZjQyOWI3ZTMzZTNiNzVlMTFjODg2ZDNjODhlYzMxJmVzPTE2ODQyNTQzMTgmdXVpZD0wYjJjMTExMTU1YTg5ZmU0ZGZhYjU4NDc3NDE0YzFiOS03MTU5MGJlMiZ2PTImYXM9MCZjZG5leF9pZD10eF9waG9uZV9saXZl/HNYLMPP360.m3u8?_t=1684225517852&_t=1684225523139", pathType = UrlType.M3U8, liveName = "芒果娱乐"),
-                MusicVo(path = "https://sztv-live.cutv.com/AxeFRth/500/q37Ake0.m3u8?sign=c83f63f5ad2220b8b0da5f2cb473dd4e&t=6465a1f7", pathType = UrlType.M3U8, liveName = "深圳卫视"),
-                MusicVo(path = "https://sztv-live.cutv.com/2q76Sw2/500/d6k2k70.m3u8?sign=5a19cd512fa208ff3fe9d76e30b4ae70&t=6465a20d", pathType = UrlType.M3U8, liveName = "深圳公共频道"),
-                MusicVo(path = "https://sztv-live.cutv.com/1q4iPng/500/f5i1k40.m3u8?sign=5066b6ac5083c16f59a5a813d871672a&t=6465a222", pathType = UrlType.M3U8, liveName = "深圳娱乐频道"),
-                MusicVo(path = "https://sztv-live.cutv.com/4azbkoY/500/63r4kz0.m3u8?sign=21eb8f57979d42e78212ee6d8ca1b2af&t=6465a232", pathType = UrlType.M3U8, liveName = "深圳电视剧频道"),
-                MusicVo(path = "https://volc-stream.kksmg.com/live/dfws/index.m3u8?volcSecret=4f341cef920f83557063876cdf400f28&volcTime=1684312287", pathType = UrlType.M3U8, liveName = "东方卫视"),
-                MusicVo(path = "https://tencent-stream.kksmg.com/live/ylpd.m3u8?txSecret=86dfe8f9d8ac20d2a500f3b28106f5c6&txTime=6464912f", pathType = UrlType.M3U8, liveName = "都市频道"),
-                MusicVo(path = "https://tencent-stream.kksmg.com/live/wypd.m3u8?txSecret=d431af9912bf409330443a0abd89a54f&txTime=64649158", pathType = UrlType.M3U8, liveName = "外语频道"),
+                MusicVo(path = "http://ali-vl.cztv.com/channels/lantian/channel001/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=edb9ed932efb100c8acc51590186e08e&t=1684153870", pathType = UrlType.M3U8, songName = "浙江卫视"),
+                MusicVo(path = "https://padtx.qing.mgtv.com/nn_live/nn_x64/cWlkPSZzPTQzZjQyOWI3ZTMzZTNiNzVlMTFjODg2ZDNjODhlYzMxJmVzPTE2ODQyNTQzMTgmdXVpZD0wYjJjMTExMTU1YTg5ZmU0ZGZhYjU4NDc3NDE0YzFiOS03MTU5MGJlMiZ2PTImYXM9MCZjZG5leF9pZD10eF9waG9uZV9saXZl/HNYLMPP360.m3u8?_t=1684225517852&_t=1684225523139", pathType = UrlType.M3U8, songName = "芒果娱乐"),
+                MusicVo(path = "https://sztv-live.cutv.com/AxeFRth/500/q37Ake0.m3u8?sign=c83f63f5ad2220b8b0da5f2cb473dd4e&t=6465a1f7", pathType = UrlType.M3U8, songName = "深圳卫视"),
+                MusicVo(path = "https://sztv-live.cutv.com/2q76Sw2/500/d6k2k70.m3u8?sign=5a19cd512fa208ff3fe9d76e30b4ae70&t=6465a20d", pathType = UrlType.M3U8, songName = "深圳公共频道"),
+                MusicVo(path = "https://sztv-live.cutv.com/1q4iPng/500/f5i1k40.m3u8?sign=5066b6ac5083c16f59a5a813d871672a&t=6465a222", pathType = UrlType.M3U8, songName = "深圳娱乐频道"),
+                MusicVo(path = "https://sztv-live.cutv.com/4azbkoY/500/63r4kz0.m3u8?sign=21eb8f57979d42e78212ee6d8ca1b2af&t=6465a232", pathType = UrlType.M3U8, songName = "深圳电视剧频道"),
+                MusicVo(path = "https://volc-stream.kksmg.com/live/dfws/index.m3u8?volcSecret=4f341cef920f83557063876cdf400f28&volcTime=1684312287", pathType = UrlType.M3U8, songName = "东方卫视"),
+                MusicVo(path = "https://tencent-stream.kksmg.com/live/ylpd.m3u8?txSecret=86dfe8f9d8ac20d2a500f3b28106f5c6&txTime=6464912f", pathType = UrlType.M3U8, songName = "都市频道"),
+                MusicVo(path = "https://tencent-stream.kksmg.com/live/wypd.m3u8?txSecret=d431af9912bf409330443a0abd89a54f&txTime=64649158", pathType = UrlType.M3U8, songName = "外语频道"),
 
             )
             mMusicBinder.setPlayList(data)
@@ -77,7 +77,7 @@ class LiveFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHold
                 adapter = mLiveAdapter
                 mLiveAdapter.setOnItemClickListener { adapter, view, position ->
                     mMusicBinder.play(position)
-                    mBindingView.gcLayer.setLiveName(mMusicBinder.getPlayInfo().liveName)
+                    mBindingView.gcLayer.setLiveName(mMusicBinder.getPlayInfo().songName)
                 }
             }
         }
@@ -85,7 +85,7 @@ class LiveFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHold
             mMusicBinder.registerCallBack(this)
             mBindingView.gcLayer.apply {
                 initMusicBinder(mMusicBinder)
-                setLiveName(mMusicBinder.getPlayInfo().liveName)
+                setLiveName(mMusicBinder.getPlayInfo().songName)
             }
 
         }
@@ -117,12 +117,6 @@ class LiveFragment: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHold
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-    }
-
-    override fun playPosition(position: Int) {
-    }
-
-    override fun prepareStart(playInfo: PlayInfo) {
     }
 
     override fun startPlay(position: Long) {
