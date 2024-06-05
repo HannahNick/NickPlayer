@@ -32,6 +32,7 @@ import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
 import com.nick.music.server.binder.MusicBinder
 import com.nick.music.util.Ring
+import com.nick.music.view.AbstractLrcView
 import com.nick.music.view.PlayerSeekBar
 import com.nick.music.view.RhythmView
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +46,8 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
     private val mTasks: Queue<Runnable> = LinkedList()
     private lateinit var mMusicBinder: MusicBinder
     private val mPlayModeList = Ring<PlayMode>().apply { addAll(PlayMode.values().toMutableList()) }
+    private var mCenterSize: Float = 30f
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -190,7 +193,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
                 mMusicBinder.setPlayMode(playMode?:PlayMode.CYCLE)
             }
             ivMusicList.setOnClickListener {
-                LogUtils.json(GsonUtils.toJson(mMusicBinder.getRandomMusicList()))
+                mCenterSize = mlvLyrics.setCenterTextSize(mCenterSize)
             }
             rtvRhythm.lyricCallBackListener = this@MusicFragment
         }
@@ -302,9 +305,9 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
                 tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
                 tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
                 mlvLyrics.apply {
-                    initLrcData()
                     setData(krcInfo.lyricsLineInfoTreeMap,krcInfo.transliterationLrcLineInfos,krcInfo.transliterationLrcLineInfos)
-
+                    lrcStatus = AbstractLrcView.LRCSTATUS_LRC
+                    setPauseFlag(false)
                 }
             }
 

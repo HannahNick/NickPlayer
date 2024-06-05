@@ -1,5 +1,6 @@
 package com.nick.music.view;
 
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,15 +15,14 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.nick.music.R;
-import com.nick.music.model.LyricsInfo;
-import com.nick.music.model.LyricsLineInfo;
-import com.nick.music.util.ColorUtils;
-import com.nick.music.util.LyricsUtils;
 import com.xyz.base.utils.L;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import com.nick.music.model.LyricsLineInfo;
+import com.nick.music.util.ColorUtils;
+import com.nick.music.util.LyricsUtils;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
 
@@ -103,12 +103,17 @@ public abstract class AbstractLrcView extends View {
      * 默认歌词画笔
      */
     private Paint mPaint;
+
+    /**
+     * 未唱和将要唱的画笔
+     */
+    private Paint mPaintSM;
     /**
      * 默认画笔颜色
      */
     private int[] mPaintColors = new int[]{
-            ColorUtils.parserColor("#555555"),
-            ColorUtils.parserColor("#555555")
+            ColorUtils.parserColor("#ffffff"),
+            ColorUtils.parserColor("#ffffff")
     };
     /**
      * 高亮歌词画笔
@@ -116,9 +121,15 @@ public abstract class AbstractLrcView extends View {
     private Paint mPaintHL;
     //高亮颜色
     private int[] mPaintHLColors = new int[]{
-            ColorUtils.parserColor("#0288d1"),
-            ColorUtils.parserColor("#0288d1")
+            ColorUtils.parserColor("#abdcff"),
+            ColorUtils.parserColor("#0396ff")
     };
+
+    /**
+     * 当前歌词上面第一行歌词画笔
+     */
+    private Paint mLastUpLinePaint;
+
     /**
      * 轮廓画笔
      */
@@ -181,6 +192,9 @@ public abstract class AbstractLrcView extends View {
      * 绘画去搜索歌词文字画笔
      */
     private Paint mGotoSearchTextPaint;
+
+
+
     /**
      * 按下搜索歌词文字颜色
      */
@@ -215,16 +229,21 @@ public abstract class AbstractLrcView extends View {
     /**
      * 空行高度
      */
-    private float mSpaceLineHeight = 60;
+    private float mSpaceLineHeight = 80;
     /**
      * 歌词字体大小
      */
-    private float mFontSize = 30;
+    protected float mFontSize = 50;
+
+    /**
+     * 未唱和将要唱字体大小
+     */
+    protected float mSMFontSize = 30;
 
     /**
      * 左右间隔距离
      */
-    private float mPaddingLeftOrRight = 15;
+    public float mPaddingLeftOrRight = 15;
 
     /**
      * 歌词的最大宽度
@@ -425,10 +444,15 @@ public abstract class AbstractLrcView extends View {
         mLrcLineInfos.clear();
         mTranslateLrcLineInfos.clear();
         mTransliterationLrcLineInfos.clear();
-
         mLrcLineInfos.putAll(treeMap);
-        mTranslateLrcLineInfos.addAll(translateLrcLineInfos);
-        mTransliterationLrcLineInfos.addAll(transliterationLrcLineInfos);
+
+        if (translateLrcLineInfos!=null){
+            mTranslateLrcLineInfos.addAll(translateLrcLineInfos);
+        }
+        if (transliterationLrcLineInfos!=null){
+            mTransliterationLrcLineInfos.addAll(transliterationLrcLineInfos);
+        }
+
         L.i(String.format("treeMap: %s ,mTransliterationLrcLineInfos: %s ",treeMap.size(),mTransliterationLrcLineInfos.size()));
     }
 
@@ -454,12 +478,26 @@ public abstract class AbstractLrcView extends View {
         mPaint.setDither(true);
         mPaint.setAntiAlias(true);
         mPaint.setTextSize(mFontSize);
+        mPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        //未唱和将要唱文字画笔
+        mPaintSM = new Paint();
+        mPaintSM.setDither(true);
+        mPaintSM.setAntiAlias(true);
+        mPaintSM.setTextSize(mSMFontSize);
+
+        mLastUpLinePaint = new Paint();
+        mLastUpLinePaint.setDither(true);
+        mLastUpLinePaint.setAntiAlias(true);
+        mLastUpLinePaint.setTextSize(mFontSize);
+        mLastUpLinePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         //高亮画笔
         mPaintHL = new Paint();
         mPaintHL.setDither(true);
         mPaintHL.setAntiAlias(true);
         mPaintHL.setTextSize(mFontSize);
+        mPaintHL.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         //轮廓画笔
         mPaintOutline = new Paint();
@@ -467,18 +505,21 @@ public abstract class AbstractLrcView extends View {
         mPaintOutline.setAntiAlias(true);
         mPaintOutline.setColor(Color.BLACK);
         mPaintOutline.setTextSize(mFontSize);
+        mPaintOutline.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         //额外歌词画笔
         mExtraLrcPaint = new Paint();
         mExtraLrcPaint.setDither(true);
         mExtraLrcPaint.setAntiAlias(true);
         mExtraLrcPaint.setTextSize(mExtraLrcFontSize);
+        mExtraLrcPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         //额外高亮歌词画笔
         mExtraLrcPaintHL = new Paint();
         mExtraLrcPaintHL.setDither(true);
         mExtraLrcPaintHL.setAntiAlias(true);
         mExtraLrcPaintHL.setTextSize(mExtraLrcFontSize);
+        mExtraLrcPaintHL.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         //额外画笔轮廓
         mExtraLrcPaintOutline = new Paint();
@@ -486,12 +527,14 @@ public abstract class AbstractLrcView extends View {
         mExtraLrcPaintOutline.setAntiAlias(true);
         mExtraLrcPaintOutline.setColor(Color.BLACK);
         mExtraLrcPaintOutline.setTextSize(mExtraLrcFontSize);
+        mExtraLrcPaintOutline.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         //绘画去搜索歌词画笔
         mGotoSearchTextPaint = new Paint();
         mGotoSearchTextPaint.setDither(true);
         mGotoSearchTextPaint.setAntiAlias(true);
         mGotoSearchTextPaint.setTextSize(mFontSize);
+        mGotoSearchTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         //绘画去搜索歌词矩形画笔
         mGotoSearchRectPaint = new Paint();
@@ -499,6 +542,7 @@ public abstract class AbstractLrcView extends View {
         mGotoSearchRectPaint.setAntiAlias(true);
         mGotoSearchRectPaint.setStrokeWidth(2);
         mGotoSearchRectPaint.setTextSize(mFontSize);
+        mGotoSearchRectPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         //
         mActivityWR = new WeakReference<>(context);
@@ -520,40 +564,39 @@ public abstract class AbstractLrcView extends View {
         mPaintHL.setAlpha(255);
         mExtraLrcPaint.setAlpha(255);
         mExtraLrcPaintHL.setAlpha(255);
-        onDrawLrcView(canvas);
-//        if (mLrcStatus == LRCSTATUS_INIT || mLrcStatus == LRCSTATUS_NOLRC_DEFTEXT) {
-//            //绘画默认文本
-//            String defText = getDefText();
-//            float textWidth = LyricsUtils.getTextWidth(mPaint, defText);
-//            int textHeight = LyricsUtils.getTextHeight(mPaint);
-//            float hlWidth = textWidth / 2;
-//            float x = (getWidth() - textWidth) / 2;
-//            float y = (getHeight() + textHeight) / 2;
+        if (mLrcStatus == LRCSTATUS_INIT || mLrcStatus == LRCSTATUS_NOLRC_DEFTEXT) {
+            //绘画默认文本
+            String defText = getDefText();
+            float textWidth = LyricsUtils.getTextWidth(mPaint, defText);
+            int textHeight = LyricsUtils.getTextHeight(mPaint);
+            float hlWidth = textWidth / 2;
+            float x = (getWidth() - textWidth) / 2;
+            float y = (getHeight() + textHeight) / 2;
 //            LyricsUtils.drawOutline(canvas, mPaintOutline, defText, x, y);
-//            LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, mPaintColors, mPaintHLColors, defText, hlWidth, x, y);
-//        } else if (mLrcStatus == LRCSTATUS_LOADING || mLrcStatus == LRCSTATUS_ERROR || mLrcStatus == LRCSTATUS_NONSUPPORT) {
-//            //绘画加载中文本
-//            String text = getDefText();
-//            if (mLrcStatus == LRCSTATUS_LOADING) {
-//                text = getLoadingText();
-//            } else if (mLrcStatus == LRCSTATUS_ERROR) {
-//                text = getLoadErrorText();
-//            } else if (mLrcStatus == LRCSTATUS_NONSUPPORT) {
-//                text = getNonsupportText();
-//            }
-//            float textWidth = LyricsUtils.getTextWidth(mPaint, text);
-//            int textHeight = LyricsUtils.getTextHeight(mPaint);
-//            float x = (getWidth() - textWidth) / 2;
-//            float y = (getHeight() + textHeight) / 2;
+            LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, mPaintColors, mPaintHLColors, defText, hlWidth, x, y);
+        } else if (mLrcStatus == LRCSTATUS_LOADING || mLrcStatus == LRCSTATUS_ERROR || mLrcStatus == LRCSTATUS_NONSUPPORT) {
+            //绘画加载中文本
+            String text = getDefText();
+            if (mLrcStatus == LRCSTATUS_LOADING) {
+                text = getLoadingText();
+            } else if (mLrcStatus == LRCSTATUS_ERROR) {
+                text = getLoadErrorText();
+            } else if (mLrcStatus == LRCSTATUS_NONSUPPORT) {
+                text = getNonsupportText();
+            }
+            float textWidth = LyricsUtils.getTextWidth(mPaint, text);
+            int textHeight = LyricsUtils.getTextHeight(mPaint);
+            float x = (getWidth() - textWidth) / 2;
+            float y = (getHeight() + textHeight) / 2;
 //            LyricsUtils.drawOutline(canvas, mPaintOutline, text, x, y);
-//            LyricsUtils.drawText(canvas, mPaint, mPaintColors, text, x, y);
-//        } else if (mLrcStatus == LRCSTATUS_NOLRC_GOTOSEARCH) {
-//            String btnText = getGotoSearchText();
-//            //绘画搜索歌词按钮
-//            drawGoToSearchBtn(canvas, mGotoSearchRectPaint, mGotoSearchTextPaint, btnText);
-//        } else if (mLrcStatus == LRCSTATUS_LRC) {
-//            onDrawLrcView(canvas);
-//        }
+            LyricsUtils.drawText(canvas, mPaint, mPaintColors, text, x, y);
+        } else if (mLrcStatus == LRCSTATUS_NOLRC_GOTOSEARCH) {
+            String btnText = getGotoSearchText();
+            //绘画搜索歌词按钮
+            drawGoToSearchBtn(canvas, mGotoSearchRectPaint, mGotoSearchTextPaint, btnText);
+        } else if (mLrcStatus == LRCSTATUS_LRC) {
+            onDrawLrcView(canvas);
+        }
 
     }
 
@@ -1301,6 +1344,15 @@ public abstract class AbstractLrcView extends View {
     public Paint getPaint() {
         return mPaint;
     }
+
+    public Paint getSMPaint(){
+        return mPaintSM;
+    }
+
+    public Paint getLastUpLinePaint(){
+        return mLastUpLinePaint;
+    }
+
 
     public int[] getPaintColors() {
         return mPaintColors;

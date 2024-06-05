@@ -32,9 +32,6 @@ class NickExoPlayer(context: Context, val tag: String): AbsPlayer() {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
                 L.i("$tag onPlaybackStateChanged: $playbackState")
-                mPositionCallBackList.dispatch {
-                    onPlaybackStateChanged(playbackState)
-                }
                 when (playbackState) {
                     Player.STATE_READY -> {
                         L.i("$tag duration: ${mPlayer.duration}")

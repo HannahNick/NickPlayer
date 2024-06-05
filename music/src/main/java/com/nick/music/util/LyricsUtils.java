@@ -162,6 +162,7 @@ public class LyricsUtils {
         if (lyricsType == LyricsInfo.LRC || lyricsWordIndex == -2) {
             // 整行歌词
             lineLyricsHLWidth = curLrcTextWidth;
+//            L.i(String.format("curLyrics: %s,lineLyricsHLWidth: %s ",curLyrics,lineLyricsHLWidth));
         } else {
             if (lyricsWordIndex != -1) {
                 String lyricsWords[] = lyricsLineInfo.getLyricsWords();
@@ -185,6 +186,7 @@ public class LyricsUtils {
                         / wordsDisInterval[lyricsWordIndex]
                         * lyricsWordHLTime;
                 lineLyricsHLWidth = lyricsBeforeWordWidth + len;
+//                L.i(String.format("curLyrics: %s,lineLyricsHLWidth: %s lyricsBeforeWordWidth:%s len:%s",curLyrics,lineLyricsHLWidth,lyricsBeforeWordWidth,len));
             }
         }
 
@@ -240,8 +242,7 @@ public class LyricsUtils {
         paint.setShader(linearGradient);
         canvas.drawText(text, x, y, paint);
         //设置动感歌词过渡效果
-        canvas.clipRect(x, y - getRealTextHeight(paint), x + hlWidth,
-                y + getRealTextHeight(paint));
+        canvas.clipRect(x, y - getRealTextHeight(paint), x + hlWidth, y + getRealTextHeight(paint));
 
         //设置为上下渐变
         LinearGradient linearGradientHL = new LinearGradient(x, y - getTextHeight(paint), x, y, paintHLColor, null, Shader.TileMode.CLAMP);
