@@ -7,6 +7,14 @@
     android:background="@color/green35bdbd"
     tools:context=".ui.MusicPlayActivity">
 
+    <com.nick.music.view.NetWorkCheckView
+        android:layout_width="@dimen/px70"
+        android:layout_height="@dimen/px70"
+        android:padding="@dimen/px10"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
     <com.nick.music.view.RhythmView
         android:id="@+id/rtv_rhythm"
         android:layout_width="match_parent"
