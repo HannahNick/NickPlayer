@@ -562,12 +562,15 @@ public class LyricsUtils {
      * @param textMaxWidth
      */
     public static void splitLrcLyrics(LyricsLineInfo lyricsLineInfo, Paint paint, float textMaxWidth) {
+        if (lyricsLineInfo==null){
+            return;
+        }
+
         List<LyricsLineInfo> lyricsLineInfos = new ArrayList<>();
         String lineLyrics = lyricsLineInfo.getLineLyrics().trim();
         // 每行的歌词长度
         int lineWidth = (int) paint.measureText(lineLyrics);
-        float maxLineWidth = textMaxWidth;
-        if (lineWidth > maxLineWidth) {
+        if (lineWidth > textMaxWidth) {
 
             int lyricsWordsWidth = 0;
             //开始索引和结束索引
@@ -580,7 +583,7 @@ public class LyricsUtils {
                 if ((i + 1) < lineLyrics.length()) {
                     nextLyricsWordWidth = (int) paint.measureText(lineLyrics.charAt(i + 1) + "");
                 }
-                if (lyricsWordsWidth + nextLyricsWordWidth > maxLineWidth) {
+                if (lyricsWordsWidth + nextLyricsWordWidth > textMaxWidth) {
 
                     LyricsLineInfo newLyricsLineInfo = getNewLrcLyricsLineInfo(
                             lyricsLineInfo, startIndex, i);

@@ -25,6 +25,7 @@ import com.nick.music.R
 import com.nick.music.databinding.FragmentMusicPlayBinding
 import com.nick.music.entity.PlayInfo
 import com.nick.music.krc.KrcLyricsFileReader
+import com.nick.music.krc.LrcLyricsFileReader
 import com.nick.music.model.LyricsTag
 import com.nick.music.player.PlayInfoCallBack
 import com.nick.music.server.MusicServer
@@ -35,6 +36,7 @@ import com.nick.music.util.Ring
 import com.nick.music.view.AbstractLrcView
 import com.nick.music.view.PlayerSeekBar
 import com.nick.music.view.RhythmView
+import com.xyz.base.utils.L
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -93,7 +95,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
         val mcList = FileUtils.listFilesInDir(mcPath)
         return mcList.map {
             val albumName = it.name.substring(0,it.name.lastIndexOf("."))
-            MusicVo("1",albumName,"","$mcPath/${it.name}", lyricPath = "$krcPath/${albumName}.krc")
+            MusicVo("1",albumName,"","$mcPath/${it.name}", lyricPath = "$krcPath/${albumName}.lrc")
         }
     }
 
@@ -297,15 +299,24 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
             if (TextUtils.isEmpty(path)){
                 return
             }
-            val krcInfo = KrcLyricsFileReader().readFile(File(path))
-            if (krcInfo!=null){
-                rtvRhythm.setData(krcInfo,playInfoDuration)
-                ktvLyric.setData(krcInfo)
-//                rlvLyrics.setData(krcInfo)
-                tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
-                tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
+            val lrcInfo = LrcLyricsFileReader().readFile(File(path))
+//            val krcInfo = KrcLyricsFileReader().readFile(File(path))
+//            if (krcInfo!=null){
+//                rtvRhythm.setData(krcInfo,playInfoDuration)
+//                ktvLyric.setData(krcInfo)
+////                rlvLyrics.setData(krcInfo)
+//                tvAlbumName.text = krcInfo.lyricsTags[LyricsTag.TAG_TITLE] as String
+//                tvMainActor.text = krcInfo.lyricsTags[LyricsTag.TAG_ARTIST] as String
+//                mlvLyrics.apply {
+//                    setData(krcInfo.lyricsLineInfoTreeMap,krcInfo.transliterationLrcLineInfos,krcInfo.transliterationLrcLineInfos,krcInfo.lyricsType)
+//                    lrcStatus = AbstractLrcView.LRCSTATUS_LRC
+//                    setPauseFlag(false)
+//                }
+//            }
+            if (lrcInfo!=null){
+                L.i(lrcInfo)
                 mlvLyrics.apply {
-                    setData(krcInfo.lyricsLineInfoTreeMap,krcInfo.transliterationLrcLineInfos,krcInfo.transliterationLrcLineInfos)
+                    setData(lrcInfo.lyricsLineInfoTreeMap,lrcInfo.transliterationLrcLineInfos,lrcInfo.transliterationLrcLineInfos,lrcInfo.lyricsType)
                     lrcStatus = AbstractLrcView.LRCSTATUS_LRC
                     setPauseFlag(false)
                 }

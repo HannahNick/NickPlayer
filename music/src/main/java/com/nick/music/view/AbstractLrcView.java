@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.nick.music.R;
+import com.nick.music.model.LyricsInfo;
 import com.xyz.base.utils.L;
 
 import java.lang.ref.WeakReference;
@@ -98,7 +99,10 @@ public abstract class AbstractLrcView extends View {
      */
     public static final int LRCPLAYERSTATUS_SEEKTO = 2;
 
-
+    /**
+     * 默认动感歌词类型
+     */
+    protected int mLyricsinfoType = LyricsInfo.DYNAMIC;
     /**
      * 默认歌词画笔
      */
@@ -440,7 +444,7 @@ public abstract class AbstractLrcView extends View {
         init(context);
     }
 
-    public void setData(TreeMap<Integer, LyricsLineInfo> treeMap,List<LyricsLineInfo> translateLrcLineInfos,List<LyricsLineInfo> transliterationLrcLineInfos){
+    public void setData(TreeMap<Integer, LyricsLineInfo> treeMap,List<LyricsLineInfo> translateLrcLineInfos,List<LyricsLineInfo> transliterationLrcLineInfos,int lyricsInfoType){
         mLrcLineInfos.clear();
         mTranslateLrcLineInfos.clear();
         mTransliterationLrcLineInfos.clear();
@@ -452,8 +456,9 @@ public abstract class AbstractLrcView extends View {
         if (transliterationLrcLineInfos!=null){
             mTransliterationLrcLineInfos.addAll(transliterationLrcLineInfos);
         }
+        mLyricsinfoType = lyricsInfoType;
 
-        L.i(String.format("treeMap: %s ,mTransliterationLrcLineInfos: %s ",treeMap.size(),mTransliterationLrcLineInfos.size()));
+        L.i(String.format("treeMap: %s ,mTransliterationLrcLineInfos: %s mLyricsinfoType:%s",treeMap.size(),mTransliterationLrcLineInfos.size(),mLyricsinfoType));
     }
 
     /**
@@ -1135,13 +1140,18 @@ public abstract class AbstractLrcView extends View {
      */
     public void updateSplitData(long playProgress) {
         //动感歌词
-        //获取分割后的索引
-        mSplitLyricsLineNum = LyricsUtils.getSplitDynamicLyricsLineNum(mLrcLineInfos, mLyricsLineNum, playProgress, 0);
-        //获取原始的歌词字索引
-        mLyricsWordIndex = LyricsUtils.getLyricsWordIndex(mLrcLineInfos, mLyricsLineNum, playProgress, 0);
-        //获取分割后的歌词字索引
-        mSplitLyricsWordIndex = LyricsUtils.getSplitLyricsWordIndex(mLrcLineInfos, mLyricsLineNum, playProgress, 0);
-        mLyricsWordHLTime = LyricsUtils.getDisWordsIndexLenTime(mLrcLineInfos, mLyricsLineNum, playProgress, 0);
+        if (mLyricsinfoType == LyricsInfo.DYNAMIC){
+            //获取分割后的索引
+            mSplitLyricsLineNum = LyricsUtils.getSplitDynamicLyricsLineNum(mLrcLineInfos, mLyricsLineNum, playProgress, 0);
+            //获取原始的歌词字索引
+            mLyricsWordIndex = LyricsUtils.getLyricsWordIndex(mLrcLineInfos, mLyricsLineNum, playProgress, 0);
+            //获取分割后的歌词字索引
+            mSplitLyricsWordIndex = LyricsUtils.getSplitLyricsWordIndex(mLrcLineInfos, mLyricsLineNum, playProgress, 0);
+            mLyricsWordHLTime = LyricsUtils.getDisWordsIndexLenTime(mLrcLineInfos, mLyricsLineNum, playProgress, 0);
+        }else {
+            mSplitLyricsLineNum = 100;
+        }
+
         if ( mExtraLrcStatus == EXTRALRCSTATUS_SHOWTRANSLATELRC && mTranslateDrawType == TRANSLATE_DRAW_TYPE_DYNAMIC) {
             //显示翻译歌词且歌词类型是动感歌词且以动感歌词的形式绘画翻译歌词
             if (mTranslateLrcLineInfos != null && mTranslateLrcLineInfos.size() > 0) {

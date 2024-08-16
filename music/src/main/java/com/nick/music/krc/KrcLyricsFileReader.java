@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * @Description: krcs歌词读取器
@@ -86,9 +87,9 @@ public class KrcLyricsFileReader extends LyricsFileReader {
 
     public KrcLyricsFileReader() {
         mRollPaint.setTextSize(mRollTextSize);
-        mTextSize = 30f;
+        mTextSize = 105f;
         mPaint.setTextSize(mTextSize);
-        MAX_Width = ConvertUtils.dp2px(200);
+        MAX_Width = 1820f;
     }
 
     @Override
@@ -128,11 +129,12 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         mHasCheckOriginLineSizeEqTransliterSize = false;
         mOriginLineSizeEqTransliterSize = false;
         LyricsInfo lyricsInfo = new LyricsInfo();
+        lyricsInfo.setLyricsType(LyricsInfo.DYNAMIC);
         TreeMap<Integer, LyricsLineInfo> lyricsLineInfos = new TreeMap<>();
         Map<String, Object> lyricsTags = new HashMap<>();
         int index = 0;
         int transliterationIndex = 0;
-        List<LyricsLineInfo> tempList = new ArrayList<>();
+        List<LyricsLineInfo> originTempList = new ArrayList<>();
         int lyricsTextLinelength = lyricsList.size();
         for (int i = 0; i < lyricsTextLinelength; i++) {
             String lineInfo = lyricsList.get(i);
@@ -145,12 +147,12 @@ public class KrcLyricsFileReader extends LyricsFileReader {
             checkOriginLineSizeEqTransliterSize(lyricsTextLinelength - i,
                     lyricsInfo.getTranslateLrcLineInfos() == null ? 0 : lyricsInfo.getTranslateLrcLineInfos().size(),
                     lyricsInfo.getTransliterationLrcLineInfos() == null ? 0 : lyricsInfo.getTransliterationLrcLineInfos().size());
-            checkLineIsStartSex(tempList, lyricsLineInfo);
-            if (tempList.size() == 1) {//有男女对唱的单独行跳过此轮循环将在下一轮循环中拼接
+            checkLineIsStartSex(originTempList, lyricsLineInfo);
+            if (originTempList.size() == 1) {//有男女对唱的单独行跳过此轮循环将在下一轮循环中拼接
                 continue;
             }
             //拼接歌词
-            LyricsLineInfo appendLyricsLineInfo = mergeLyricsLine(tempList);
+            LyricsLineInfo appendLyricsLineInfo = mergeLyricsLine(originTempList);
             //获取文件翻译数据
             List<TranslateLrcLineInfo> translateLrcLineInfos = null;
             //原始歌词行数和翻译歌词行数对不上就不用处理翻译数据了
@@ -165,21 +167,23 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 transliterationIndex++;
             }
             if (appendLyricsLineInfo != null) {
+                LyricsLineInfo afterMergeTransliteration = mergeTransliteration(lyricsInfo.getTransliterationLrcLineInfos(), index + 1);
+                transliterationIndex--;
                 mergeTranslate(translateLrcLineInfos, index + 1);
-                Pair<List<LyricsLineInfo>, List<LyricsLineInfo>> pair = wrapLyricsLineInfos(appendLyricsLineInfo, transliterationLrcLineInfos);
+                Pair<List<LyricsLineInfo>, List<LyricsLineInfo>> pair = wrapLyricsLineInfos(appendLyricsLineInfo, afterMergeTransliteration);
                 for (int j = 0; j < pair.first.size(); j++) {
                     if (j > 0) {
                         if (translateLrcLineInfos != null) {
                             translateLrcLineInfos.add(index, new TranslateLrcLineInfo(""));
                         }
-                        if (transliterationLrcLineInfos != null) {
+                        if (afterMergeTransliteration != null) {
                             lyricsInfo.getTransliterationLrcLineInfos().add(index, pair.second.get(j));
                         }
                     }
                     lyricsLineInfos.put(index, pair.first.get(j));
                     index++;
                 }
-                tempList.clear();
+                originTempList.clear();
                 continue;
             }
             Pair<List<LyricsLineInfo>, List<LyricsLineInfo>> pair = wrapLyricsLineInfos(lyricsLineInfo, transliterationLrcLineInfos);
@@ -234,6 +238,26 @@ public class KrcLyricsFileReader extends LyricsFileReader {
         TranslateLrcLineInfo lastTranslateLrcLineInfo = translate.get(index - 1);
         TranslateLrcLineInfo element = translate.remove(index);
         lastTranslateLrcLineInfo.setLineLyrics(lastTranslateLrcLineInfo.getLineLyrics().concat(element.getLineLyrics()));
+    }
+
+    /**
+     * 拼接音译数据
+     * @param transliterList 音译list
+     * @param index 需要去除的元素下标
+     */
+    public LyricsLineInfo mergeTransliteration(List<LyricsLineInfo> transliterList, int index){
+        if (transliterList == null || index <= 0 || index >= transliterList.size()) {
+            return null;
+        }
+        LyricsLineInfo lastLyricsLineInfo = transliterList.get(index-1);
+        LyricsLineInfo element = transliterList.remove(index);
+        String[] lastLyricsWords = lastLyricsLineInfo.getLyricsWords();
+        String[] elementLyricsWords = element.getLyricsWords();
+        String[] concatResult = Stream.concat(Arrays.stream(lastLyricsWords), Arrays.stream(elementLyricsWords)).toArray(String[]::new);
+
+        lastLyricsLineInfo.setLyricsWords(concatResult);
+        lastLyricsLineInfo.setLineLyrics(lastLyricsLineInfo.getLineLyrics().concat(element.getLineLyrics()));
+        return lastLyricsLineInfo;
     }
 
     /**
@@ -295,17 +319,17 @@ public class KrcLyricsFileReader extends LyricsFileReader {
     /**
      * 检测是否是对唱类型开头
      *
-     * @param tempList
+     * @param originTempList
      * @param lyricsLineInfo 当前行歌词
      */
-    private void checkLineIsStartSex(List<LyricsLineInfo> tempList, LyricsLineInfo lyricsLineInfo) {
-        if (tempList.size() == 1) {
-            tempList.add(lyricsLineInfo);
+    private void checkLineIsStartSex(List<LyricsLineInfo> originTempList, LyricsLineInfo lyricsLineInfo) {
+        if (originTempList.size() == 1) {
+            originTempList.add(lyricsLineInfo);
         }
         String lineLyrics = lyricsLineInfo.getLineLyrics();
         //如果是 男: 女: 这种类型开头
         if (lineLyrics.endsWith("：") || lineLyrics.endsWith(":")) {
-            tempList.add(lyricsLineInfo);
+            originTempList.add(lyricsLineInfo);
         }
     }
 
@@ -776,14 +800,14 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 lineLyrics.append(lyricsWords[k]);
             }
             //检查是否是对唱类型
-            checkTranslateIsSexStart(tempTransliterationLrcLineInfo, lineLyrics.toString());
-            if (tempTransliterationLrcLineInfo.size() == 1) {
-                continue;
-            }
-            String mergeTemp = mergeTranslateIsSexStart(tempTransliterationLrcLineInfo);
+//            checkTranslateIsSexStart(tempTransliterationLrcLineInfo, lineLyrics.toString());
+//            if (tempTransliterationLrcLineInfo.size() == 1) {
+//                continue;
+//            }
+//            String mergeTemp = mergeTranslateIsSexStart(tempTransliterationLrcLineInfo);
 
-            transliterationLrcLineInfo.setLineLyrics(TextUtils.isEmpty(mergeTemp) ? lineLyrics.toString() : mergeTemp);
-            transliterationLrcLineInfo.setLyricsWords(TextUtils.isEmpty(mergeTemp) ? lyricsWords : mergeTempArray(lyricsWords, tempTransliterationLrcLineInfo.get(0)));
+            transliterationLrcLineInfo.setLineLyrics(lineLyrics.toString());
+            transliterationLrcLineInfo.setLyricsWords(lyricsWords);
 
             transliterationLrcLineInfos.add(transliterationLrcLineInfo);
             tempTransliterationLrcLineInfo.clear();
