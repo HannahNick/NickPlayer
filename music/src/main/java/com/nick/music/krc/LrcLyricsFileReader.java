@@ -170,9 +170,10 @@ public class LrcLyricsFileReader extends LyricsFileReader {
         }else {
             float accumulatedWidth = 0f;
             StringBuilder currentLine = new StringBuilder();
-            String [] lineWordArray = lineLyrics.split("");
+            boolean isMostEnglish = isMostlyEnglishText(lineLyrics);
+            String [] lineWordArray = isMostEnglish?lineLyrics.split("\\s+"):lineLyrics.split("");
             for (int i = 0; i < lineWordArray.length; i++) {
-                String word = lineWordArray[i];
+                String word = isMostEnglish?lineWordArray[i].concat(" "):lineWordArray[i];
                 float wordWidth = mPaint.measureText(word);
                 if (accumulatedWidth + wordWidth <= MAX_Width) {
                     currentLine.append(word);
@@ -194,6 +195,30 @@ public class LrcLyricsFileReader extends LyricsFileReader {
             }
         }
         lyricsLineInfo.setSplitLyricsLineInfos(tempLyricsLine);
+    }
+
+    /**
+     * 如果文本中英文数量超过70%，就认为是英文
+     *
+     * @param text 文本
+     * @return 是否是英文
+     */
+    public boolean isMostlyEnglishText(String text) {
+//        if (containsEnglishCharacters(text)){
+//            return true;
+//        }
+        int totalCharacters = text.length();
+        int englishCharacters = 0;
+        // 统计文本中的英文字母数量
+        for (char c : text.toCharArray()) {
+            if (Character.isLetter(c) && Character.UnicodeBlock.of(c) == Character.UnicodeBlock.BASIC_LATIN) {
+                englishCharacters++;
+            }
+        }
+        // 计算英文字母比例，如果超过50%则认为是英文
+        double englishPercentage = (double) englishCharacters / totalCharacters * 100;
+//        L.i(String.format("isMostlyEnglishText:%s Precent:%s",text,englishPercentage));
+        return englishPercentage >= 30;
     }
 
     private boolean isTextFitInOneLine(String lineText) {
