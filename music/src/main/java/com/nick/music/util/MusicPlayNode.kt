@@ -1,5 +1,7 @@
 package com.nick.music.util
 
+import com.xyz.base.utils.L
+
 /**
  * 音乐数据环,用于记录随机播放数据
  */
@@ -77,21 +79,60 @@ class MusicPlayNode<T> {
             }
             tempNode = tempNode.next
         }
-
     }
 
-    fun getCurrentNodeData(): T {
-        return mCurrentNode!!.data
+    fun remove(data: T) {
+        var tempNode: Node<T>? = mFirstNode
+        while (tempNode != null) {
+            if (tempNode.data == data) {
+                // 如果只有一个节点
+                if (tempNode.next == tempNode && tempNode.last == tempNode) {
+                    reset()
+                    return
+                }
+
+                // Update the previous and next nodes
+                tempNode.last!!.next = tempNode.next
+                tempNode.next!!.last = tempNode.last
+
+                // Update the first and last nodes if necessary
+                if (tempNode == mFirstNode) {
+                    mFirstNode = tempNode.next
+                }
+                if (tempNode == mLastNode) {
+                    mLastNode = tempNode.last
+                }
+
+                // Update the current node if necessary
+                if (tempNode == mCurrentNode) {
+                    mCurrentNode = tempNode.next
+                }
+
+                // Decrease the size
+                size--
+                return
+            }
+            tempNode = tempNode.next
+            if (tempNode == mFirstNode) {
+                break
+            }
+        }
+        val newList = convertList()
+        L.i("node data:${newList.size}")
     }
 
-    fun nextData(justNextInfo: Boolean = false): T {
-        val nextNode = mCurrentNode!!.next
+    fun getCurrentNodeData(): T? {
+        return mCurrentNode?.data
+    }
+
+    fun nextData(justNextInfo: Boolean = false): T? {
+        val nextNode = mCurrentNode?.next
         if (justNextInfo){
-            return nextNode!!.data
+            return nextNode?.data
         }
         //如果当前是最后一个节点就跳到第一个节点
         mCurrentNode = nextNode ?: mFirstNode
-        return mCurrentNode!!.data
+        return mCurrentNode?.data
     }
 
     fun lastData(): T {

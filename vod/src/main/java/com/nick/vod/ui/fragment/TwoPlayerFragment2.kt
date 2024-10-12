@@ -20,6 +20,7 @@ import com.nick.base.vo.MusicVo
 import com.nick.music.entity.AudioTrackType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
+import com.nick.music.player.PlayPositionCallBack
 import com.nick.music.server.KTVServer
 import com.nick.music.server.MusicServer
 import com.nick.music.server.PlayMode
@@ -32,7 +33,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-class TwoPlayerFragment2: Fragment(), ServiceConnection, PlayInfoCallBack, SurfaceHolder.Callback {
+class TwoPlayerFragment2: Fragment(), ServiceConnection, PlayInfoCallBack, PlayPositionCallBack, SurfaceHolder.Callback {
 
     private val mBinding by lazy { FragmentTwoPlayer2Binding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()

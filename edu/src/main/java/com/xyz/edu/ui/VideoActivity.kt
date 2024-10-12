@@ -106,12 +106,16 @@ class VideoActivity : BaseActivity<IVideoC.Presenter>(), IVideoC.View, PlayInfoC
         mProxy?.stop()
     }
 
-    override fun playEnd(playIndex: Int) {
-        super.playEnd(playIndex)
-        L.i("播放结束，上报学习结果")
-//        presenter.reportStudyResult(mPersonPlanItemId)
-        PlanManager.toNextPlanItem(this,mItemIndex)
+    override fun playEnd() {
+        super.playEnd()
     }
+//
+//    override fun playEnd(playIndex: Int) {
+//        super.playEnd(playIndex)
+//        L.i("播放结束，上报学习结果")
+////        presenter.reportStudyResult(mPersonPlanItemId)
+//        PlanManager.toNextPlanItem(this,mItemIndex)
+//    }
 
     override fun preInitDataFinish() {
         L.i("preInitDataFinish")

@@ -46,6 +46,12 @@ ext {
 
             //cocos
             cocoslib            : "0.0.1.13",
+
+            "exoplayer"          : "1.1.1.16.10",
+            "extractor"          : "1.1.1.16.10",
+            "exo_common"         : "1.1.1.16.10",
+            "exoplayer_hls"      : "1.1.1.16.10",
+            "exoplayer_ffmpeg"   : "1.1.1.16.10",
     ]
 
     getProjectName = { Project project ->

@@ -26,6 +26,7 @@ import com.bumptech.glide.request.target.Target
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
+import com.nick.music.player.PlayPositionCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.binder.MusicBinder
 import com.nick.music.server.binder.impl.MusicServerBinder
@@ -35,7 +36,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-class GlidePlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack {
+class GlidePlayerFragment: Fragment(), ServiceConnection, PlayInfoCallBack,PlayPositionCallBack {
 
     private val mBinding by lazy { FragmentGlidePlayerBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()

@@ -28,6 +28,10 @@ data class MusicVo (
      */
     var imgPath: String = "",
     /**
+     * 内置图片资源文件id
+     */
+    var localImgRes: Int = -1,
+    /**
      * 创建时间
      */
     val createTime: String = "",
@@ -43,4 +47,8 @@ data class MusicVo (
      * 歌词路径
      */
     val lyricPath: String = "",
-): Parcelable
+): Parcelable{
+    override fun toString(): String {
+        return "MusicVo(id='$id', songName='$songName', mainActors='$mainActors', path='$path', pathType=$pathType, imgPath='$imgPath', createTime='$createTime', updateTime='$updateTime', lyricPath='$lyricPath')"
+    }
+}

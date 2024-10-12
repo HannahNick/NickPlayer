@@ -28,6 +28,7 @@ import com.nick.music.krc.KrcLyricsFileReader
 import com.nick.music.krc.LrcLyricsFileReader
 import com.nick.music.model.LyricsTag
 import com.nick.music.player.PlayInfoCallBack
+import com.nick.music.player.PlayPositionCallBack
 import com.nick.music.server.MusicServer
 import com.nick.music.server.PlayMode
 import com.nick.music.server.PlayStatus
@@ -42,7 +43,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.LyricCallBackListener,PlayerSeekBar.SeekCallBack {
+class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,PlayPositionCallBack,RhythmView.LyricCallBackListener,PlayerSeekBar.SeekCallBack {
 
     private val mBinding by lazy { FragmentMusicPlayBinding.inflate(layoutInflater) }
     private val mTasks: Queue<Runnable> = LinkedList()
@@ -263,6 +264,7 @@ class MusicFragment:Fragment(), ServiceConnection,PlayInfoCallBack,RhythmView.Ly
 
     override fun onServiceDisconnected(name: ComponentName?) {
     }
+
 
     override fun playPosition(position: Long) {
         val playTime = TimeUtils.millis2String(position,"mm:ss")

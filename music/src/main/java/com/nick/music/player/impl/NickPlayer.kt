@@ -43,8 +43,8 @@ class NickPlayer(val tag: String): AbsPlayer(){
                     mPlayStatus = PlayStatus.PLAY
                 }
 
-                mPositionCallBackList.dispatch {
-                    prepareStart(getCurrentInfo())
+                mPlayInfoCallBackList.dispatch {
+                    prepareStart(getCurrentPlayInfo())
                 }
             }
             setOnBufferingUpdateListener { mp,precent ->
@@ -72,7 +72,8 @@ class NickPlayer(val tag: String): AbsPlayer(){
         mMediaPlayer.release()
         mMediaPlayer.clearOnMediaTimeDiscontinuityListener()
         mMediaPlayer.clearOnSubtitleDataListener()
-        mPositionCallBackList.clear()
+        mPlayInfoCallBackList.clear()
+        mPlayPositionCallBackList.clear()
     }
 
     override fun startPlay() {
@@ -126,7 +127,7 @@ class NickPlayer(val tag: String): AbsPlayer(){
     }
 
     override fun getCurrentAudioTrack(): AudioTrackType {
-        TODO("Not yet implemented")
+        return AudioTrackType.ACC
     }
 
     override fun toggle() {
@@ -135,6 +136,10 @@ class NickPlayer(val tag: String): AbsPlayer(){
         }else{
             play(mIndex)
         }
+    }
+
+    override fun getSessionId(): Int {
+        return mMediaPlayer.audioSessionId
     }
 
 }

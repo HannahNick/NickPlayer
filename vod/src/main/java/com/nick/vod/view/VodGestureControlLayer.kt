@@ -91,7 +91,7 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
 
 
     private fun playOrPause(){
-        val playInfo = mPlayerControl.getCurrentInfo()
+        val playInfo = mPlayerControl.getCurrentPlayInfo()
         if (playInfo.playStatus == PlayStatus.PLAY){
             mIvPlay.setImageResource(R.drawable.ic_play)
 //            mIvCenterPlay.setImageResource(R.drawable.ic_play)
@@ -105,7 +105,7 @@ class VodGestureControlLayer @JvmOverloads constructor(context: Context, attrs: 
     }
 
     fun flushPlayStatus(){
-        val playInfo = mPlayerControl.getCurrentInfo()
+        val playInfo = mPlayerControl.getCurrentPlayInfo()
         if (playInfo.playStatus == PlayStatus.PLAY){
             mIvPlay.setImageResource(R.drawable.ic_live_pause)
 //            mIvCenterPlay.setImageResource(R.drawable.ic_live_pause)

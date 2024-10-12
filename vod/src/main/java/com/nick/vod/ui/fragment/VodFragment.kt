@@ -12,6 +12,7 @@ import com.blankj.utilcode.util.TimeUtils
 import com.nick.base.vo.MusicVo
 import com.nick.music.entity.PlayInfo
 import com.nick.music.player.PlayInfoCallBack
+import com.nick.music.player.PlayPositionCallBack
 import com.nick.music.player.impl.NickExoPlayer
 import com.nick.vod.databinding.LayoutVodBinding
 import com.nick.vod.view.LiveGestureControlLayer
@@ -20,7 +21,7 @@ import com.xyz.base.utils.L
 import com.xyz.vod.play.widget.SubRipTextView
 import java.io.File
 
-class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
+class VodFragment: Fragment(), PlayInfoCallBack, PlayPositionCallBack, SurfaceHolder.Callback,
     LiveGestureControlLayer.GestureCallBack{
 
     private lateinit var mBindingView: LayoutVodBinding
@@ -82,11 +83,11 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
 //            }
             svVideo.holder.addCallback(this@VodFragment)
         }
-        mPlayerControl.registerCallBack(this)
+        mPlayerControl.registerPositionCallBack(this)
         if (activity is PlayInfoCallBack){
             LogUtils.i("activity is PlayInfoCallBack")
             val activityMusicCallBack = activity as PlayInfoCallBack
-            mPlayerControl.registerCallBack(activityMusicCallBack)
+            mPlayerControl.registerPlayInfoCallBack(activityMusicCallBack)
         }
     }
 
@@ -131,10 +132,10 @@ class VodFragment: Fragment(), PlayInfoCallBack, SurfaceHolder.Callback,
         mPlayerControl.seek(position.toLong())
 
     }
-
-    override fun loading(show: Boolean) {
-        mBindingView.lpbLoading.visibility = if (show) View.VISIBLE else View.GONE
-    }
+//
+//    override fun loading(show: Boolean) {
+//        mBindingView.lpbLoading.visibility = if (show) View.VISIBLE else View.GONE
+//    }
 
     override fun onDestroy() {
         super.onDestroy()

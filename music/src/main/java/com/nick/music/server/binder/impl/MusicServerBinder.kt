@@ -50,7 +50,7 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
     }
 
     override fun getPlayInfo(): PlayInfo {
-        return playerControl.getCurrentInfo()
+        return playerControl.getCurrentPlayInfo()
     }
 
     override fun release() {
@@ -58,11 +58,11 @@ class MusicServerBinder(private val playerControl: PlayerControl) :Binder(),Musi
     }
 
     override fun registerCallBack(callBack: PlayInfoCallBack) {
-        playerControl.registerCallBack(callBack)
+        playerControl.registerPlayInfoCallBack(callBack)
     }
 
     override fun removeCallBack(callBack: PlayInfoCallBack) {
-        playerControl.removeCallBack(callBack)
+        playerControl.removePlayInfoCallCallBack(callBack)
     }
 
     override fun setPlayMode(playMode: PlayMode) {

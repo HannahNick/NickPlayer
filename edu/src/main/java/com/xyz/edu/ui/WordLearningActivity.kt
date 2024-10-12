@@ -72,7 +72,7 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
         mPersonPlanItemId = intent.getStringExtra(PERSON_PLAN_ITEM_ID)?:""
         mItemIndex = intent.getIntExtra(ITEM_INDEX,0)
         L.i("zipUrl:$zipUrl zipMd5:$zipMd5 personPlanItemId:$mPersonPlanItemId")
-        mAudioPlayer.registerCallBack(this)
+        mAudioPlayer.registerPlayInfoCallBack(this)
         presenter.downZip(zipUrl,zipMd5)
 
     }
@@ -95,23 +95,23 @@ class WordLearningActivity : BaseActivity<IWordLearningC.Presenter>(),IWordLearn
         presenter.release()
     }
 
-    override fun playEnd(playIndex: Int) {
-        // 切图，换文本
-        val currentIndex = playIndex+1
-        if (currentIndex < mImgList.size){
-            val imgPath = mImgList[currentIndex]
-            val imgText = mTextList[currentIndex]
-            L.i("imgPath:$imgPath \n imgText:$imgText")
-            Glide.with(this)
-                .load(imgPath)
-                .into(mBinding.ivLessonImg)
-            mBinding.tvWord.text = imgText
-        }else{//已经播完了，就上报学习记录
-            presenter.reportStudyResult(mPersonPlanItemId)
-            PlanManager.toNextPlanItem(this,mItemIndex)
-        }
-
-    }
+//    override fun playEnd(playIndex: Int) {
+//        // 切图，换文本
+//        val currentIndex = playIndex+1
+//        if (currentIndex < mImgList.size){
+//            val imgPath = mImgList[currentIndex]
+//            val imgText = mTextList[currentIndex]
+//            L.i("imgPath:$imgPath \n imgText:$imgText")
+//            Glide.with(this)
+//                .load(imgPath)
+//                .into(mBinding.ivLessonImg)
+//            mBinding.tvWord.text = imgText
+//        }else{//已经播完了，就上报学习记录
+//            presenter.reportStudyResult(mPersonPlanItemId)
+//            PlanManager.toNextPlanItem(this,mItemIndex)
+//        }
+//
+//    }
 
     override fun getZipData(dirPath: String,zipDataList: List<ZipDataVo>) {
         L.i("dirPath:$dirPath ,zipDataList:$zipDataList")

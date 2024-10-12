@@ -6,6 +6,7 @@ import com.nick.music.entity.AudioTrackType
 import com.nick.music.entity.PlayInfo
 import com.nick.music.server.PlayMode
 import com.nick.music.server.TrackType
+import com.nick.music.util.MusicPlayNode
 
 interface PlayerControl {
     /**
@@ -17,6 +18,11 @@ interface PlayerControl {
      * 强化播放
      */
     fun forcePlay(index: Int){}
+
+    /**
+     * 准备
+     */
+    fun prepare(index: Int = 0){}
 
     /**
      * 当播放器准备好后播放
@@ -46,9 +52,14 @@ interface PlayerControl {
     fun seek(position: Long){}
 
     /**
-     * 设置升降key,只能从0到24之间变换
+     * 设置升降key,只能从0到24之间变换,用于seekBar的使用，12是中间值
      */
     fun setKey(key: Int){}
+
+    /**
+     * 设置升降key,exoPlayer可接受的类型,1是不变调值
+     */
+    fun setKey(key: Float = 1f){}
 
     /**
      * 下一首
@@ -80,6 +91,8 @@ interface PlayerControl {
      */
     fun appendPlayList(data: List<MusicVo>){}
 
+    fun removeData(index: Int): MusicVo?{return null}
+
     /**
      * 获取播放列表
      */
@@ -88,12 +101,12 @@ interface PlayerControl {
     /**
      * 获取当前播放信息和状态
      */
-    fun getCurrentInfo(): PlayInfo
+    fun getCurrentPlayInfo(): PlayInfo
 
     /**
      * 下一首歌信息
      */
-    fun getNextCurrentInfo(): PlayInfo
+    fun getNextPlayInfo(): PlayInfo
 
     /**
      * 释放资源
@@ -103,17 +116,23 @@ interface PlayerControl {
     /**
      * 注册播放位置回调
      */
-    fun registerCallBack(callBack: PlayInfoCallBack){}
+    fun registerPlayInfoCallBack(callBack: PlayInfoCallBack){}
 
     /**
      * 移除播放位置回调
      */
-    fun removeCallBack(callBack: PlayInfoCallBack){}
+    fun removePlayInfoCallCallBack(callBack: PlayInfoCallBack){}
+
+    fun registerPositionCallBack(callBack: PlayPositionCallBack){}
+
+    fun removePositionCallBack(callBack: PlayPositionCallBack){}
 
     /**
      * 设置播放模式 null下一个模式
      */
     fun setPlayMode(playMode: PlayMode? = null){}
+
+    fun setPlayModeList(playNodeList: MusicPlayNode<PlayMode>){}
 
     /**
      * 获取随机播放列表数据
@@ -160,7 +179,15 @@ interface PlayerControl {
      */
     fun changeTrack(audioTrackType: AudioTrackType)
 
+    fun changeTrack(trackIndex: Int){}
+
     fun getCurrentAudioTrack(): AudioTrackType
 
     fun toggle()
+
+    fun resumePlay(){}
+
+    fun getSessionId():Int
+
+    fun dispatchSongIsRemove(needCallUI: Boolean){}
 }

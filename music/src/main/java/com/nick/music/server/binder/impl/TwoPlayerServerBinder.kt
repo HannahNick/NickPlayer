@@ -66,11 +66,11 @@ class TwoPlayerServerBinder(private val vodControl: PlayerControl, private val m
     }
 
     override fun registerCallBack(callBack: PlayInfoCallBack) {
-        musicControl.registerCallBack(callBack)
+        musicControl.registerPlayInfoCallBack(callBack)
     }
 
     override fun removeCallBack(callBack: PlayInfoCallBack) {
-        musicControl.removeCallBack(callBack)
+        musicControl.removePlayInfoCallCallBack(callBack)
     }
 
     override fun release() {
